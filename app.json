@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Rolê que Rende",
+    "slug": "role-que-rende",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "rolequerende",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": { "supportsTablet": true },
+    "android": { "edgeToEdgeEnabled": true },
+    "web": { "bundler": "metro", "output": "single" },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true }
+  }
+}
