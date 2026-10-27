@@ -55,5 +55,25 @@ o tempo é curto. Prefira código direto e legível a padrões cerimoniais.
 
 - Componentes em PascalCase; hooks `useAlgo`; arquivos de feature em camelCase.
 - Commits no padrão Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`.
-- Uma branch por feature; abra PR para `main`.
 - Textos de interface em **português brasileiro** natural.
+
+## Fluxo de branches (gitflow)
+
+```
+main                  ← estável; só recebe merge de dev (protegida: PR + 1 aprovação)
+└── dev               ← integração; branch padrão no GitHub
+    ├── feat/vila           ← feature, sai de dev e volta para dev
+    │   ├── sub/vila-mapa       ← sub-branch, sai de feat/vila e volta para feat/vila
+    │   └── sub/vila-painel
+    └── fix/<nome>          ← correção, sai de dev e volta para dev
+```
+
+- **Nunca** commite direto em `main`. Todo trabalho começa a partir de `dev`.
+- Features: `feat/<feature>` a partir de `dev`. Correções: `fix/<nome>` a partir de `dev`.
+- Sub-branches de uma feature: `sub/<feature>-<parte>` a partir de `feat/<feature>`
+  (ex.: `sub/vila-mapa`). Não use `feat/vila/mapa` — o git não permite
+  `feat/vila` e `feat/vila/mapa` ao mesmo tempo.
+- Nomes de branch em minúsculas, com hífen (`feat/pesquisa-diagnostica`).
+- Merge sempre com **merge commit** (squash e rebase estão desativados no repo).
+  A branch é apagada automaticamente após o merge do PR.
+- `dev` → `main` só quando houver uma versão estável (marco, demo, entrega).

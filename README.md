@@ -57,6 +57,20 @@ supabase/         # schema SQL + RLS + Edge Function do chat
 docs/             # MVP, arquitetura, edital, gamificação
 ```
 
+## Fluxo de branches
+
+Usamos gitflow: `dev` é a branch padrão e de integração; `main` só recebe
+versões estáveis vindas de `dev`.
+
+```bash
+git switch dev && git pull
+git switch -c feat/vila            # nova feature a partir de dev
+git switch -c sub/vila-mapa        # sub-branch a partir de feat/vila
+```
+
+PRs: `sub/*` → `feat/*` → `dev` → `main`, sempre com merge commit.
+Detalhes em `AGENTS.md` (seção "Fluxo de branches").
+
 ## Documentos
 
 - `docs/MVP.md` — escopo e fluxo das telas
