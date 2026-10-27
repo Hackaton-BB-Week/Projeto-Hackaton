@@ -7,10 +7,23 @@
     "scheme": "rolequerende",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "ios": { "supportsTablet": true },
-    "android": { "edgeToEdgeEnabled": true },
-    "web": { "bundler": "metro", "output": "single" },
-    "plugins": ["expo-router"],
-    "experiments": { "typedRoutes": true }
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

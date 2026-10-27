@@ -13,13 +13,13 @@ também `docs/MVP.md`, `docs/GAMIFICACAO.md` e `docs/EDITAL.md`.
 
 - Expo (React Native) + TypeScript + Expo Router.
 - Zustand (estado de UI) + TanStack Query (dados do Supabase).
-- Supabase (Postgres + Auth + RLS + Edge Functions). pnpm como gerenciador.
+- Supabase (Postgres + Auth + RLS + Edge Functions). npm como gerenciador.
 
 ```bash
-pnpm install          # instalar
-pnpm start            # rodar o app (Expo)
-pnpm lint             # ESLint
-pnpm typecheck        # tsc --noEmit
+npm install           # instalar
+npm start             # rodar o app (Expo)
+npm run lint          # ESLint
+npm run typecheck     # tsc --noEmit
 ```
 
 ## Arquitetura (siga à risca)

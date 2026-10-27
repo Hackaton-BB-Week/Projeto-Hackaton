@@ -26,20 +26,19 @@ multiplica o ganho diário (×1 → ×1,2 → ×1,5 → ×2 → ×3). Ver `docs/
 | Estado | **Zustand** (UI) + **TanStack Query** (dados do Supabase) |
 | Backend | **Supabase** (Postgres + Auth + RLS + Edge Functions) |
 | IA (chat) | **Supabase Edge Function** (proxy — a chave da LLM nunca vai pro app) |
-| Gerenciador | **pnpm** |
+| Gerenciador | **npm** |
 
-> Decisões assumidas: **pnpm** e **Edge Function** para a IA. Para trocar por
-> npm, use `npm` no lugar de `pnpm`. Para hospedar a IA na Vercel em vez do
+> Decisões assumidas: **npm** e **Edge Function** para a IA. Para hospedar a IA na Vercel em vez do
 > Supabase, mova `supabase/functions/chat` para uma rota serverless e ajuste a
 > URL em `.env`.
 
 ## Como rodar
 
 ```bash
-pnpm install
+npm install
 cp .env.example .env    # preencha com suas chaves do Supabase
 npx expo install        # alinha as versões nativas ao SDK do Expo
-pnpm start              # abre o Expo; leia o QR com o Expo Go
+npm start               # abre o Expo; leia o QR com o Expo Go
 ```
 
 ## Estrutura
