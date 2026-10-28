@@ -19,9 +19,8 @@ export const MENU_SECTIONS: MenuSection[] = [
   {
     title: 'Ferramentas de apoio',
     items: [
-      // Rota /pre-jogo pronta na branch feat/pre-jogo (aguardando merge).
-      { id: 'prejogo', label: 'Modo pré-jogo', icon: 'shield', href: null },
-      // Abre a aba Ajuda; com feat/pre-jogo mergeada, já abre o exercício direto.
+      { id: 'prejogo', label: 'Modo pré-jogo', icon: 'shield', href: '/pre-jogo' },
+      // Abre a aba Ajuda já com o exercício de respiração.
       { id: 'respiracao', label: 'Respiração guiada', icon: 'wind', href: '/ajuda?respirar=1' },
       { id: 'chat', label: 'Conversar com a Rô', icon: 'message-circle', href: '/chat' },
       { id: 'financeiro', label: 'Painel financeiro', icon: 'credit-card', href: '/financeiro' },
