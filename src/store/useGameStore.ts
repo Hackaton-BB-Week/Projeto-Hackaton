@@ -18,17 +18,12 @@ export function dailyCoinGain(weeklySpend: number, streak: number): number {
   return Math.round((weeklySpend / 7) * multiplierForStreak(streak));
 }
 
-export type VillageTask = 'roof' | 'walls' | 'frontGarden' | 'tree' | 'bench';
-
-type Village = Partial<Record<VillageTask, { style: number }>>;
-
 interface GameState {
   weeklySpend: number;
   streak: number;
   total: number;
   relapses: number;
   coins: number;
-  village: Village;
   villageGrey: boolean;
   missionDone: boolean;
 
@@ -36,7 +31,8 @@ interface GameState {
   advanceDays: (n: number) => void;
   registerRelapse: () => void;
   completeMission: (bonus?: number) => void;
-  restore: (task: VillageTask, style: number, cost: number) => void;
+  /** Gasta moedas se houver saldo. Retorna false (sem gastar nada) se não houver. */
+  spendCoins: (cost: number) => boolean;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -45,7 +41,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   total: 1,
   relapses: 0,
   coins: 0,
-  village: {},
   villageGrey: false,
   missionDone: false,
 
@@ -74,9 +69,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   completeMission: (bonus = 15) =>
     set((s) => (s.missionDone ? s : { missionDone: true, coins: s.coins + bonus })),
 
-  restore: (task, style, cost) => {
-    const s = get();
-    if (s.coins < cost) return;
-    set({ coins: s.coins - cost, village: { ...s.village, [task]: { style } } });
+  spendCoins: (cost) => {
+    if (get().coins < cost) return false;
+    set((s) => ({ coins: s.coins - cost }));
+    return true;
   },
 }));
