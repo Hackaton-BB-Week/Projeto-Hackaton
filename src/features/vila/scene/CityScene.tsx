@@ -11,13 +11,11 @@ interface Props {
   built: BuiltMap;
   width: number;
   height: number;
-  /** Toque em um lote (construído ou não). */
-  onPlotPress?: (plotId: string) => void;
 }
 
 // Cidade isométrica inteira. Desenha do fundo para a frente (gx + gy crescente)
-// para que os prédios da frente cubram os de trás.
-function CityScene({ cityIndex, built, width, height, onPlotPress }: Props) {
+// para que os prédios da frente cubram os de trás. O toque nos lotes é tratado em CityView.
+function CityScene({ cityIndex, built, width, height }: Props) {
   const city = CITIES[cityIndex];
 
   const content = useMemo(() => {
@@ -49,19 +47,11 @@ function CityScene({ cityIndex, built, width, height, onPlotPress }: Props) {
         {objects.map((o, i) => {
           const d = new Painter(city.ox, city.oy);
           o.draw(d);
-          const plotId = o.plot;
-          return (
-            <G
-              key={plotId ?? `a${i}`}
-              onPress={plotId && onPlotPress ? () => onPlotPress(plotId) : undefined}
-            >
-              {d.els}
-            </G>
-          );
+          return <G key={o.plot ?? `a${i}`}>{d.els}</G>;
         })}
       </>
     );
-  }, [city, built, onPlotPress]);
+  }, [city, built]);
 
   const b = city.bounds;
   return (
