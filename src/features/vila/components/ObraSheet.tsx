@@ -1,24 +1,33 @@
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { styleOptionsFor, type Plot } from '../data/cities';
 import { BuildingPreview } from '../scene/CityScene';
 import { isAvailable, type BuiltMap } from '@/store/useVilaStore';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 interface Props {
-  plot: Plot | null;
+  plot: Plot;
   built: BuiltMap;
   coins: number;
   onBuild: (plotId: string, style: number) => void;
   onClose: () => void;
+  /** Espaço da barra de navegação do sistema, embaixo do painel. */
+  bottomInset?: number;
 }
 
 // Painel de uma obra: estado, benefício, custo, requisito, estilo e botão de construir.
-export default function ObraSheet({ plot, built, coins, onBuild, onClose }: Props) {
+// Aparece por cima do app pela rota app/obra.tsx (apresentação transparentModal).
+export default function ObraSheet({
+  plot,
+  built,
+  coins,
+  onBuild,
+  onClose,
+  bottomInset = 0,
+}: Props) {
   const [style, setStyle] = useState(0);
-  useEffect(() => setStyle(0), [plot?.id]);
+  useEffect(() => setStyle(0), [plot.id]);
 
-  if (!plot) return null;
   const done = built[plot.id];
   const available = isAvailable(plot, built);
   const canPay = coins >= plot.cost;
@@ -26,9 +35,12 @@ export default function ObraSheet({ plot, built, coins, onBuild, onClose }: Prop
   const state = done ? 'Concluída' : available ? 'Pronta para construir' : 'Bloqueada';
 
   return (
-    <Modal transparent animationType="slide" visible onRequestClose={onClose}>
+    <View style={styles.root}>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Fechar painel" />
-      <View style={styles.sheet} accessibilityViewIsModal>
+      <View
+        style={[styles.sheet, { paddingBottom: spacing.xl + bottomInset }]}
+        accessibilityViewIsModal
+      >
         <View style={styles.grab} />
         <Text style={styles.title} accessibilityRole="header">
           {plot.name}
@@ -81,7 +93,7 @@ export default function ObraSheet({ plot, built, coins, onBuild, onClose }: Prop
           <Button label={done ? 'Fechar' : 'Entendi'} onPress={onClose} />
         )}
       </View>
-    </Modal>
+    </View>
   );
 }
 
@@ -127,6 +139,7 @@ function Button({
 }
 
 const styles = StyleSheet.create({
+  root: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { flex: 1, backgroundColor: 'rgba(10,20,40,.45)' },
   sheet: {
     backgroundColor: colors.surface,
