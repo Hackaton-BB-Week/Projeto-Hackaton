@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { router } from 'expo-router';
 import { AccessibilityInfo, Pressable, StyleSheet, Text, View } from 'react-native';
 import CityHeader from './components/CityHeader';
-import ObraSheet from './components/ObraSheet';
 import ObrasList from './components/ObrasList';
 import { CITIES } from './data/cities';
 import CityView from './scene/CityView';
@@ -10,14 +10,14 @@ import { builtCount, isCityComplete, useVilaStore } from '@/store/useVilaStore';
 import { formatCoins } from '@/lib/format';
 import { colors, radius, spacing } from '@/theme/tokens';
 
-// Bloco da vila para a tela Início: cidade com câmera, lista de obras e painel.
+// Bloco da vila para a tela Início: cidade com câmera e lista de obras. O painel da
+// obra abre como rota (app/obra.tsx).
 // É autossuficiente (lê e grava nos stores), então a Home só precisa de <VilaSection />.
 export default function VilaSection() {
   const coins = useGameStore((s) => s.coins);
-  const { cityIndex, built: builtByCity, build, nextCity } = useVilaStore();
+  const { cityIndex, built: builtByCity, nextCity } = useVilaStore();
   const city = CITIES[cityIndex];
   const built = builtByCity[cityIndex];
-  const [openId, setOpenId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,21 +27,26 @@ export default function VilaSection() {
     return () => clearTimeout(t);
   }, [notice]);
 
-  const onBuild = (plotId: string, style: number) => {
-    if (build(plotId, style)) {
-      setOpenId(null);
-      setNotice('Obra concluída!');
-    }
-  };
+  // Avisa quando uma obra nova é concluída (a construção acontece no painel).
+  const done = builtCount(built);
+  const lastDone = useRef({ cityIndex, done });
+  useEffect(() => {
+    const last = lastDone.current;
+    if (last.cityIndex === cityIndex && done > last.done) setNotice('Obra concluída!');
+    lastDone.current = { cityIndex, done };
+  }, [cityIndex, done]);
 
-  const onPlotPress = useCallback((id: string) => setOpenId(id), []);
+  const openObra = useCallback(
+    (id: string) => router.push({ pathname: '/obra', params: { id } }),
+    [],
+  );
   const complete = isCityComplete(cityIndex, built);
   const next = CITIES[cityIndex + 1];
 
   return (
     <View style={styles.c}>
-      <CityHeader name={city.name} done={builtCount(built)} total={city.plots.length} />
-      <CityView cityIndex={cityIndex} built={built} onPlotPress={onPlotPress} />
+      <CityHeader name={city.name} done={done} total={city.plots.length} />
+      <CityView cityIndex={cityIndex} built={built} onPlotPress={openObra} />
       {notice && (
         <View style={styles.notice} accessibilityLiveRegion="polite">
           <Text style={styles.noticeTxt}>{notice}</Text>
@@ -71,7 +76,7 @@ export default function VilaSection() {
         </Text>
         <Text style={styles.coins}>● {formatCoins(coins)} moedas</Text>
       </View>
-      <ObrasList city={city} built={built} onOpen={setOpenId} />
+      <ObrasList city={city} built={built} onOpen={openObra} />
 
       {__DEV__ && (
         <Pressable
@@ -82,14 +87,6 @@ export default function VilaSection() {
           <Text style={styles.devTxt}>+300 moedas (só em desenvolvimento)</Text>
         </Pressable>
       )}
-
-      <ObraSheet
-        plot={city.plots.find((p) => p.id === openId) ?? null}
-        built={built}
-        coins={coins}
-        onBuild={onBuild}
-        onClose={() => setOpenId(null)}
-      />
     </View>
   );
 }

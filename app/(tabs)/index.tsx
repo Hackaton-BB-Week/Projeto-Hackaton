@@ -1,4 +1,6 @@
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+// ScrollView do gesture-handler: deixa o arraste/pinça da vila ganhar da rolagem da página.
+import { ScrollView } from 'react-native-gesture-handler';
 import { VilaSection } from '@/features/vila';
 import { useProfile } from '@/hooks/useProfile';
 import { formatBRL, formatCoins } from '@/lib/format';

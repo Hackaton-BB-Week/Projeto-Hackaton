@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
-import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -15,9 +15,11 @@ import CityScene from './CityScene';
 import { HH, HW } from './painter';
 
 // Câmera da vila: arrastar, pinça e botões +/−, com limites para a cidade não
-// sumir da tela. O zoom é real: o SVG é vetorial e é redesenhado na escala nova.
+// sumir da tela. O SVG é desenhado RENDER_SCALE vezes maior e reduzido na tela: no Android
+// a escala de uma View amplia a imagem já pronta, então desenhar grande mantém o zoom nítido.
 const MIN_ZOOM = 1;
-const MAX_ZOOM = 2.8;
+const MAX_ZOOM = 2.5;
+const RENDER_SCALE = MAX_ZOOM;
 const START_ZOOM = 1.45;
 
 interface Props {
@@ -101,7 +103,9 @@ export default function CityView({ cityIndex, built, height = 280, onPlotPress }
     [built, cityIndex, height, onPlotPress, width],
   );
 
+  // minDistance baixo: o mapa assume o arraste antes de a página começar a rolar.
   const pan = Gesture.Pan()
+    .minDistance(4)
     .onStart(() => {
       start.value = { s: scale.value, x: tx.value, y: ty.value };
     })
@@ -154,26 +158,47 @@ export default function CityView({ cityIndex, built, height = 280, onPlotPress }
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: tx.value }, { translateY: ty.value }, { scale: scale.value }],
+    transform: [
+      { translateX: tx.value },
+      { translateY: ty.value },
+      { scale: scale.value / RENDER_SCALE },
+    ],
   }));
 
   const city = CITIES[cityIndex];
   const done = Object.keys(built).length;
 
   return (
-    <GestureHandlerRootView style={[styles.viewport, { height }]}>
+    // O recorte (overflow) fica numa View comum: no Android, o GestureHandlerRootView não recorta.
+    <View style={[styles.viewport, { height }]} collapsable={false}>
       {/* O detector fica na camada fixa: assim os toques chegam em coordenadas da tela. */}
       <GestureDetector gesture={gesture}>
         <View
-          style={StyleSheet.absoluteFill}
+          style={[StyleSheet.absoluteFill, styles.clip]}
           collapsable={false}
           onLayout={onLayout}
           accessible
           accessibilityLabel={`Mapa da cidade ${city.name}: ${done} de ${city.plots.length} obras concluídas. Use a lista de obras abaixo para construir.`}
         >
-          <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                left: (width - width * RENDER_SCALE) / 2,
+                top: (height - height * RENDER_SCALE) / 2,
+                width: width * RENDER_SCALE,
+                height: height * RENDER_SCALE,
+              },
+              animatedStyle,
+            ]}
+          >
             {width > 0 && (
-              <CityScene cityIndex={cityIndex} built={built} width={width} height={height} />
+              <CityScene
+                cityIndex={cityIndex}
+                built={built}
+                width={width * RENDER_SCALE}
+                height={height * RENDER_SCALE}
+              />
             )}
           </Animated.View>
         </View>
@@ -182,7 +207,7 @@ export default function CityView({ cityIndex, built, height = 280, onPlotPress }
         <ZoomButton label="+" a11y="Aproximar" onPress={() => zoomBy(1.3)} />
         <ZoomButton label="−" a11y="Afastar" onPress={() => zoomBy(1 / 1.3)} />
       </View>
-    </GestureHandlerRootView>
+    </View>
   );
 }
 
@@ -213,6 +238,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     backgroundColor: colors.sky2,
   },
+  clip: { overflow: 'hidden' },
   zoom: { position: 'absolute', right: 10, bottom: 10, gap: 8 },
   zoomBtn: {
     width: 44,
