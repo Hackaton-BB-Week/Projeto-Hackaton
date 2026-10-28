@@ -1,11 +1,14 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import { formatBRL } from '@/lib/format';
 import { useFinance } from '../useFinance';
 
 // Atalho autocontido para a Home: basta colocar <FinanceShortcut /> na tela.
 export function FinanceShortcut() {
+  const styles = useThemedStyles(makeStyles);
   const { notBet } = useFinance();
   return (
     <Pressable
@@ -26,7 +29,8 @@ export function FinanceShortcut() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -40,7 +44,7 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.85 },
   flex: { flex: 1 },
-  t: { fontSize: 15, fontWeight: '700', color: colors.ink },
-  d: { fontSize: 12, color: colors.muted, marginTop: 2 },
-  chev: { fontSize: 24, color: colors.blue, fontWeight: '600' },
+  t: { fontSize: fs(15), fontWeight: '700', color: colors.ink },
+  d: { fontSize: fs(12), color: colors.muted, marginTop: 2 },
+  chev: { fontSize: fs(24), color: colors.brand, fontWeight: '600' },
 });

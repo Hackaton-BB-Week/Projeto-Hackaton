@@ -6,7 +6,9 @@ import { useSwipeToClose } from '@/hooks/useSwipeToClose';
 import { styleOptionsFor, type Plot } from '../data/cities';
 import { BuildingPreview } from '../scene/CityScene';
 import { isAvailable, type BuiltMap } from '@/store/useVilaStore';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 interface Props {
   plot: Plot;
@@ -28,6 +30,7 @@ export default function ObraSheet({
   onClose,
   bottomInset = 0,
 }: Props) {
+  const styles = useThemedStyles(makeStyles);
   const [style, setStyle] = useState(0);
   // Fecha deslizando para baixo, o mesmo caminho por onde entrou.
   const swipe = useSwipeToClose(onClose);
@@ -109,6 +112,7 @@ export default function ObraSheet({
 }
 
 function Row({ k, v }: { k: string; v: string }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.row}>
       <Text style={styles.k}>{k}</Text>
@@ -130,6 +134,7 @@ function Button({
   disabled?: boolean;
   hint?: string;
 }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <Pressable
       onPress={onPress}
@@ -149,7 +154,8 @@ function Button({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { flex: 1, backgroundColor: 'rgba(10,20,40,.45)' },
   sheet: {
@@ -167,11 +173,11 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: colors.line,
   },
-  title: { fontSize: 20, fontWeight: '700', color: colors.ink },
-  zone: { fontSize: 13, color: colors.muted, marginTop: -6 },
+  title: { fontSize: fs(20), fontWeight: '700', color: colors.ink },
+  zone: { fontSize: fs(13), color: colors.muted, marginTop: -6 },
   hero: {
     alignItems: 'center',
-    backgroundColor: colors.sky,
+    backgroundColor: colors.bg,
     borderRadius: radius.lg,
     paddingVertical: spacing.sm,
   },
@@ -183,11 +189,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
   },
-  k: { fontSize: 14, color: colors.muted },
-  v: { fontSize: 14, color: colors.ink, fontWeight: '600', flexShrink: 1, textAlign: 'right' },
+  k: { fontSize: fs(14), color: colors.muted },
+  v: { fontSize: fs(14), color: colors.ink, fontWeight: '600', flexShrink: 1, textAlign: 'right' },
   eyebrow: {
     marginTop: spacing.sm,
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '700',
     color: colors.navy,
     textTransform: 'uppercase',
@@ -203,9 +209,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.line,
   },
-  styleSel: { borderColor: colors.blue, backgroundColor: colors.sky },
+  styleSel: { borderColor: colors.brand, backgroundColor: colors.bg },
   swatch: { width: 18, height: 18, borderRadius: 9 },
-  styleTxt: { fontSize: 13, color: colors.ink, fontWeight: '600' },
+  styleTxt: { fontSize: fs(13), color: colors.ink, fontWeight: '600' },
   btn: {
     minHeight: 48,
     borderRadius: radius.md,
@@ -214,6 +220,6 @@ const styles = StyleSheet.create({
   },
   btnPrimary: { backgroundColor: colors.gold, marginTop: spacing.sm },
   btnDisabled: { backgroundColor: colors.line },
-  btnTxt: { fontSize: 15, fontWeight: '700', color: colors.muted },
+  btnTxt: { fontSize: fs(15), fontWeight: '700', color: colors.muted },
   btnPrimaryTxt: { color: colors.goldInk },
 });
