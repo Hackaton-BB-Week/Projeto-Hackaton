@@ -12,25 +12,28 @@ import { FinanceShortcut } from '@/features/financeiro/components/FinanceShortcu
 export default function Hub() {
   const { coins, preserved, multiplier } = useProfile();
   return (
-    <ScrollView style={styles.scroll} contentContainerStyle={styles.c}>
-      <View style={styles.hud}>
-        <Text style={styles.h}>Olá!</Text>
-        <Text style={styles.m}>Moedas: {formatCoins(coins)}</Text>
-        <Text style={styles.m}>Preservado: {formatBRL(preserved)}</Text>
-        <Text style={styles.m}>Multiplicador: x{multiplier}</Text>
-        <FinanceShortcut />
-      </View>
-      <VilaSection
-        mapOverlay={<PlantBadge />}
-        belowMap={
-          <>
-            <RecoveryBanner />
-            <DailyActions />
-          </>
-        }
-      />
+    <>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.c}>
+        <View style={styles.hud}>
+          <Text style={styles.h}>Olá!</Text>
+          <Text style={styles.m}>Moedas: {formatCoins(coins)}</Text>
+          <Text style={styles.m}>Preservado: {formatBRL(preserved)}</Text>
+          <Text style={styles.m}>Multiplicador: x{multiplier}</Text>
+          <FinanceShortcut />
+        </View>
+        <VilaSection
+          mapOverlay={<PlantBadge />}
+          belowMap={
+            <>
+              <RecoveryBanner />
+              <DailyActions />
+            </>
+          }
+        />
+      </ScrollView>
+      {/* Fora do ScrollView: no Android, um Modal dentro dele abre encolhido. */}
       <PlantSheets />
-    </ScrollView>
+    </>
   );
 }
 
