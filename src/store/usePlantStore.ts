@@ -34,6 +34,8 @@ interface PlantState {
   /** Murcha a planta se a pessoa passou um dia inteiro sem cuidar dela. */
   checkAbsence: () => void;
   devAdvanceDay: () => void;
+  /** Começa do zero (novo login). `lastDayNum` permite simular a demonstração. */
+  reset: (lastDayNum?: number | null) => void;
 }
 
 export const usePlantStore = create<PlantState>()(
@@ -100,6 +102,16 @@ export const usePlantStore = create<PlantState>()(
       },
 
       devAdvanceDay: () => set((s) => ({ dayOffset: s.dayOffset + 1 })),
+
+      reset: (lastDayNum = null) =>
+        set({
+          lastDayNum,
+          lastCareDay: lastDayNum ?? dayNumber(),
+          relapseDays: [],
+          mood: 'healthy',
+          witherReason: null,
+          dayOffset: 0,
+        }),
     }),
     {
       name: 'rqr-plant',
