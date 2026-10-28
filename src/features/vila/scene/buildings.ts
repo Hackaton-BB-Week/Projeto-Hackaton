@@ -12,35 +12,36 @@ const ROOFS: [string, string][] = [
 ];
 
 /** Árvore em blocos: tronco no chão, copa apoiada no tronco e uma camada menor por cima. */
+// A copa começa acima de ~5 de altura para o tronco aparecer embaixo dela (o canto da
+// frente da copa fica 4,8 abaixo do canto da frente do tronco, por causa da perspectiva).
 export function treeBlock(d: Painter, gx: number, gy: number, sc = 1, z = 0) {
   if (z === 0) d.shadow(gx + 0.3, gy + 0.3, 0.4, 0.4);
-  d.box(gx + 0.44, gy + 0.44, 0.12, 0.12, 6 * sc, '#9c6b3f', '#86592f', '#6e4824', z);
-  d.box(gx + 0.28, gy + 0.28, 0.44, 0.44, 9 * sc, '#5bbf3f', '#4aa832', '#3d9029', z + 5 * sc);
-  d.box(gx + 0.35, gy + 0.35, 0.3, 0.3, 6 * sc, '#7ad95a', '#6bd14a', '#5bbf3f', z + 14 * sc);
+  d.box(gx + 0.44, gy + 0.44, 0.12, 0.12, 12 * sc, '#9c6b3f', '#86592f', '#6e4824', z);
+  d.box(gx + 0.28, gy + 0.28, 0.44, 0.44, 8 * sc, '#5bbf3f', '#4aa832', '#3d9029', z + 10 * sc);
+  d.box(gx + 0.35, gy + 0.35, 0.3, 0.3, 6 * sc, '#7ad95a', '#6bd14a', '#5bbf3f', z + 17 * sc);
 }
 
 function bigTree(d: Painter, gx: number, gy: number) {
   d.shadow(gx + 0.14, gy + 0.14, 0.72, 0.72);
-  d.box(gx + 0.4, gy + 0.4, 0.2, 0.2, 10, '#9c6b3f', '#86592f', '#6e4824');
-  d.box(gx + 0.1, gy + 0.1, 0.8, 0.8, 12, '#54b838', '#47a030', '#3a8928', 8);
-  d.box(gx + 0.22, gy + 0.22, 0.56, 0.56, 10, '#64cc45', '#54b838', '#47a030', 20);
-  d.box(gx + 0.33, gy + 0.33, 0.34, 0.34, 7, '#7ad95a', '#64cc45', '#54b838', 30);
+  d.box(gx + 0.4, gy + 0.4, 0.2, 0.2, 16, '#9c6b3f', '#86592f', '#6e4824');
+  d.box(gx + 0.1, gy + 0.1, 0.8, 0.8, 10, '#54b838', '#47a030', '#3a8928', 14);
+  d.box(gx + 0.22, gy + 0.22, 0.56, 0.56, 8, '#64cc45', '#54b838', '#47a030', 24);
+  d.box(gx + 0.33, gy + 0.33, 0.34, 0.34, 6, '#7ad95a', '#64cc45', '#54b838', 32);
 }
 
 function lamp(d: Painter, gx: number, gy: number) {
   const [x, y] = d.iso(gx + 0.5, gy + 0.5);
-  d.ellipse(x, y + 2, 4, 2, 'rgba(20,34,24,.14)');
+  d.ellipse(x + 3, y, 4, 2, 'rgba(20,34,24,.14)');
   d.rect(x - 1.4, y - 22, 2.8, 22, '#6a7486', 1);
   d.rect(x - 3, y - 26, 6, 5, '#ffd45e', 2);
 }
 
+// Banco em blocos isométricos: encosto (atrás), pés e assento, todos encostados.
 function bench(d: Painter, gx: number, gy: number, z = 0) {
-  const [x, yGround] = d.iso(gx + 0.5, gy + 0.5);
-  const y = yGround - z;
-  d.rect(x - 7, y - 4, 14, 3.4, '#b5793f', 1.4);
-  d.rect(x - 7, y - 9, 14, 3, '#c98a4e', 1.4);
-  d.rect(x - 6, y - 3, 2, 4, '#8a5a2b');
-  d.rect(x + 4, y - 3, 2, 4, '#8a5a2b');
+  d.box(gx + 0.3, gy + 0.4, 0.4, 0.05, 6, '#c98a4e', '#b5793f', '#8a5a2b', z + 3);
+  d.box(gx + 0.32, gy + 0.47, 0.04, 0.08, 3, '#8a5a2b', '#7a4f25', '#6a441f', z);
+  d.box(gx + 0.64, gy + 0.47, 0.04, 0.08, 3, '#8a5a2b', '#7a4f25', '#6a441f', z);
+  d.box(gx + 0.3, gy + 0.45, 0.4, 0.14, 1.5, '#c98a4e', '#b5793f', '#9a6430', z + 3);
 }
 
 function fountain(d: Painter, gx: number, gy: number, z = 0) {
@@ -162,10 +163,14 @@ const BUILDERS: Record<BuildingType, Builder> = {
     d.box(p.gx + 0.26, p.gy + 0.26, 0.48, 0.48, 13, '#ffe6a6', '#f3cd84', '#e4bb6a');
     d.roofPrism(p.gx + 0.2, p.gy + 0.2, 0.6, 0.6, 13, 7, '#ff8f6b', '#e0674a');
   },
+  // Píer: deck de madeira saindo da areia (atrás) para o mar, apoiado em estacas,
+  // com um poste de amarração na ponta.
   pier: (d, p) => {
-    d.shadow(p.gx + 0.1, p.gy + 0.35, 0.8, 0.3);
-    d.box(p.gx + 0.1, p.gy + 0.35, 0.8, 0.3, 6, '#d8a86a', '#bd8f4f', '#a37b3f');
-    d.box(p.gx + 0.74, p.gy + 0.3, 0.2, 0.4, 14, '#f0dca8', '#dcc488', '#c6ad70');
+    for (const ey of [0.12, 0.48, 0.84])
+      for (const ex of [0.37, 0.59])
+        d.box(p.gx + ex, p.gy + ey, 0.04, 0.04, 5, '#a37b3f', '#8a6534', '#6e4f27');
+    d.box(p.gx + 0.35, p.gy - 0.05, 0.3, 0.97, 2, '#d8a86a', '#bd8f4f', '#a37b3f', 5);
+    d.box(p.gx + 0.46, p.gy + 0.8, 0.08, 0.08, 4, '#8a6534', '#7a5a2e', '#6e4f27', 7);
   },
   plaza: (d, p) => {
     d.shadow(p.gx + 0.16, p.gy + 0.16, 0.68, 0.68);

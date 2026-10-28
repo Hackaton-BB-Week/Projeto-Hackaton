@@ -180,16 +180,13 @@ export class Painter {
     this.poly([at(gy1, z1), at(gy2, z1), at(gy2, z2), at(gy1, z2)], fill);
   }
 
+  /** Sombra no chão, projetada para a direita (sol vindo da esquerda). Fica rente à base,
+   *  então o objeto parece apoiado; uma sombra deslocada para baixo dava ideia de flutuar. */
   shadow(gx: number, gy: number, w: number, d: number) {
-    const o = 3;
-    const down = (p: Pt): Pt => [p[0], p[1] + o];
+    const sx = gx + 0.14;
+    const sy = gy - 0.14;
     this.poly(
-      [
-        down(this.iso(gx, gy)),
-        down(this.iso(gx + w, gy)),
-        down(this.iso(gx + w, gy + d)),
-        down(this.iso(gx, gy + d)),
-      ],
+      [this.iso(sx, sy), this.iso(sx + w, sy), this.iso(sx + w, sy + d), this.iso(sx, sy + d)],
       'rgba(20,34,24,.15)',
     );
   }
