@@ -152,7 +152,8 @@ function Button({
 
 const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { flex: 1, backgroundColor: 'rgba(10,20,40,.45)' },
+  // Cobre a tela inteira (atrás do painel): sem faixa clara quando o painel desliza.
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(10,20,40,.45)' },
   sheet: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: radius.xl,
