@@ -77,4 +77,5 @@ Detalhes em `AGENTS.md` (seção "Fluxo de branches").
 - `docs/ARQUITETURA.md` — padrões e regras de organização
 - `docs/GAMIFICACAO.md` — mecânica da Vila e da economia de moedas
 - `docs/EDITAL.md` — regras do edital e restrições que o produto DEVE respeitar
+- `docs/prototipo/role-que-rende.html` — protótipo interativo (referência de UX); abra no navegador
 - `AGENTS.md` — instruções para trabalhar com assistentes de IA neste repo

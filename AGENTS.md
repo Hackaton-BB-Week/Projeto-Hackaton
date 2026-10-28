@@ -9,6 +9,10 @@ App mobile "Rolê que Rende" (hackathon BBDW 2026) para apoiar quem quer repensa
 sua relação com apostas. Público amplo; tom acolhedor, nunca moralista. Leia
 também `docs/MVP.md`, `docs/GAMIFICACAO.md` e `docs/EDITAL.md`.
 
+O protótipo interativo em `docs/prototipo/role-que-rende.html` (HTML/JS puro) é
+a referência de UX: telas, textos e mecânicas devem ser portados dele para React
+Native. Ele não faz parte do app.
+
 ## Stack e comandos
 
 - Expo (React Native) + TypeScript + Expo Router.
