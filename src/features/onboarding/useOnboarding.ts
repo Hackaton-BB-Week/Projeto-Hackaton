@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useGameStore } from '@/store/useGameStore';
 import { useUserStore } from '@/store/useUserStore';
 import { useSurveyStore } from './useSurveyStore';
+import type { StartingPoint } from './profile';
 
 // Ações do fluxo de entrada. As telas só chamam estas funções.
 export function useOnboarding() {
@@ -15,6 +16,14 @@ export function useOnboarding() {
     router.push('/onboarding/pesquisa');
   };
 
+  /** Conclui a pesquisa: salva o resultado e começa a vila do zero (80 moedas, como no protótipo). */
+  const finishOnboarding = (sp: StartingPoint) => {
+    completeOnboarding({ weeklySpend: sp.weekly, trigger: sp.trigger, goal: sp.goal });
+    useGameStore.setState({ weeklySpend: sp.weekly, coins: 80, streak: 0, total: 0 });
+    useSurveyStore.getState().reset();
+    router.replace('/(tabs)');
+  };
+
   /** Atalho "Explorar demonstração": dados de exemplo, pula a pesquisa. */
   const startDemo = (typedName: string) => {
     setIdentity(typedName.trim() || 'Alex (exemplo)', '');
@@ -23,5 +32,5 @@ export function useOnboarding() {
     router.replace('/(tabs)');
   };
 
-  return { submitIdentity, startDemo };
+  return { submitIdentity, finishOnboarding, startDemo };
 }
