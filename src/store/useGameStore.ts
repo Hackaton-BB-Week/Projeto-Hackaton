@@ -31,6 +31,8 @@ interface GameState {
   advanceDays: (n: number) => void;
   registerRelapse: () => void;
   completeMission: (bonus?: number) => void;
+  /** Credita moedas ganhas (ex.: missões diárias). Ignora valores inválidos. */
+  earnCoins: (amount: number) => void;
   /** Gasta moedas se houver saldo. Retorna false (sem gastar nada) se não houver. */
   spendCoins: (cost: number) => boolean;
 }
@@ -68,6 +70,11 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   completeMission: (bonus = 15) =>
     set((s) => (s.missionDone ? s : { missionDone: true, coins: s.coins + bonus })),
+
+  earnCoins: (amount) => {
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    set((s) => ({ coins: s.coins + Math.round(amount) }));
+  },
 
   spendCoins: (cost) => {
     if (get().coins < cost) return false;
