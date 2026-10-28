@@ -25,8 +25,7 @@ export const MENU_SECTIONS: MenuSection[] = [
       { id: 'respiracao', label: 'Respiração guiada', icon: 'wind', href: '/ajuda?respirar=1' },
       { id: 'chat', label: 'Conversar com a Rô', icon: 'message-circle', href: '/chat' },
       { id: 'financeiro', label: 'Painel financeiro', icon: 'credit-card', href: '/financeiro' },
-      // Rota /missoes pronta na branch feat/missoes (aguardando merge).
-      { id: 'missoes', label: 'Missões do dia', icon: 'target', href: null },
+      { id: 'missoes', label: 'Missões do dia', icon: 'target', href: '/missoes' },
       { id: 'escolha', label: 'Aposta ou Escolha?', icon: 'check-square', href: null },
       { id: 'diagnostico', label: 'Refazer diagnóstico', icon: 'compass', href: null },
       { id: 'ajuda', label: 'Ajuda e recursos', icon: 'life-buoy', href: '/ajuda' },
