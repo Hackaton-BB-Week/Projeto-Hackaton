@@ -11,19 +11,20 @@ const ROOFS: [string, string][] = [
   ['#ffb23a', '#e89524'],
 ];
 
-export function treeBlock(d: Painter, gx: number, gy: number, sc = 1) {
-  d.shadow(gx + 0.3, gy + 0.3, 0.4, 0.4);
-  d.box(gx + 0.44, gy + 0.44, 0.12, 0.12, 9 * sc, '#9c6b3f', '#86592f', '#6e4824');
-  d.box(gx + 0.28, gy + 0.28, 0.44, 0.44, 12 * sc, '#5bbf3f', '#4aa832', '#3d9029');
-  d.box(gx + 0.35, gy + 0.35, 0.3, 0.3, 9 * sc, '#7ad95a', '#6bd14a', '#5bbf3f');
+/** Árvore em blocos: tronco no chão, copa apoiada no tronco e uma camada menor por cima. */
+export function treeBlock(d: Painter, gx: number, gy: number, sc = 1, z = 0) {
+  if (z === 0) d.shadow(gx + 0.3, gy + 0.3, 0.4, 0.4);
+  d.box(gx + 0.44, gy + 0.44, 0.12, 0.12, 6 * sc, '#9c6b3f', '#86592f', '#6e4824', z);
+  d.box(gx + 0.28, gy + 0.28, 0.44, 0.44, 9 * sc, '#5bbf3f', '#4aa832', '#3d9029', z + 5 * sc);
+  d.box(gx + 0.35, gy + 0.35, 0.3, 0.3, 6 * sc, '#7ad95a', '#6bd14a', '#5bbf3f', z + 14 * sc);
 }
 
 function bigTree(d: Painter, gx: number, gy: number) {
   d.shadow(gx + 0.14, gy + 0.14, 0.72, 0.72);
-  d.box(gx + 0.4, gy + 0.4, 0.2, 0.2, 24, '#9c6b3f', '#86592f', '#6e4824');
-  d.box(gx + 0.1, gy + 0.1, 0.8, 0.8, 20, '#54b838', '#47a030', '#3a8928');
-  d.box(gx + 0.22, gy + 0.22, 0.56, 0.56, 30, '#64cc45', '#54b838', '#47a030');
-  d.box(gx + 0.33, gy + 0.33, 0.34, 0.34, 37, '#7ad95a', '#64cc45', '#54b838');
+  d.box(gx + 0.4, gy + 0.4, 0.2, 0.2, 10, '#9c6b3f', '#86592f', '#6e4824');
+  d.box(gx + 0.1, gy + 0.1, 0.8, 0.8, 12, '#54b838', '#47a030', '#3a8928', 8);
+  d.box(gx + 0.22, gy + 0.22, 0.56, 0.56, 10, '#64cc45', '#54b838', '#47a030', 20);
+  d.box(gx + 0.33, gy + 0.33, 0.34, 0.34, 7, '#7ad95a', '#64cc45', '#54b838', 30);
 }
 
 function lamp(d: Painter, gx: number, gy: number) {
@@ -33,20 +34,23 @@ function lamp(d: Painter, gx: number, gy: number) {
   d.rect(x - 3, y - 26, 6, 5, '#ffd45e', 2);
 }
 
-function bench(d: Painter, gx: number, gy: number) {
-  const [x, y] = d.iso(gx + 0.5, gy + 0.5);
+function bench(d: Painter, gx: number, gy: number, z = 0) {
+  const [x, yGround] = d.iso(gx + 0.5, gy + 0.5);
+  const y = yGround - z;
   d.rect(x - 7, y - 4, 14, 3.4, '#b5793f', 1.4);
   d.rect(x - 7, y - 9, 14, 3, '#c98a4e', 1.4);
   d.rect(x - 6, y - 3, 2, 4, '#8a5a2b');
   d.rect(x + 4, y - 3, 2, 4, '#8a5a2b');
 }
 
-function fountain(d: Painter, gx: number, gy: number) {
-  const [x, y] = d.iso(gx + 0.5, gy + 0.5);
-  d.shadow(gx + 0.3, gy + 0.3, 0.4, 0.4);
-  d.box(gx + 0.3, gy + 0.3, 0.4, 0.4, 4, '#dcd9c6', '#ccc8b4', '#bbb7a2');
-  d.ellipse(x, y - 5, 10, 5, '#7fd0ec');
-  d.ellipse(x, y - 6, 5, 2.6, '#bdeafb');
+function fountain(d: Painter, gx: number, gy: number, z = 0) {
+  const [x, yGround] = d.iso(gx + 0.5, gy + 0.5);
+  const y = yGround - z;
+  if (z === 0) d.shadow(gx + 0.3, gy + 0.3, 0.4, 0.4);
+  d.box(gx + 0.3, gy + 0.3, 0.4, 0.4, 4, '#dcd9c6', '#ccc8b4', '#bbb7a2', z);
+  // A água cabe dentro da borda de pedra (o losango do topo tem 12 x 6 de meia largura/altura).
+  d.ellipse(x, y - 5, 8, 4, '#7fd0ec');
+  d.ellipse(x, y - 5.5, 4, 2, '#bdeafb');
 }
 
 function palm(d: Painter, gx: number, gy: number) {
@@ -56,7 +60,7 @@ function palm(d: Painter, gx: number, gy: number) {
   const ty = y - 20;
   d.rect(x - 14, ty - 4, 16, 7, '#4fc06a', 3, `rotate(-20 ${x - 14} ${ty - 4})`);
   d.rect(x - 2, ty - 4, 16, 7, '#4fc06a', 3, `rotate(20 ${x + 14} ${ty - 4})`);
-  d.rect(x - 7, ty - 9, 14, 7, '#4fc06a', 3);
+  d.rect(x - 7, ty - 7, 14, 7, '#4fc06a', 3);
 }
 
 type Builder = (d: Painter, p: Spot, style: number) => void;
@@ -66,57 +70,82 @@ const BUILDERS: Record<BuildingType, Builder> = {
     const [light, dark] = ROOFS[style] ?? ROOFS[0];
     d.shadow(p.gx + 0.2, p.gy + 0.2, 0.6, 0.6);
     d.box(p.gx + 0.2, p.gy + 0.2, 0.6, 0.6, 17, '#ffe6b0', '#f0cf84', '#dcb869');
+    d.faceRight(p.gx + 0.8, p.gy + 0.43, p.gy + 0.57, 0, 10, '#8a5a2b');
     d.roofPrism(p.gx + 0.12, p.gy + 0.12, 0.76, 0.76, 17, 11, light, dark);
-    const [x, y] = d.iso(p.gx + 0.74, p.gy + 0.5);
-    d.rect(x - 3, y - 14, 5, 9, '#8a5a2b', 1);
   },
   apartment: (d, p) => {
     d.shadow(p.gx + 0.22, p.gy + 0.22, 0.56, 0.56);
     d.box(p.gx + 0.22, p.gy + 0.22, 0.56, 0.56, 44, '#bfe3ff', '#98c7ec', '#7cb0da');
-    for (let i = 0; i < 3; i++)
-      d.box(p.gx + 0.22, p.gy + 0.3, 0.56, 0.05, 34 - i * 11, '#ffffff', '#dfeefb', '#cfe2f4');
-    d.box(p.gx + 0.44, p.gy + 0.28, 0.14, 0.14, 50, '#aecbe4', '#93b4d2', '#7ea3c6');
+    for (let i = 0; i < 3; i++) {
+      const z = 8 + i * 11;
+      d.faceLeft(p.gy + 0.78, p.gx + 0.27, p.gx + 0.73, z, z + 5, '#ffffff');
+      d.faceRight(p.gx + 0.78, p.gy + 0.27, p.gy + 0.73, z, z + 5, '#dfeefb');
+    }
+    d.box(p.gx + 0.44, p.gy + 0.28, 0.14, 0.14, 6, '#aecbe4', '#93b4d2', '#7ea3c6', 44);
   },
   civic: (d, p) => {
     d.shadow(p.gx + 0.16, p.gy + 0.16, 0.68, 0.68);
     d.box(p.gx + 0.16, p.gy + 0.16, 0.68, 0.68, 24, '#f3eefb', '#dcd2ee', '#c7bbdf');
     d.roofPrism(p.gx + 0.1, p.gy + 0.1, 0.8, 0.8, 24, 9, '#c9b6ef', '#b39ce0');
     const [x, y] = d.iso(p.gx + 0.5, p.gy + 0.5);
-    d.rect(x - 1, y - 46, 2, 11, '#8b93a3');
+    d.rect(x - 1, y - 46, 2, 13, '#8b93a3');
     d.rect(x + 1, y - 46, 8, 5, '#ffc62b');
   },
   shop: (d, p, style) => {
     const awning = style === 1 ? '#49c2d6' : '#ff6b5e';
     d.shadow(p.gx + 0.22, p.gy + 0.22, 0.56, 0.56);
     d.box(p.gx + 0.22, p.gy + 0.22, 0.56, 0.56, 16, '#ffd98a', '#f0c05f', '#dcab45');
-    const [x, y] = d.iso(p.gx + 0.5, p.gy + 0.78);
-    d.rect(x - 16, y - 9, 32, 6, awning, 2, `rotate(26 ${x} ${y})`);
+    const at = (gx: number, gy: number, z: number): [number, number] => {
+      const [x, y] = d.iso(gx, gy);
+      return [x, y - z];
+    };
+    d.poly(
+      [
+        at(p.gx + 0.24, p.gy + 0.78, 13),
+        at(p.gx + 0.76, p.gy + 0.78, 13),
+        at(p.gx + 0.76, p.gy + 0.93, 8),
+        at(p.gx + 0.24, p.gy + 0.93, 8),
+      ],
+      awning,
+    );
   },
   market: (d, p) => {
     d.shadow(p.gx + 0.16, p.gy + 0.16, 0.68, 0.68);
     d.box(p.gx + 0.16, p.gy + 0.16, 0.68, 0.68, 15, '#ffe9c2', '#f2d49a', '#e2c07f');
-    d.box(p.gx + 0.16, p.gy + 0.16, 0.68, 0.1, 19, '#2e9e5b', '#248049', '#1f6b3f');
-    d.roofPrism(p.gx + 0.1, p.gy + 0.1, 0.8, 0.8, 19, 6, '#8aa0b5', '#6f8599');
+    d.box(p.gx + 0.16, p.gy + 0.16, 0.68, 0.68, 4, '#2e9e5b', '#248049', '#1f6b3f', 11);
+    d.roofPrism(p.gx + 0.1, p.gy + 0.1, 0.8, 0.8, 15, 6, '#8aa0b5', '#6f8599');
   },
   sport: (d, p) => {
     d.shadow(p.gx + 0.18, p.gy + 0.18, 0.64, 0.64);
     d.box(p.gx + 0.18, p.gy + 0.18, 0.64, 0.64, 4, '#7ec98a', '#6ab877', '#5aa667');
-    const [x, y] = d.iso(p.gx + 0.5, p.gy + 0.5);
-    d.circle(x, y - 4, 7, 'none', '#fff', 1.4);
-    d.line([x, y - 11], [x, y + 3], '#fff', 1.2);
+    const on = (gx: number, gy: number): [number, number] => {
+      const [x, y] = d.iso(gx, gy);
+      return [x, y - 4];
+    };
+    const [x, y] = on(p.gx + 0.5, p.gy + 0.5);
+    d.ellipse(x, y, 9, 4.5, 'none', '#fff', 1.4);
+    d.line(on(p.gx + 0.5, p.gy + 0.2), on(p.gx + 0.5, p.gy + 0.8), '#fff', 1.2);
   },
   garden: (d, p) => {
     d.shadow(p.gx + 0.2, p.gy + 0.2, 0.6, 0.6);
     d.box(p.gx + 0.2, p.gy + 0.2, 0.6, 0.6, 3, '#8fd888', '#7cc876', '#6ab767');
-    const [x, y] = d.iso(p.gx + 0.5, p.gy + 0.5);
-    const flowers = ['#ff6f91', '#ffd45e', '#9b6dff', '#ff914d', '#4fc06a'];
-    flowers.forEach((c, i) => d.circle(x - 16 + i * 8, y - 8 - (i % 2) * 4, 3, c));
+    const flowers: [number, number, string][] = [
+      [0.35, 0.35, '#ff6f91'],
+      [0.65, 0.35, '#ffd45e'],
+      [0.5, 0.5, '#9b6dff'],
+      [0.35, 0.65, '#ff914d'],
+      [0.65, 0.65, '#4fc06a'],
+    ];
+    flowers.forEach(([fx, fy, c]) => {
+      const [x, y] = d.iso(p.gx + fx, p.gy + fy);
+      d.circle(x, y - 6, 3, c);
+    });
   },
   park: (d, p) => {
     d.shadow(p.gx + 0.1, p.gy + 0.1, 0.8, 0.8);
     d.box(p.gx + 0.1, p.gy + 0.1, 0.8, 0.8, 2, '#9fd89a', '#8cc985', '#79b873');
-    treeBlock(d, p.gx + 0.02, p.gy + 0.08, 0.9);
-    treeBlock(d, p.gx + 0.42, p.gy + 0.44, 0.75);
+    treeBlock(d, p.gx + 0.02, p.gy + 0.08, 0.9, 2);
+    treeBlock(d, p.gx + 0.42, p.gy + 0.44, 0.75, 2);
   },
   trees: (d, p) => {
     treeBlock(d, p.gx + 0.08, p.gy + 0.08, 1);
@@ -141,8 +170,9 @@ const BUILDERS: Record<BuildingType, Builder> = {
   plaza: (d, p) => {
     d.shadow(p.gx + 0.16, p.gy + 0.16, 0.68, 0.68);
     d.box(p.gx + 0.16, p.gy + 0.16, 0.68, 0.68, 3, '#eceadb', '#dcd9c6', '#ccc8b4');
-    fountain(d, p.gx + 0.2, p.gy + 0.2);
-    bench(d, p.gx + 0.72, p.gy + 0.22);
+    // Fonte no centro e banco na ponta da frente, os dois apoiados na praça (3 de altura).
+    fountain(d, p.gx, p.gy, 3);
+    bench(d, p.gx + 0.24, p.gy + 0.24, 3);
   },
   palm: (d, p) => palm(d, p.gx, p.gy),
 };
