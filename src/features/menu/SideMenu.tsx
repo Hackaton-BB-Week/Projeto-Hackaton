@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
+  BackHandler,
   Easing,
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,7 +21,9 @@ import { useDemoActions } from './useDemoActions';
 
 const DURATION = 260;
 
-/** Menu lateral (gaveta da esquerda). Montado uma vez em app/_layout.tsx. */
+/** Menu lateral (gaveta da esquerda). Montado uma vez em app/_layout.tsx, por cima de tudo.
+ *  Não usa <Modal>: no Android com a nova arquitetura ele abre sem tamanho (só o topo
+ *  aparece) e trava os toques. É uma camada absoluta que cobre a tela inteira. */
 export function SideMenu() {
   const { colors, fs, reduceMotion } = useTheme();
   const insets = useSafeAreaInsets();
@@ -50,6 +52,16 @@ export function SideMenu() {
     }).start(finish);
   }, [open, reduceMotion, progress]);
 
+  // "Voltar" do Android fecha o menu (antes isso era feito pelo Modal).
+  useEffect(() => {
+    if (!open) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      closeMenu();
+      return true;
+    });
+    return () => sub.remove();
+  }, [open, closeMenu]);
+
   // O "Reiniciar" pede um segundo toque; volta ao normal depois de alguns segundos.
   useEffect(() => {
     if (!confirmReset) return;
@@ -70,8 +82,10 @@ export function SideMenu() {
 
   const translateX = progress.interpolate({ inputRange: [0, 1], outputRange: [-panelWidth, 0] });
 
+  if (!mounted) return null;
+
   return (
-    <Modal visible={mounted} transparent animationType="none" onRequestClose={closeMenu}>
+    <View style={styles.overlay}>
       <Animated.View style={[styles.backdrop, { opacity: progress }]}>
         <Pressable
           style={StyleSheet.absoluteFill}
@@ -97,7 +111,10 @@ export function SideMenu() {
           <View style={[styles.logo, { backgroundColor: colors.gold }]}>
             <Feather name="feather" size={20} color={colors.goldInk} />
           </View>
-          <Text style={[styles.title, { color: colors.ink, fontSize: fs(17) }]} accessibilityRole="header">
+          <Text
+            style={[styles.title, { color: colors.ink, fontSize: fs(17) }]}
+            accessibilityRole="header"
+          >
             Menu
           </Text>
           <Pressable
@@ -214,11 +231,12 @@ export function SideMenu() {
           </View>
         </ScrollView>
       </Animated.View>
-    </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  overlay: { ...StyleSheet.absoluteFillObject, zIndex: 100, elevation: 100 },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(6,16,40,0.5)' },
   panel: {
     position: 'absolute',
@@ -234,7 +252,13 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', gap: 11, padding: 18, paddingBottom: 10 },
   logo: { width: 38, height: 38, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
   title: { flex: 1, fontWeight: '700' },
-  close: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  close: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   section: { paddingHorizontal: 12, paddingVertical: 6 },
   label: { fontWeight: '700', paddingTop: 12, paddingBottom: 6, paddingHorizontal: 8 },
   item: {
