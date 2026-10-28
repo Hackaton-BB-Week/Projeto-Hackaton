@@ -9,9 +9,11 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "chat:dev": "deno run --watch --allow-net --allow-env --env-file=supabase/functions/.env supabase/functions/chat/index.ts"
   },
   "dependencies": {
+    "@react-native-community/netinfo": "11.4.1",
     "@supabase/supabase-js": "^2.45.4",
     "@tanstack/react-query": "^5.59.0",
     "expo": "~52.0.0",
