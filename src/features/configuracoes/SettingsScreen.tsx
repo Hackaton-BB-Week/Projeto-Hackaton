@@ -21,9 +21,9 @@ const FONT_OPTIONS: { value: FontSize; label: string; a11y: string }[] = [
 // Configurações (seção Configurações do protótipo). Cada opção muda o app na hora
 // e fica salva no aparelho.
 export function SettingsScreen() {
-  const { colors, fs } = useTheme();
+  const { colors, fs, isDark } = useTheme();
   const s = useSettingsStore();
-  const dark = s.themeMode === 'dark';
+  const followsSystem = s.themeMode === 'system';
 
   return (
     <SafeAreaView style={[styles.c, { backgroundColor: colors.bg }]} edges={['top', 'bottom']}>
@@ -31,10 +31,16 @@ export function SettingsScreen() {
       <ScrollView contentContainerStyle={styles.body}>
         <Eyebrow>Aparência</Eyebrow>
         <Card style={styles.card}>
-          <SettingRow first title="Modo escuro" description="Tema escuro em todo o app">
+          <SettingRow
+            first
+            title="Modo escuro"
+            description={
+              followsSystem ? 'Seguindo o modo do celular' : 'Tema escuro em todo o app'
+            }
+          >
             <SettingSwitch
               label="Modo escuro"
-              value={dark}
+              value={isDark}
               onChange={(v) => s.setThemeMode(v ? 'dark' : 'light')}
             />
           </SettingRow>
