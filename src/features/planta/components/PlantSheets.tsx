@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { AppState, View, Text, StyleSheet } from 'react-native';
-import { Sheet } from '@/components/Sheet';
+import { BottomPanel } from './BottomPanel';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { showToast } from '@/components/Toast';
@@ -35,7 +35,7 @@ export function PlantSheets() {
     relapseToday: 'Hoje foi um dia difícil',
   };
   useAbsenceCheck();
-  const { colors, fs, reduceMotion } = useTheme();
+  const { colors, fs } = useTheme();
   const { sheet, open, close } = usePlantUi();
   const p = usePlant();
   const registerRelapse = usePlantStore((s) => s.registerRelapse);
@@ -52,12 +52,12 @@ export function PlantSheets() {
   // Um Sheet só, com o conteúdo do painel aberto: no Android, vários Modals
   // montados ao mesmo tempo abrem encolhidos no canto.
   return (
-    <Sheet visible={sheet !== null} title={sheet ? TITLES[sheet] : ''} onClose={close}>
+    <BottomPanel visible={sheet !== null} title={sheet ? TITLES[sheet] : ''} onClose={close}>
       {sheet === 'plant' && (
         <>
           <Text style={sub}>{plantText}</Text>
           <Card style={styles.row}>
-            <PlantArt stage={p.stage} wither={p.wither} size={84} animate={!reduceMotion} />
+            <PlantArt stage={p.stage} wither={p.wither} size={84} animate={false} />
             <View style={styles.flex}>
               <Text style={[styles.stage, { color: colors.ink, fontSize: fs(16) }]}>
                 {p.wither ? 'Precisando de cuidado' : p.stageName}
@@ -146,7 +146,7 @@ export function PlantSheets() {
           <Button label="Entendi" variant="navy" onPress={close} />
         </>
       )}
-    </Sheet>
+    </BottomPanel>
   );
 }
 
