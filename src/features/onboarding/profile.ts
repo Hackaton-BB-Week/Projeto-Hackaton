@@ -13,7 +13,7 @@ export interface StartingPoint {
   message: string;
 }
 
-const GOAL_TEXT: Record<number, string> = {
+export const GOAL_TEXT: Record<number, string> = {
   0: 'guardar esse dinheiro',
   1: 'estar mais perto de quem você ama',
   2: 'cuidar da sua saúde',

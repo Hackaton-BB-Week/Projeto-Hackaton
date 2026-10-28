@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { Eyebrow } from '@/components/Eyebrow';
@@ -14,6 +14,15 @@ export function HelpScreen() {
   const { colors, fs } = useTheme();
   const channels = useHelpChannels();
   const [breathing, setBreathing] = useState(false);
+
+  // `/ajuda?respirar=1` (ex.: vindo do modo pré-jogo) já abre o exercício.
+  const { respirar } = useLocalSearchParams<{ respirar?: string }>();
+  useEffect(() => {
+    if (respirar) {
+      setBreathing(true);
+      router.setParams({ respirar: undefined });
+    }
+  }, [respirar]);
 
   return (
     <SafeAreaView style={[styles.c, { backgroundColor: colors.bg }]} edges={['top']}>

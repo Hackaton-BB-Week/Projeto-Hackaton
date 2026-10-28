@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ToastHost } from '@/components/Toast';
+import { SideMenu } from '@/features/menu/SideMenu';
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ export default function RootLayout() {
             options={{ presentation: 'transparentModal', animation: 'slide_from_bottom' }}
           />
         </Stack>
+        <SideMenu />
         <ToastHost />
       </QueryClientProvider>
     </GestureHandlerRootView>
