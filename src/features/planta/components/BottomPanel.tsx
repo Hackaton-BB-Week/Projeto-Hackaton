@@ -1,73 +1,77 @@
 import { useEffect, type ReactNode } from 'react';
 import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import { GestureDetector } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
+import { useSwipeToClose } from '@/hooks/useSwipeToClose';
 import { useTheme } from '@/theme/useTheme';
 
-// Painel que sobe de baixo, desenhado dentro da própria tela (como o .sheet do protótipo).
-// Não usa <Modal>: no Android, o Modal abria encolhido e invisível e travava os toques.
-export function BottomPanel({
-  visible,
-  title,
-  onClose,
-  children,
-}: {
+type Props = {
   visible: boolean;
   title: string;
   onClose: () => void;
   children: ReactNode;
-}) {
-  const { colors, fs, reduceMotion } = useTheme();
+};
 
-  // "Voltar" do Android fecha o painel.
+// Painel que sobe de baixo, desenhado dentro da própria tela (como o .sheet do protótipo).
+// Não usa <Modal>: no Android, o Modal abria encolhido e invisível e travava os toques.
+// Fecha deslizando para baixo, pelo X, tocando fora ou no "voltar" do Android.
+export function BottomPanel(props: Props) {
+  if (!props.visible) return null;
+  return <Panel {...props} />;
+}
+
+function Panel({ title, onClose, children }: Props) {
+  const { colors, fs } = useTheme();
+  const { gesture, panelStyle, backdropStyle, onLayout, dismiss } = useSwipeToClose(onClose, {
+    animateIn: true,
+  });
+
   useEffect(() => {
-    if (!visible) return;
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      onClose();
+      dismiss();
       return true;
     });
     return () => sub.remove();
-  }, [visible, onClose]);
-
-  if (!visible) return null;
+  }, [dismiss]);
 
   return (
     <View style={StyleSheet.absoluteFill}>
-      <Animated.View
-        entering={reduceMotion ? undefined : FadeIn.duration(180)}
-        exiting={reduceMotion ? undefined : FadeOut.duration(150)}
-        style={[StyleSheet.absoluteFill, styles.backdrop]}
-      >
+      <Animated.View style={[StyleSheet.absoluteFill, styles.backdrop, backdropStyle]}>
         <Pressable
           style={StyleSheet.absoluteFill}
-          onPress={onClose}
+          onPress={dismiss}
           accessibilityRole="button"
           accessibilityLabel="Fechar"
         />
       </Animated.View>
       <Animated.View
-        entering={reduceMotion ? undefined : SlideInDown.duration(260)}
-        exiting={reduceMotion ? undefined : SlideOutDown.duration(200)}
-        style={[styles.panel, { backgroundColor: colors.bg }]}
+        onLayout={onLayout}
+        style={[styles.panel, { backgroundColor: colors.bg }, panelStyle]}
         accessibilityViewIsModal
       >
-        <View style={[styles.grab, { backgroundColor: colors.line }]} />
-        <View style={styles.header}>
-          <Text
-            style={[styles.title, { color: colors.ink, fontSize: fs(18) }]}
-            accessibilityRole="header"
-          >
-            {title}
-          </Text>
-          <Pressable
-            onPress={onClose}
-            style={[styles.close, { backgroundColor: colors.surface2 }]}
-            accessibilityRole="button"
-            accessibilityLabel={`Fechar ${title}`}
-          >
-            <Feather name="x" size={20} color={colors.ink} />
-          </Pressable>
-        </View>
+        {/* Alça + título: área de arrastar (o conteúdo abaixo continua rolando). */}
+        <GestureDetector gesture={gesture}>
+          <View>
+            <View style={[styles.grab, { backgroundColor: colors.line }]} />
+            <View style={styles.header}>
+              <Text
+                style={[styles.title, { color: colors.ink, fontSize: fs(18) }]}
+                accessibilityRole="header"
+              >
+                {title}
+              </Text>
+              <Pressable
+                onPress={dismiss}
+                style={[styles.close, { backgroundColor: colors.surface2 }]}
+                accessibilityRole="button"
+                accessibilityLabel={`Fechar ${title}`}
+              >
+                <Feather name="x" size={20} color={colors.ink} />
+              </Pressable>
+            </View>
+          </View>
+        </GestureDetector>
         <ScrollView contentContainerStyle={styles.body} bounces={false}>
           {children}
         </ScrollView>

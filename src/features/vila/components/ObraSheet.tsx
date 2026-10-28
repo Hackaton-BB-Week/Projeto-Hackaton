@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
+import { useSwipeToClose } from '@/hooks/useSwipeToClose';
 import { styleOptionsFor, type Plot } from '../data/cities';
 import { BuildingPreview } from '../scene/CityScene';
 import { isAvailable, type BuiltMap } from '@/store/useVilaStore';
@@ -26,6 +29,8 @@ export default function ObraSheet({
   bottomInset = 0,
 }: Props) {
   const [style, setStyle] = useState(0);
+  // Fecha deslizando para baixo, o mesmo caminho por onde entrou.
+  const swipe = useSwipeToClose(onClose);
   useEffect(() => setStyle(0), [plot.id]);
 
   const done = built[plot.id];
@@ -37,8 +42,10 @@ export default function ObraSheet({
   return (
     <View style={styles.root}>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Fechar painel" />
-      <View
-        style={[styles.sheet, { paddingBottom: spacing.xl + bottomInset }]}
+      <GestureDetector gesture={swipe.gesture}>
+      <Animated.View
+        onLayout={swipe.onLayout}
+        style={[styles.sheet, { paddingBottom: spacing.xl + bottomInset }, swipe.panelStyle]}
         accessibilityViewIsModal
       >
         <View style={styles.grab} />
@@ -92,7 +99,8 @@ export default function ObraSheet({
         ) : (
           <Button label={done ? 'Fechar' : 'Entendi'} onPress={onClose} />
         )}
-      </View>
+      </Animated.View>
+      </GestureDetector>
     </View>
   );
 }
