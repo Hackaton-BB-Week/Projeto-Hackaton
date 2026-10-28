@@ -20,6 +20,9 @@ export type Palette = {
   success: string;
   success2: string;
   green600: string;
+  /** Verde de destaque (barras, avisos de sucesso). */
+  green: string;
+  greenSoft: string;
   danger: string;
   dangerSoft: string;
   navy: string;
@@ -46,6 +49,8 @@ const light: Palette = {
   success: '#146c3c',
   success2: '#23874e',
   green600: '#157a43',
+  green: '#2e9e5b',
+  greenSoft: '#e3f3e9',
   danger: '#d2502f',
   dangerSoft: '#fbe7e0',
   navy: '#122744',
@@ -71,6 +76,8 @@ const dark: Palette = {
   success: '#146c3c',
   success2: '#23874e',
   green600: '#4fc08a',
+  green: '#4fc08a',
+  greenSoft: '#1d3a2b',
   danger: '#ff7a5c',
   dangerSoft: '#3a241d',
   navy: '#0c1627',
@@ -84,6 +91,8 @@ const colorblindLight: Partial<Palette> = {
   success: '#005a8f',
   success2: '#1c75b8',
   green600: '#0072b2',
+  green: '#0072b2',
+  greenSoft: '#d7e9f5',
   danger: '#d55e00',
   dangerSoft: '#fbe6d6',
 };
@@ -91,6 +100,8 @@ const colorblindDark: Partial<Palette> = {
   success: '#005a8f',
   success2: '#1c75b8',
   green600: '#4ea3e0',
+  green: '#4ea3e0',
+  greenSoft: '#17344a',
   danger: '#ff8c42',
   dangerSoft: '#3a271a',
 };

@@ -1,8 +1,11 @@
 import { View, Text, StyleSheet } from 'react-native';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 // Bloco de número grande + legenda (ex.: "R$ 120 · deixou de apostar").
 export function FinanceStat({ value, label, color }: { value: string; label: string; color: string }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.c} accessible accessibilityLabel={`${value}, ${label}`}>
       <Text style={[styles.v, { color }]}>{value}</Text>
@@ -11,7 +14,8 @@ export function FinanceStat({ value, label, color }: { value: string; label: str
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   c: {
     flex: 1,
     backgroundColor: colors.surface,
@@ -20,6 +24,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     padding: spacing.sm + 2,
   },
-  v: { fontSize: 18, fontWeight: '700', fontVariant: ['tabular-nums'] },
-  l: { fontSize: 11, color: colors.muted, marginTop: 2 },
+  v: { fontSize: fs(18), fontWeight: '700', fontVariant: ['tabular-nums'] },
+  l: { fontSize: fs(11), color: colors.muted, marginTop: 2 },
 });

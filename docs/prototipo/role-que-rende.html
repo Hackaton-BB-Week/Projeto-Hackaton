@@ -1,0 +1,864 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Rolê que Rende</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap">
+<style>
+/* Layout: moldura de celular; telas roláveis; barra de abas fixa.
+   Jogo principal = Vila que Rende: cidade isométrica reconstruída com moedas.
+   Paleta: azul-marinho de confiança + amarelo de ação (BB), verdes naturais. */
+:root{
+  --navy:#0a2a66;--blue:#1f5bd6;--blue-700:#17409a;
+  --sky:#eaf1fc;--sky-2:#dbe6fa;
+  --gold:#ffc62b;--gold-ink:#5a3f00;
+  --green:#2e9e5b;--green-600:#248049;--green-soft:#e4f4ea;--leaf:#3cb371;
+  --ink:#152238;--muted:#5e6b84;--faint:#8b97ad;--line:#e2e7f1;
+  --surface:#ffffff;--surface-2:#f6f8fd;
+  --danger:#c0442b;--danger-soft:#fbe8e3;
+  --shadow:0 1px 2px rgba(16,30,65,.06), 0 8px 24px rgba(16,30,65,.08);
+  --shadow-sm:0 1px 2px rgba(16,30,65,.07);
+  --f-display:'Sora',system-ui,sans-serif;
+  --f-body:'Plus Jakarta Sans',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:var(--f-body);color:var(--ink);
+  background:radial-gradient(1200px 600px at 50% -10%, #12367f 0%, var(--navy) 55%, #071e4d 100%);
+  -webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;
+  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));
+  padding-block:max(20px, env(safe-area-inset-top,0px)) max(20px, env(safe-area-inset-bottom,0px));}
+#device{position:relative;width:100%;max-width:392px;height:min(820px, calc(100dvh - 40px));
+  background:var(--sky);border-radius:34px;overflow:hidden;
+  box-shadow:0 30px 70px rgba(4,14,40,.55), 0 2px 0 rgba(255,255,255,.06);display:flex;flex-direction:column}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;background:var(--sky)}
+.screen.has-tabs{padding-bottom:76px}
+.screen[hidden]{display:none!important}
+.screen.enter{animation:slidein .32s cubic-bezier(.22,.61,.36,1)}
+@keyframes slidein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen.enter{animation:none}}
+.pad{padding:20px 20px 24px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin:0}
+.lead{color:var(--muted);line-height:1.55;font-size:14.5px}
+.num{font-variant-numeric:tabular-nums}
+.section-t{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 10px}
+.btn{appearance:none;border:0;cursor:pointer;font-family:var(--f-body);font-weight:700;font-size:15px;border-radius:14px;padding:15px 18px;width:100%;transition:transform .12s,box-shadow .12s,background .15s;display:inline-flex;align-items:center;justify-content:center;gap:9px}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--gold);color:var(--gold-ink);box-shadow:0 6px 16px rgba(255,198,43,.4)}
+.btn-primary:hover{background:#ffcf4d}
+.btn-navy{background:var(--navy);color:#fff}.btn-navy:hover{background:#0d3179}
+.btn-ghost{background:transparent;color:var(--blue);font-weight:600;box-shadow:none;padding:12px}
+.btn-ghost:hover{background:var(--sky-2)}
+.btn-outline{background:var(--surface);color:var(--ink);border:1.5px solid var(--line);box-shadow:var(--shadow-sm)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-sm{width:auto;padding:10px 14px;font-size:13px;border-radius:11px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.field label{font-size:13px;font-weight:600;color:var(--ink)}
+.field input{font-family:var(--f-body);font-size:15px;padding:14px 15px;border-radius:13px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s}
+.field input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(31,91,214,.12)}
+.field .err{font-size:12px;color:var(--danger);min-height:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 11px;border-radius:999px;background:var(--green-soft);color:var(--green-600)}
+.chip.gold{background:#fff5d6;color:var(--gold-ink)}
+
+/* welcome */
+#welcome{background:linear-gradient(180deg,#0a2a66 0%,#123a86 48%,#1f5bd6 140%)}
+#welcome .pad{color:#fff;flex:1;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:11px;margin-top:8px}
+.brand .mark{width:42px;height:42px;border-radius:13px;background:var(--gold);display:grid;place-items:center;box-shadow:0 6px 18px rgba(255,198,43,.45)}
+.brand .name{font-family:var(--f-display);font-weight:700;font-size:18px;color:#fff;letter-spacing:-.02em}
+.welcome-hero{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:14px 0}
+.welcome-hero h1{color:#fff;font-size:30px;line-height:1.12;font-weight:700}
+.welcome-hero .k{color:#bcd0f5}
+.welcome-form{background:#fff;border-radius:22px 22px 0 0;margin:8px -20px -24px;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.welcome-note{font-size:12px;color:var(--faint);text-align:center;margin-top:12px;line-height:1.5}
+.hero-art{height:150px;position:relative;margin:4px 0}
+
+/* survey */
+.topbar{display:flex;align-items:center;gap:12px;padding:16px 20px 8px}
+.iconbtn{appearance:none;border:0;background:var(--surface);width:38px;height:38px;border-radius:12px;display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow-sm);color:var(--ink);flex-shrink:0}
+.iconbtn:hover{background:var(--surface-2)}
+.progress{flex:1;height:7px;border-radius:999px;background:var(--sky-2);overflow:hidden}
+.progress > i{display:block;height:100%;background:var(--gold);border-radius:999px;transition:width .35s cubic-bezier(.22,.61,.36,1)}
+.qcount{font-size:12.5px;font-weight:600;color:var(--muted);min-width:34px;text-align:right}
+.qbody{flex:1;display:flex;flex-direction:column;padding:12px 20px 0}
+.qbody h2{font-size:22px;line-height:1.2;margin-bottom:4px}
+.qbody .qhint{color:var(--muted);font-size:13.5px;margin:0 0 18px}
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:15px 16px;font-size:14.5px;font-weight:500;color:var(--ink);cursor:pointer;font-family:var(--f-body);display:flex;align-items:center;gap:13px;transition:border-color .14s,background .14s,transform .1s}
+.opt:hover{border-color:var(--blue)}.opt:active{transform:scale(.995)}
+.opt .radio{width:21px;height:21px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;display:grid;place-items:center;transition:border-color .14s}
+.opt.sel{border-color:var(--blue);background:var(--sky)}.opt.sel .radio{border-color:var(--blue)}
+.opt.sel .radio::after{content:"";width:11px;height:11px;border-radius:50%;background:var(--blue)}
+.qfoot{padding:16px 20px calc(18px + env(safe-area-inset-bottom,0px))}
+
+/* profile */
+.profile-card{position:relative;overflow:hidden;background:linear-gradient(150deg,#123a86,#1f5bd6);color:#fff;border:0}
+.profile-card .est{font-family:var(--f-display);font-weight:700;font-size:34px;line-height:1;margin:6px 0 2px}
+.profile-card .estlbl{font-size:12px;color:#c6d7f6}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+.stat .v{font-family:var(--f-display);font-weight:700;font-size:19px;color:var(--ink)}.stat .l{font-size:11.5px;color:var(--muted);margin-top:2px}
+.reflect{line-height:1.6;font-size:14px;color:var(--ink)}.reflect b{color:var(--navy)}
+
+/* hub */
+.hub-head{background:linear-gradient(170deg,#0a2a66,#17409a);color:#fff;padding:22px 20px 26px;border-radius:0 0 26px 26px}
+.hub-head .hi{font-size:13px;color:#bcd0f5}
+.hub-head h2{color:#fff;font-size:23px;margin:2px 0 3px}
+.hub-head .sub{color:#c6d7f6;font-size:13px;line-height:1.45}
+.hub-metrics{display:flex;gap:10px;margin-top:16px}
+.metric{flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:11px 13px}
+.metric .v{font-family:var(--f-display);font-weight:700;font-size:18px;color:#fff;display:flex;align-items:center;gap:5px}
+.metric .l{font-size:11px;color:#bcd0f5;margin-top:1px}
+.play-cta{position:relative;overflow:hidden;cursor:pointer;background:linear-gradient(135deg,#fff6df,#ffe9ad);border:1px solid #f1d98a;border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center}
+.play-cta .mini{width:104px;height:72px;flex-shrink:0;border-radius:12px;overflow:hidden;background:#e8f3ff}
+.play-cta h3{font-size:17px;color:var(--gold-ink)}
+.play-cta p{margin:3px 0 0;font-size:12.5px;color:#7a5a12;line-height:1.4}
+.play-cta .go{margin-left:auto;color:var(--gold-ink);flex-shrink:0}
+.garden-cta{cursor:pointer;background:linear-gradient(135deg,#eafaef,#d6f0e0);border:1px solid #c4e6d0;border-radius:18px;padding:14px;display:flex;gap:13px;align-items:center}
+.garden-cta .mini-garden{width:64px;height:64px;flex-shrink:0}
+.garden-cta h4{font-size:15px;color:var(--green-600)}
+.garden-cta p{margin:2px 0 0;font-size:12px;color:#3c6b4e;line-height:1.35}
+.garden-cta .go{margin-left:auto;color:var(--green-600);flex-shrink:0}
+.mission-card{display:flex;gap:13px;align-items:center}
+.mission-card .mi{width:44px;height:44px;border-radius:13px;background:#fff5d6;display:grid;place-items:center;flex-shrink:0;color:var(--gold-ink)}
+.mission-card .mt{flex:1;min-width:0}
+.mission-card .mt .l{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.mission-card .mt p{margin:2px 0 0;font-size:14px;font-weight:600;line-height:1.35}
+.mission-done{background:var(--green-soft);border-color:#c4e6d0}.mission-done .mi{background:var(--green);color:#fff}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow-sm);transition:transform .12s,box-shadow .12s}
+.tile:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.tile .ti{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;margin-bottom:10px}
+.tile h4{font-size:15px;margin:0}.tile p{margin:3px 0 0;font-size:12px;color:var(--muted);line-height:1.4}
+.tile.chat .ti{background:var(--sky-2);color:var(--blue-700)}.tile.sos .ti{background:var(--danger-soft);color:var(--danger)}
+
+/* VILA / cidade */
+#vila{background:linear-gradient(180deg,#eaf4ff 0%,#eaf1fc 46%,var(--sky) 100%)}
+.vila-top{display:flex;align-items:center;gap:10px;padding:16px 20px 4px}
+.wallet{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px 14px;box-shadow:var(--shadow-sm)}
+.wallet .c{font-family:var(--f-display);font-weight:700;font-size:20px;color:var(--navy)}
+.wallet .u{font-size:11px;color:var(--muted)}
+.mult-badge{margin-left:auto;background:linear-gradient(135deg,#2e9e5b,#248049);color:#fff;font-family:var(--f-display);font-weight:700;font-size:15px;padding:8px 13px;border-radius:12px;box-shadow:0 4px 12px rgba(46,158,91,.3)}
+.city-head{padding:4px 20px 0;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.city-name{font-family:var(--f-display);font-weight:700;font-size:16px}
+.city-obj{font-size:12px;color:var(--muted)}
+.city-wrap{padding:2px 12px 0}
+.city-scene{width:100%;max-width:100%;transition:transform .3s}
+.city-scene.pulse{animation:cpulse .5s ease}
+@keyframes cpulse{0%{transform:scale(1)}40%{transform:scale(1.012)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.city-scene.pulse{animation:none}}
+.objbar{display:flex;align-items:center;gap:10px;padding:0 20px}
+.objbar .bar{flex:1;height:8px;border-radius:999px;background:var(--sky-2);overflow:hidden}
+.objbar .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#ffb300);transition:width .5s}
+.objbar .lbl{font-size:12px;font-weight:700;color:var(--muted)}
+.zone-h{display:flex;align-items:center;gap:8px;margin:2px 0 8px}
+.zone-h .zt{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--blue)}
+.zone-h .zc{font-size:11px;color:var(--faint)}
+.obra{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:11px 13px;box-shadow:var(--shadow-sm);cursor:pointer;transition:border-color .12s}
+.obra:hover{border-color:var(--blue)}
+.obra+.obra{margin-top:9px}
+.obra .oi{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:grid;place-items:center;background:var(--sky)}
+.obra-main{flex:1;min-width:0}
+.obra-name{font-size:14px;font-weight:600;line-height:1.3}
+.obra-sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+.obra-right{flex-shrink:0;font-size:13px;font-weight:700}
+.obra.done{background:var(--green-soft);border-color:#c4e6d0}
+.obra.done .obra-right{color:var(--green-600)}
+.obra.locked{opacity:.65;cursor:default}
+.cost-pill{display:inline-flex;align-items:center;gap:4px;color:var(--gold-ink);background:#fff5d6;border-radius:9px;padding:5px 9px;font-size:12.5px}
+.cost-pill.no{background:var(--sky);color:var(--faint)}
+.celebrate{background:linear-gradient(140deg,#123a86,#1f5bd6);color:#fff;text-align:center;border:0}
+.celebrate h3{color:#fff;font-size:18px}
+.celebrate p{color:#c6d7f6;font-size:13px;line-height:1.5;margin:6px 0 14px}
+.econ-card{background:linear-gradient(140deg,#fff8e4,#fff);border:1px solid #f1e2b0}
+.econ-card .er{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);line-height:1.4}
+.econ-card .er + .er{margin-top:8px}
+.demo-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.demo-note{font-size:11px;color:var(--faint);display:flex;align-items:center;gap:6px;margin-top:2px}
+
+/* obra panel (sheet) */
+.panel-hero{border-radius:14px;overflow:hidden;background:#e8f3ff;margin:4px 0 14px;height:120px;display:grid;place-items:center}
+.panel-hero svg{width:62%;height:100%}
+.panel-row{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;padding:7px 0;border-top:1px solid var(--line)}
+.panel-row .k{color:var(--muted)}
+.panel-row .v{font-weight:600}
+.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 4px}
+.style-opt{display:flex;align-items:center;gap:9px;background:var(--surface);border:1.5px solid var(--line);border-radius:13px;padding:12px;font-family:var(--f-body);font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer}
+.style-opt.sel{border-color:var(--blue);background:var(--sky)}
+.swatch{width:20px;height:20px;border-radius:6px;flex-shrink:0;box-shadow:inset 0 0 0 1px #0000001a}
+
+/* garden */
+#garden{background:linear-gradient(180deg,#eef7ff 0%,#eaf1fc 40%,var(--sky) 100%)}
+.garden-stage{position:relative;padding:8px 20px 0;display:flex;flex-direction:column;align-items:center}
+.garden-scene{width:min(280px,72vw);max-width:100%;filter:drop-shadow(0 18px 24px rgba(16,40,80,.14))}
+.day-badge{position:absolute;top:14px;right:24px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px 13px;text-align:center;box-shadow:var(--shadow-sm)}
+.day-badge .d{font-family:var(--f-display);font-weight:700;font-size:22px;color:var(--green-600);line-height:1}
+.day-badge .l{font-size:10px;color:var(--muted);letter-spacing:.04em}
+.stage-label{text-align:center;font-size:13px;color:var(--green-600);font-weight:600;margin:6px 0 2px}
+.stage-label.wither{color:#b5651d}
+.garden-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:4px}
+.gstat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
+.gstat .v{font-family:var(--f-display);font-weight:700;font-size:17px}.gstat .l{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.2}
+.retomada-card{background:linear-gradient(140deg,#fff3e2,#fff);border:1px solid #f0d9b8}
+.retomada-card h4{font-size:16px;color:#9a5b16}
+.retomada-card p{font-size:13px;color:var(--muted);line-height:1.5;margin:6px 0 12px}
+.money-card{background:linear-gradient(140deg,#fff8e4,#fff);border:1px solid #f1e2b0}
+.money-card .big{font-family:var(--f-display);font-weight:700;font-size:26px;color:var(--navy);margin:4px 0 0}
+.money-card .est-tag{font-size:11px;color:var(--faint)}
+.money-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.money-grid .mg{background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.money-grid .mg .v{font-weight:700;font-size:15px;font-family:var(--f-display)}.money-grid .mg .l{font-size:11px;color:var(--muted)}
+
+/* sheet */
+.sheet-backdrop{position:absolute;inset:0;background:rgba(10,22,46,.5);display:grid;place-items:end center;z-index:40;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{background:var(--surface);width:100%;border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px));animation:up .28s cubic-bezier(.22,.61,.36,1);max-height:88%;overflow-y:auto}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.sheet h3{font-size:19px;margin-bottom:6px}.sheet .psub{color:var(--muted);line-height:1.5;font-size:13.5px;margin:0 0 10px}
+.sheet .grab{width:40px;height:4px;border-radius:999px;background:var(--line);margin:0 auto 16px}
+
+/* chat */
+#chat{background:var(--surface-2)}
+.chat-head{background:var(--surface);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
+.chat-head .av{width:40px;height:40px;border-radius:12px;background:linear-gradient(140deg,#1f5bd6,#123a86);display:grid;place-items:center;color:#fff;flex-shrink:0}
+.chat-head .nm{font-family:var(--f-display);font-weight:700;font-size:15px}
+.chat-head .st{font-size:11.5px;color:var(--green-600);display:flex;align-items:center;gap:5px}
+.chat-head .st::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green)}
+.chat-log{flex:1;padding:18px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:82%;padding:12px 14px;border-radius:16px;font-size:14px;line-height:1.5;animation:pop .22s ease}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.msg.bot{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:5px;box-shadow:var(--shadow-sm)}
+.msg.me{align-self:flex-end;background:var(--navy);color:#fff;border-bottom-right-radius:5px}
+.msg.bot .res{display:block;margin-top:8px;font-size:12px;color:var(--blue);font-weight:600;cursor:pointer}
+.suggests{display:flex;gap:8px;overflow-x:auto;padding:10px 18px;scrollbar-width:none}
+.suggests::-webkit-scrollbar{display:none}
+.suggests button{white-space:nowrap;background:var(--surface);border:1px solid var(--line);color:var(--blue-700);font-weight:600;font-size:12.5px;padding:9px 13px;border-radius:999px;cursor:pointer;font-family:var(--f-body);flex-shrink:0}
+.suggests button:hover{background:var(--sky)}
+.chat-input{display:flex;gap:9px;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
+.chat-input input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:999px;padding:12px 16px;font-family:var(--f-body);font-size:14px;outline:none}
+.chat-input input:focus{border-color:var(--blue)}
+.chat-input button{width:46px;height:46px;border-radius:50%;border:0;background:var(--gold);color:var(--gold-ink);cursor:pointer;flex-shrink:0;display:grid;place-items:center}
+.typing{display:flex;gap:4px;padding:14px}.typing i{width:7px;height:7px;border-radius:50%;background:var(--faint);animation:bl 1s infinite}
+.typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+@keyframes bl{0%,60%,100%{opacity:.3}30%{opacity:1}}
+
+/* sos */
+.help-item{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--line)}
+.help-item:last-child{border-bottom:0}
+.help-item .hi{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;flex-shrink:0;background:var(--sky-2);color:var(--blue-700)}
+.help-item h4{font-size:15.5px;margin:0}.help-item p{margin:3px 0 8px;font-size:13px;color:var(--muted);line-height:1.5}
+.phone-pill{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;font-weight:700;font-size:14px;padding:9px 14px;border-radius:12px;font-variant-numeric:tabular-nums}
+.copy-btn{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 11px;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;margin-left:7px}
+.copy-btn:hover{background:var(--sky)}
+.breathe-card{background:linear-gradient(140deg,#123a86,#1f5bd6);color:#fff;text-align:center}
+.breathe-orb{width:96px;height:96px;border-radius:50%;margin:14px auto 10px;background:radial-gradient(circle at 40% 35%, #ffe79a, var(--gold));box-shadow:0 0 0 0 rgba(255,198,43,.5);animation:breathe 7s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(.72);box-shadow:0 0 0 0 rgba(255,198,43,.45)}45%{transform:scale(1);box-shadow:0 0 0 22px rgba(255,198,43,0)}}
+@media (prefers-reduced-motion:reduce){.breathe-orb{animation:none;transform:scale(.9)}}
+
+/* tabbar */
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding:9px 6px calc(9px + env(safe-area-inset-bottom,0px))}
+.tabbar button{flex:1;appearance:none;border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--f-body);font-size:10.5px;font-weight:600;color:var(--faint);padding:5px 0}
+.tabbar button .ic{transition:transform .14s}
+.tabbar button.active{color:var(--blue)}.tabbar button.active .ic{transform:translateY(-1px)}
+.tabbar button.sos.active{color:var(--danger)}
+.restart{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:14px;z-index:35;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--muted);box-shadow:var(--shadow-sm)}
+.restart:hover{color:var(--navy)}
+.toast{position:absolute;left:50%;bottom:94px;transform:translateX(-50%) translateY(20px);z-index:50;background:var(--navy);color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;box-shadow:0 10px 30px rgba(4,14,40,.4);max-width:88%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hide{display:none!important}
+@media (min-width:460px){#device{border:1px solid rgba(255,255,255,.08)}}
+@media (max-width:459px){body{padding:0}#device{max-width:none;width:100%;height:100dvh;border-radius:0;box-shadow:none}}
+</style>
+
+<div id="device">
+  <button class="restart hide" id="restartBtn" title="Reiniciar demonstração" aria-label="Reiniciar demonstração">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+  </button>
+
+  <!-- WELCOME -->
+  <section class="screen" id="welcome">
+    <div class="pad">
+      <div class="brand"><div class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5a3f00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M12 10c0-3 2-5 5-5 0 3-2 5-5 5Z"/><path d="M12 13C12 10 10 8 7 8c0 3 2 5 5 5Z"/></svg></div><span class="name">Rolê que Rende</span></div>
+      <div class="welcome-hero">
+        <div class="hero-art" aria-hidden="true">
+          <svg viewBox="0 0 300 150" width="100%" height="100%">
+            <defs><linearGradient id="coin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe79a"/><stop offset="1" stop-color="#ffc62b"/></linearGradient></defs>
+            <circle cx="235" cy="40" r="30" fill="url(#coin)" opacity=".95"/>
+            <path d="M235 25v30M228 32h10a4 4 0 0 1 0 8h-6a4 4 0 0 0 0 8h10" stroke="#5a3f00" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+            <g transform="translate(60 150)"><path d="M0 0C0 -40 0 -58 0 -58" stroke="#3cb371" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M0 -40C-22 -46 -34 -34 -34 -34C-14 -28 0 -40 0 -40Z" fill="#2e9e5b"/><path d="M0 -52C18 -58 30 -46 30 -46C12 -40 0 -52 0 -52Z" fill="#3cb371"/><circle cx="0" cy="-64" r="9" fill="#ffc62b"/></g>
+          </svg>
+        </div>
+        <h1>Cada dia sem apostar<br>reconstrói um pedaço<br>da sua cidade.</h1>
+        <p class="lead k">Transforme o dinheiro e o tempo das apostas em progresso de verdade — no seu ritmo, sem cobrança.</p>
+      </div>
+      <form class="welcome-form" id="welcomeForm" novalidate>
+        <div class="field"><label for="nm">Como podemos te chamar?</label><input id="nm" name="nm" type="text" autocomplete="given-name" placeholder="Seu primeiro nome"><span class="err" id="nmErr"></span></div>
+        <div class="field"><label for="em">Seu e-mail</label><input id="em" name="em" type="email" autocomplete="email" placeholder="voce@email.com"><span class="err" id="emErr"></span></div>
+        <button type="submit" class="btn btn-primary">Começar minha jornada</button>
+        <button type="button" class="btn btn-ghost" id="demoBtn">Explorar demonstração</button>
+        <p class="welcome-note">O Rolê que Rende é um apoio para desenvolver uma relação mais consciente com as apostas. Ele não substitui acompanhamento profissional.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- SURVEY -->
+  <section class="screen" id="survey">
+    <div class="topbar">
+      <button class="iconbtn" id="surveyBack" aria-label="Voltar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="progress"><i id="surveyBar" style="width:0%"></i></div><span class="qcount" id="surveyCount">1/7</span>
+    </div>
+    <div class="qbody"><h2 id="qTitle"></h2><p class="qhint" id="qHint"></p><div class="options" id="qOptions"></div></div>
+    <div class="qfoot"><button class="btn btn-navy" id="surveyNext" disabled>Continuar</button></div>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="screen" id="profile">
+    <div class="pad" style="gap:16px;display:flex;flex-direction:column">
+      <div><p class="eyebrow">Seu ponto de partida</p><h1 style="font-size:24px;margin-top:6px">Isto é uma referência, não um rótulo.</h1></div>
+      <div class="card profile-card">
+        <span class="chip gold" style="background:rgba(255,255,255,.18);color:#fff">Estimativa semanal</span>
+        <div class="est num" id="profWeekly">R$ 0</div><div class="estlbl">com base no que você compartilhou</div>
+        <div class="stat-row"><div class="stat"><div class="v num" id="profMonthly">R$ 0</div><div class="l">por mês (estimativa)</div></div><div class="stat"><div class="v num" id="profYearly">R$ 0</div><div class="l">em um ano (estimativa)</div></div></div>
+      </div>
+      <div class="card"><p class="reflect" id="profReflect"></p></div>
+      <p class="lead" style="font-size:12.5px;color:var(--faint)">Esses valores são aproximações feitas a partir das suas respostas, só pra servir de referência. Nada aqui é avaliação clínica ou diagnóstico.</p>
+      <button class="btn btn-primary" id="toHub">Ver meu espaço</button>
+    </div>
+  </section>
+
+  <!-- HUB -->
+  <section class="screen has-tabs" id="hub">
+    <div class="hub-head">
+      <p class="hi">Que bom te ver por aqui,</p><h2 id="hubName">Olá</h2><p class="sub" id="hubEncourage">Um passo de cada vez. Hoje já conta.</p>
+      <div class="hub-metrics">
+        <div class="metric"><div class="v num"><span id="hubStreak">1</span></div><div class="l">dias em sequência</div></div>
+        <div class="metric"><div class="v num" id="hubCoins">0</div><div class="l">moedas</div></div>
+        <div class="metric"><div class="v num" id="hubSaved">R$ 0</div><div class="l">preservado</div></div>
+      </div>
+    </div>
+    <div class="pad" style="display:flex;flex-direction:column;gap:20px">
+      <div><p class="section-t">Seu jogo</p>
+        <div class="play-cta" id="hubPlay"><div class="mini" id="miniCity"></div><div><h3>Vila que Rende</h3><p id="hubPlaySub">Reconstrua sua cidade com as moedas que você conquista.</p></div><span class="go"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span></div>
+      </div>
+      <div><p class="section-t">Seu progresso</p>
+        <div class="garden-cta" id="hubGardenCta"><div class="mini-garden" id="miniGarden"></div><div><h4>Jardim de progresso</h4><p id="hubGardenSub">Sua plantinha cresce a cada dia sem apostar.</p></div><span class="go"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span></div>
+      </div>
+      <div><p class="section-t">Missão de hoje</p>
+        <div class="card mission-card" id="hubMission"><div class="mi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg></div><div class="mt"><div class="l" id="hubMissionLbl">Missão diária · +15 moedas</div><p id="hubMissionText">—</p></div><button class="btn btn-sm btn-outline" id="hubMissionBtn" style="flex-shrink:0">Concluir</button></div>
+      </div>
+      <div><p class="section-t">Quando precisar</p>
+        <div class="dual">
+          <div class="tile chat" id="hubChat"><div class="ti"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h4>Conversar</h4><p>Tire dúvidas sobre apostas e sobre o app.</p></div>
+          <div class="tile sos" id="hubSos"><div class="ti"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><h4>Preciso de ajuda</h4><p>Canais de apoio para momentos difíceis.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VILA (jogo principal) -->
+  <section class="screen has-tabs" id="vila">
+    <div class="vila-top">
+      <div class="wallet"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#ffc62b" stroke="#e0a800" stroke-width="1.5"/><path d="M12 7v10M9.5 9.2h3.2a2 2 0 0 1 0 4H10a2 2 0 0 0 0 4h3.2" stroke="#5a3f00" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg><div class="c num" id="vCoins">0</div><div class="u">moedas</div></div>
+      <div class="mult-badge" id="vMult">×1</div>
+    </div>
+    <div class="city-head"><div class="city-name" id="cityName">Bairro Esperança</div><div class="city-obj" id="cityObj">0/0 restaurado</div></div>
+    <div class="city-wrap"><div class="city-scene" id="cityScene"></div></div>
+    <div class="objbar"><div class="bar"><i id="objBar" style="width:0%"></i></div><span class="lbl" id="objLbl">0/0</span></div>
+    <div class="pad" style="display:flex;flex-direction:column;gap:16px;padding-top:14px">
+      <div id="celebrateWrap" class="hide"><div class="card celebrate"><h3 id="celebTitle">Cidade restaurada!</h3><p id="celebText"></p><button class="btn btn-primary" id="nextCityBtn">Explorar nova cidade</button></div></div>
+      <div id="zones"></div>
+      <div class="card econ-card">
+        <div class="er"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b5870a" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h3a2 2 0 0 1 0 4h-2.5a2 2 0 0 0 0 4h3"/></svg> Cada R$ 1 que você não aposta vira <b>1 moeda</b>.</div>
+        <div class="er"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green-600)" stroke-width="2" stroke-linecap="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v4h-4"/></svg> Sua <b>sequência de dias</b> multiplica o ganho diário (<span id="econMult">×1</span>).</div>
+      </div>
+      <div><p class="section-t">Modo demonstração</p>
+        <div class="card" style="display:flex;flex-direction:column;gap:10px">
+          <div class="demo-row">
+            <button class="btn btn-sm btn-outline" id="addDay">+1 dia</button>
+            <button class="btn btn-sm btn-outline" id="addWeek">+7 dias</button>
+            <button class="btn btn-sm btn-outline" id="giveCoins">+300 moedas</button>
+          </div>
+          <div class="demo-row">
+            <button class="btn btn-sm btn-outline" id="relapseBtn" style="color:var(--danger);border-color:#f0cfc6">Registrar recaída</button>
+            <button class="btn btn-sm btn-outline" id="finishCity">Concluir cidade</button>
+          </div>
+          <p class="demo-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Atalhos só para apresentar os estados do jogo ao vivo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GARDEN (progresso) -->
+  <section class="screen has-tabs" id="garden">
+    <div class="garden-stage">
+      <button class="iconbtn" id="gardenBack" style="position:absolute;top:14px;left:20px;z-index:6" aria-label="Voltar ao início"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="day-badge"><div class="d num" id="gDay">1</div><div class="l">dias</div></div>
+      <div class="garden-scene" id="gardenScene"></div>
+      <div class="stage-label" id="stageLabel">Primeiro broto</div>
+    </div>
+    <div class="pad" style="display:flex;flex-direction:column;gap:16px">
+      <div class="garden-stats">
+        <div class="gstat"><div class="v num" style="color:var(--green-600)" id="gStreak">1</div><div class="l">em sequência</div></div>
+        <div class="gstat"><div class="v num" id="gTotal">1</div><div class="l">dias no total</div></div>
+        <div class="gstat"><div class="v num" style="color:var(--gold-ink)" id="gRelapse">0</div><div class="l">recomeços</div></div>
+      </div>
+      <div class="card retomada-card hide" id="retomadaCard">
+        <h4>Vamos cuidar do seu jardim de novo?</h4>
+        <p>Sua planta está passando por um momento difícil, mas continua do tamanho que você já conquistou. Uma pequena ação de autocuidado ajuda ela a se recuperar — sem pressa e sem cobrança.</p>
+        <button class="btn btn-primary" id="retomadaBtn">Fazer missão de retomada</button>
+      </div>
+      <div class="card money-card">
+        <span class="est-tag">Dinheiro preservado (estimativa)</span>
+        <div class="big num" id="gMoney">R$ 0</div>
+        <div class="money-grid"><div class="mg"><div class="v num" id="gWeek">R$ 0</div><div class="l">por semana</div></div><div class="mg"><div class="v num" id="gMonth">R$ 0</div><div class="l">por mês</div></div></div>
+      </div>
+      <p class="lead" style="font-size:12.5px;color:var(--faint)">Esse valor vira moedas na sua Vila. Uma recaída faz a planta murchar, mas nunca apaga o tamanho já conquistado.</p>
+    </div>
+  </section>
+
+  <!-- CHAT -->
+  <section class="screen has-tabs" id="chat">
+    <div class="chat-head"><div class="av"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4M12 8a4 4 0 0 0-4 4v3a4 4 0 0 0 8 0v-3a4 4 0 0 0-4-4ZM6 15H4M20 15h-2"/></svg></div><div><div class="nm">Rô, sua companhia</div><div class="st">apoio, sem julgamento</div></div></div>
+    <div class="chat-log" id="chatLog"></div>
+    <div class="suggests" id="chatSuggests"></div>
+    <form class="chat-input" id="chatForm"><input id="chatInput" type="text" placeholder="Escreva uma mensagem..." autocomplete="off"><button type="submit" aria-label="Enviar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z"/></svg></button></form>
+  </section>
+
+  <!-- SOS -->
+  <section class="screen has-tabs" id="sos">
+    <div class="pad" style="display:flex;flex-direction:column;gap:16px">
+      <div><p class="eyebrow" style="color:var(--danger)">Você não está sozinho(a)</p><h1 style="font-size:24px;margin-top:6px">Canais de ajuda</h1><p class="lead" style="margin-top:6px">Se a vontade estiver forte ou o momento estiver pesado, procurar apoio é um ato de coragem. Estes serviços são gratuitos e sigilosos.</p></div>
+      <div class="card breathe-card"><div class="breathe-orb" aria-hidden="true"></div><h3 style="color:#fff;font-size:17px">Respire por um minuto</h3><p style="color:#c6d7f6;font-size:13px;margin:6px 0 0">Siga o círculo: inspire enquanto ele cresce, solte enquanto ele diminui. A vontade intensa costuma passar em poucos minutos.</p></div>
+      <div class="card">
+        <div class="help-item"><div class="hi" style="background:var(--danger-soft);color:var(--danger)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z"/></svg></div><div><h4>CVV — Centro de Valorização da Vida</h4><p>Apoio emocional e prevenção do suicídio, 24h por dia, por telefone, chat ou e-mail.</p><span class="phone-pill num">188<button class="copy-btn" data-copy="188">copiar</button></span></div></div>
+        <div class="help-item"><div class="hi" style="background:var(--green-soft);color:var(--green-600)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16M9 21v-4h6v4M9 7h.01M15 7h.01M9 11h.01M15 11h.01"/></svg></div><div><h4>CAPS — Atenção Psicossocial</h4><p>Serviços públicos e gratuitos de saúde mental do SUS, com acolhimento e acompanhamento. Procure a unidade mais próxima pelo posto de saúde da sua região.</p></div></div>
+        <div class="help-item"><div class="hi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></div><div><h4>Jogadores Anônimos</h4><p>Grupos de apoio mútuo e gratuitos, presenciais e online, para quem quer parar de apostar. Reuniões com pessoas que passam pelo mesmo.</p></div></div>
+      </div>
+      <p class="lead" style="font-size:12px;color:var(--faint)">O Rolê que Rende é um apoio complementar e não substitui atendimento de saúde. Em emergência, procure o serviço médico mais próximo.</p>
+    </div>
+  </section>
+
+  <nav class="tabbar hide" id="tabbar">
+    <button data-nav="hub" class="active"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5"/></svg></span>Início</button>
+    <button data-nav="vila"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l5-4 5 4v11M9 21v-5h2v5M19 21v-7l-4-3"/></svg></span>Vila</button>
+    <button data-nav="chat"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Conversar</button>
+    <button data-nav="sos" class="sos"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>Ajuda</button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var BRL=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+  function money(v){return BRL.format(Math.round(v));}
+  function coinFmt(n){return Math.round(n).toLocaleString('pt-BR');}
+  function $(id){return document.getElementById(id);}
+
+  var state={
+    name:'',email:'',answers:{},weeklySpend:0,
+    streak:1,total:1,relapses:0,coins:0,
+    plantMood:'healthy',
+    cityIndex:0, cities:[{},{}], cityDone:[false,false],
+    missionDone:false, missionIndex:0
+  };
+  var MISSIONS=["Mande mensagem para alguém de quem você gosta.","Dê uma caminhada de 15 minutos ao ar livre.","Anote uma coisa que você faria com o dinheiro preservado.","Beba um copo d'água e respire fundo 5 vezes.","Reserve 10 minutos para algo que te dá prazer.","Liste 3 pessoas com quem você pode contar."];
+  var RETOMADA_ACTIONS=["Beba um copo d'água e respire fundo três vezes.","Mande uma mensagem para alguém de confiança.","Dê uma volta curta de cinco minutos.","Lave o rosto e alongue o corpo por um minuto."];
+
+  /* economia */
+  function dailySpend(){return state.weeklySpend/7;}
+  function multiplier(streak){if(streak>=30)return 3;if(streak>=14)return 2;if(streak>=7)return 1.5;if(streak>=3)return 1.2;return 1;}
+  function fmtM(m){return(''+m).replace('.',',');}
+  function savedTotal(){return dailySpend()*state.total;}
+  function multNote(){var s=state.streak,m=multiplier(s),th=[[3,1.2],[7,1.5],[14,2],[30,3]];for(var i=0;i<th.length;i++){if(s<th[i][0])return'Multiplicador ×'+fmtM(m)+' ativo. Chegue a '+th[i][0]+' dias para ×'+fmtM(th[i][1])+'.';}return'Multiplicador máximo ×3 ativo.';}
+
+  /* ===== survey ===== */
+  var QUESTIONS=[
+    {t:"Com que frequência você costuma apostar?",h:"Pode ser uma estimativa, sem pressão.",o:[["Raramente",0],["Algumas vezes no mês",1],["Quase toda semana",2],["Quase todo dia",3]],key:"freq"},
+    {t:"Quanto costuma gastar por semana em apostas?",h:"Uma média aproximada já ajuda.",o:[["Até R$ 20",15],["R$ 20 a R$ 50",35],["R$ 50 a R$ 150",100],["R$ 150 a R$ 400",275],["Mais de R$ 400",500]],key:"spend"},
+    {t:"Apostar já afetou suas contas ou compromissos?",h:"Contas, dívidas, combinados com alguém.",o:[["Nunca",0],["Algumas vezes",1],["Com frequência",2]],key:"impact"},
+    {t:"Já tentou parar ou diminuir e teve dificuldade?",h:"",o:[["Não tentei ainda",0],["Tentei uma vez",1],["Tentei várias vezes",2]],key:"tries"},
+    {t:"Como costuma se sentir depois de apostar?",h:"Escolha o que mais se aproxima.",o:[["Tranquilo(a)",0],["Indiferente",1],["Arrependido(a)",2],["Ansioso(a)",3]],key:"feel"},
+    {t:"O que mais aumenta sua vontade de apostar?",h:"",o:[["Tédio",0],["Tentar recuperar o que perdi",1],["Ansiedade ou estresse",2],["Amigos ou propaganda",3]],key:"trigger"},
+    {t:"O que você gostaria de fazer com esse tempo e dinheiro?",h:"Vamos usar isso pra te motivar.",o:[["Guardar dinheiro",0],["Estar com quem amo",1],["Cuidar da minha saúde",2],["Realizar um objetivo",3]],key:"goal"}
+  ];
+  var qIndex=0,qSelected=null;
+  function renderQuestion(){
+    var q=QUESTIONS[qIndex];
+    $('qTitle').textContent=q.t;$('qHint').textContent=q.h;$('qHint').style.display=q.h?'block':'none';
+    $('surveyBar').style.width=((qIndex)/(QUESTIONS.length-1)*100)+'%';$('surveyCount').textContent=(qIndex+1)+'/'+QUESTIONS.length;
+    var wrap=$('qOptions');wrap.innerHTML='';var saved=state.answers[q.key];qSelected=(saved!==undefined)?saved:null;
+    q.o.forEach(function(pair){var b=document.createElement('button');b.type='button';b.className='opt'+(qSelected===pair[1]?' sel':'');b.innerHTML='<span class="radio"></span><span>'+pair[0]+'</span>';b.addEventListener('click',function(){qSelected=pair[1];state.answers[q.key]=pair[1];Array.prototype.forEach.call(wrap.children,function(c){c.classList.remove('sel');});b.classList.add('sel');$('surveyNext').disabled=false;});wrap.appendChild(b);});
+    $('surveyNext').disabled=(qSelected===null);$('surveyNext').textContent=(qIndex===QUESTIONS.length-1)?'Ver meu ponto de partida':'Continuar';
+  }
+  $('surveyNext').addEventListener('click',function(){if(qSelected===null)return;if(qIndex<QUESTIONS.length-1){qIndex++;renderQuestion();animate('survey');}else{computeProfile();show('profile');}});
+  $('surveyBack').addEventListener('click',function(){if(qIndex>0){qIndex--;renderQuestion();}else show('welcome');});
+  function computeProfile(){
+    state.weeklySpend=state.answers.spend||0;var w=state.weeklySpend;
+    $('profWeekly').textContent=money(w);$('profMonthly').textContent=money(w*4.3);$('profYearly').textContent=money(w*52);
+    var freq=state.answers.freq||0,impact=state.answers.impact||0,tries=state.answers.tries||0;
+    var goalText={0:"guardar esse dinheiro",1:"estar mais perto de quem você ama",2:"cuidar da sua saúde",3:"chegar mais perto do seu objetivo"}[state.answers.goal||0];
+    var msg;
+    if(impact>=2||freq>=3)msg="Pelo que você contou, as apostas vêm ocupando um espaço grande na sua rotina e no seu bolso. Isso não te define — é só um ponto de partida. A cada dia aqui, você vai ver esse valor virar moeda pra <b>"+goalText+"</b>.";
+    else if(freq>=1||tries>=1)msg="Você já percebe que quer ajustar essa relação, e isso é o passo mais importante. Vamos transformar o que ia pras apostas em algo real: um caminho pra <b>"+goalText+"</b>, um dia de cada vez.";
+    else msg="Que bom que você quer olhar pra isso com cuidado desde cedo. Aqui você acompanha, no seu ritmo, como o tempo e o dinheiro preservados podem te ajudar a <b>"+goalText+"</b>.";
+    $('profReflect').innerHTML=msg;
+    if(state.coins===0)state.coins=60;
+  }
+
+  /* ===== jardim ===== */
+  function stageFromDays(d){if(d<=0)return 0;if(d<3)return 1;if(d<7)return 2;if(d<14)return 3;if(d<30)return 4;return 5;}
+  var STAGE_NAMES=["Semente plantada","Primeiro broto","Muda crescendo","Plantinha firme","Botão florindo","Jardim em flor"];
+  function gardenSVG(stage,small,wither){
+    var stemTop=[150,120,96,70,52,40][stage],m=small?'m':'';
+    var leafGrad=wither?'#c98a3a':'#2e9e5b', leafGrad2=wither?'#b5651d':'#4fc27e';
+    var stemCol=wither?'#8a6a3a':'#2e9e5b';
+    var droop=wither?' transform="rotate(4 100 168)"':'';
+    var swayClass=small?'':(wither?' class="wilt"':' class="sway"');
+    var scene='<svg viewBox="0 0 200 200" width="100%" height="100%"><defs>'+
+      '<radialGradient id="sky'+m+'" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="'+(wither?'#fdf6ea':'#fbfdff')+'"/><stop offset="1" stop-color="'+(wither?'#f2e4cf':'#e7f1ff')+'"/></radialGradient>'+
+      '<linearGradient id="lf'+m+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+leafGrad2+'"/><stop offset="1" stop-color="'+leafGrad+'"/></linearGradient></defs>'+
+      '<circle cx="100" cy="90" r="92" fill="url(#sky'+m+')"/><circle cx="160" cy="44" r="16" fill="'+(wither?'#e9cf94':'#ffe08a')+'" opacity=".85"/>'+
+      '<path d="M8 150 Q100 128 192 150 L192 200 L8 200 Z" fill="'+(wither?'#efe3cc':'#e4f4ea')+'"/>';
+    var g='<g'+swayClass+droop+' style="transform-origin:100px 168px">';
+    if(stage>=1)g+='<path d="M100 168 L100 '+stemTop+'" stroke="'+stemCol+'" stroke-width="'+(stage>=3?7:5)+'" fill="none" stroke-linecap="round"/>';
+    if(stage===1)g+=leaf(100,150,-1,.8,m,wither)+leaf(100,150,1,.8,m,wither);
+    if(stage>=2)g+=leaf(100,128,-1,1,m,wither)+leaf(100,118,1,1,m,wither);
+    if(stage>=3)g+=leaf(100,100,-1,1.15,m,wither)+leaf(100,92,1,1.15,m,wither);
+    if(stage>=5)g+=leaf(100,74,-1,1.2,m,wither)+leaf(100,66,1,1.2,m,wither);
+    if(stage===3)g+='<ellipse cx="100" cy="'+(stemTop-2)+'" rx="8" ry="12" fill="'+(wither?'#c9a46a':'#6fcf97')+'"/>';
+    if(stage>=4)g+=flower(100,stemTop-4,1,wither);
+    if(stage>=5)g+=flower(74,70,.7,wither)+flower(126,64,.72,wither);
+    g+='</g>';scene+=g;
+    scene+='<path d="M72 160 L128 160 L122 196 Q100 202 78 196 Z" fill="#d08b5b"/><path d="M68 152 L132 152 L129 164 Q100 170 71 164 Z" fill="#e6ab78"/>';
+    scene+='<ellipse cx="100" cy="155" rx="29" ry="6" fill="#7b5230"/>';
+    scene+='<circle cx="54" cy="176" r="5" fill="'+(wither?'#ddd0b8':'#cfe6d7')+'"/><circle cx="150" cy="180" r="6" fill="'+(wither?'#ddd0b8':'#cfe6d7')+'"/></svg>';
+    return scene;
+  }
+  function leaf(x,y,dir,s,m,wither){var dx=26*s*dir,dy=10*s;return '<path d="M'+x+' '+y+' q '+(dx*0.6)+' '+(-dy*1.6)+' '+dx+' '+(-dy*0.4)+' q '+(-dx*0.5)+' '+(dy*1.4)+' '+(-dx)+' '+(dy*0.4)+' Z" fill="url(#lf'+m+')"/>';}
+  function flower(cx,cy,s,wither){var pet=wither?'#e0a24a':'#ffd45e',ctr=wither?'#c97b1e':'#ff9f1c';var p='<g>';for(var i=0;i<6;i++){var a=i*Math.PI/3,px=cx+Math.cos(a)*11*s,py=cy+Math.sin(a)*11*s;p+='<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="'+(7*s).toFixed(1)+'" fill="'+pet+'"/>';}p+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(7*s).toFixed(1)+'" fill="'+ctr+'"/></g>';return p;}
+  var styleSway=document.createElement('style');
+  styleSway.textContent='.sway{animation:sway 4.5s ease-in-out infinite}@keyframes sway{0%,100%{transform:rotate(-2.2deg)}50%{transform:rotate(2.2deg)}}.wilt{animation:wilt 5s ease-in-out infinite}@keyframes wilt{0%,100%{transform:rotate(3deg)}50%{transform:rotate(5deg)}}@media (prefers-reduced-motion:reduce){.sway,.wilt{animation:none}}';
+  document.head.appendChild(styleSway);
+
+  /* ===== cidade isométrica ===== */
+  var HW=26,HH=13,OX=180,OY=46;
+  function iso(gx,gy){return [OX+(gx-gy)*HW, OY+(gx+gy)*HH];}
+  function pts(a){return a.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');}
+  function poly(a,f){return '<polygon points="'+pts(a)+'" fill="'+f+'"/>';}
+  function isoBox(gx,gy,w,d,h,top,left,right){
+    var p1=iso(gx,gy),p2=iso(gx+w,gy),p3=iso(gx+w,gy+d),p4=iso(gx,gy+d);
+    var t1=[p1[0],p1[1]-h],t2=[p2[0],p2[1]-h],t3=[p3[0],p3[1]-h],t4=[p4[0],p4[1]-h];
+    return poly([p4,p3,t3,t4],left)+poly([p2,p3,t3,t2],right)+poly([t1,t2,t3,t4],top);
+  }
+  function isoRoof(gx,gy,w,d,baseH,roofH,light,dark){
+    var c1=iso(gx,gy),c2=iso(gx+w,gy),c3=iso(gx+w,gy+d),c4=iso(gx,gy+d);
+    var t1=[c1[0],c1[1]-baseH],t2=[c2[0],c2[1]-baseH],t3=[c3[0],c3[1]-baseH],t4=[c4[0],c4[1]-baseH];
+    var ap=[(t1[0]+t3[0])/2,(t1[1]+t3[1])/2-roofH];
+    function tri(a,b,c,f){return '<polygon points="'+pts([a,b,c])+'" fill="'+f+'"/>';}
+    return tri(t1,t2,ap,light)+tri(t4,t1,ap,light)+tri(t2,t3,ap,dark)+tri(t3,t4,ap,dark);
+  }
+  function tileFill(gx,gy,fill){return poly([iso(gx,gy),iso(gx+1,gy),iso(gx+1,gy+1),iso(gx,gy+1)],fill);}
+  function isoTree(gx,gy,sc){sc=sc||1;var b=iso(gx+0.5,gy+0.5);var x=b[0],y=b[1];
+    return '<rect x="'+(x-2)+'" y="'+(y-12*sc)+'" width="4" height="'+(12*sc)+'" rx="1.5" fill="#8a5a2b"/>'+
+      '<circle cx="'+x+'" cy="'+(y-18*sc)+'" r="'+(10*sc)+'" fill="#3fae6a"/>'+
+      '<circle cx="'+(x-7*sc)+'" cy="'+(y-13*sc)+'" r="'+(7*sc)+'" fill="#2e9e5b"/>'+
+      '<circle cx="'+(x+7*sc)+'" cy="'+(y-13*sc)+'" r="'+(7*sc)+'" fill="#4fc27e"/>';}
+  function isoPalm(gx,gy){var b=iso(gx+0.5,gy+0.5),x=b[0],y=b[1];
+    return '<rect x="'+(x-2)+'" y="'+(y-20)+'" width="4" height="20" rx="1.5" fill="#9a6b3a" transform="rotate(-4 '+x+' '+y+')"/>'+
+      '<g fill="#3fae6a">'+
+      '<ellipse cx="'+(x-10)+'" cy="'+(y-21)+'" rx="12" ry="5" transform="rotate(-18 '+(x-10)+' '+(y-21)+')"/>'+
+      '<ellipse cx="'+(x+10)+'" cy="'+(y-21)+'" rx="12" ry="5" transform="rotate(18 '+(x+10)+' '+(y-21)+')"/>'+
+      '<ellipse cx="'+x+'" cy="'+(y-26)+'" rx="12" ry="5"/></g>'+
+      '<circle cx="'+x+'" cy="'+(y-20)+'" r="3" fill="#c98a3a"/>';}
+  function isoLamp(gx,gy){var b=iso(gx+0.5,gy+0.5),x=b[0],y=b[1];
+    return '<rect x="'+(x-1.5)+'" y="'+(y-22)+'" width="3" height="22" fill="#5a6273"/><circle cx="'+x+'" cy="'+(y-24)+'" r="4.5" fill="#ffd45e"/><circle cx="'+x+'" cy="'+(y-24)+'" r="9" fill="#ffd45e" opacity=".2"/>';}
+
+  // builders por tipo
+  function bHouse(p,built){var roofs=[{l:'#e0674a',d:'#c0442b'},{l:'#39b87a',d:'#248049'},{l:'#4f86e0',d:'#2f5fb0'}];var r=roofs[(built&&built.style)||0];
+    return isoBox(p.gx+.24,p.gy+.24,.52,.52,13,'#f3e6c9','#e6d2a8','#d6bd8c')+isoRoof(p.gx+.17,p.gy+.17,.66,.66,13,9,r.l,r.d);}
+  function bApartment(p){return isoBox(p.gx+.2,p.gy+.2,.6,.6,32,'#d2dcec','#b6c4de','#9fb2d0')
+    +isoBox(p.gx+.2,p.gy+.2,.6,.6,34,'#c3d0e6','#c3d0e6','#c3d0e6')
+    +isoBox(p.gx+.5,p.gy+.26,.16,.16,40,'#aeb9cc','#95a2bb','#8694b0');}
+  function bCivic(p){var b=isoBox(p.gx+.16,p.gy+.16,.68,.68,20,'#eef2f8','#d7dfee','#c2cde2')+isoRoof(p.gx+.12,p.gy+.12,.76,.76,20,7,'#cfd8e8','#b7c3da');
+    var top=iso(p.gx+.5,p.gy+.5);return b+'<rect x="'+(top[0]-1)+'" y="'+(top[1]-44)+'" width="2" height="16" fill="#8b93a3"/><polygon points="'+(top[0]+1)+','+(top[1]-44)+' '+(top[0]+12)+','+(top[1]-41)+' '+(top[0]+1)+','+(top[1]-38)+'" fill="#ffc62b"/>';}
+  function bShop(p,built){var cols=[['#ffe0a6','#f3cd84','#e4bb6a'],['#d7eccf','#bcd9b0','#a6c998']];var c=cols[(built&&built.style)||0];
+    var awn=iso(p.gx+.5,p.gy+.78);return isoBox(p.gx+.22,p.gy+.22,.56,.56,14,c[0],c[1],c[2])
+      +'<rect x="'+(awn[0]-16)+'" y="'+(awn[1]-9)+'" width="32" height="6" rx="2" fill="#c0442b" transform="rotate(26 '+awn[0]+' '+awn[1]+')"/>';}
+  function bMarket(p){return isoBox(p.gx+.16,p.gy+.16,.68,.68,17,'#ffe9c2','#f2d49a','#e2c07f')
+    +isoBox(p.gx+.16,p.gy+.16,.68,.12,19,'#2e9e5b','#248049','#1f6b3f')
+    +isoRoof(p.gx+.12,p.gy+.12,.76,.76,19,6,'#8aa0b5','#6f8599');}
+  function bPlaza(p){var s=tileFill(p.gx,p.gy,'#e3e2d6')+isoBox(p.gx+.2,p.gy+.2,.6,.6,2,'#edeadd','#ddd9c9','#ccc8b6');
+    s+=isoTree(p.gx+.15,p.gy+.15,.72);s+=isoLamp(p.gx+.72,p.gy+.2);
+    var f=iso(p.gx+.6,p.gy+.62);s+='<ellipse cx="'+f[0]+'" cy="'+f[1]+'" rx="9" ry="5" fill="#9ec9e6"/><ellipse cx="'+f[0]+'" cy="'+(f[1]-2)+'" rx="5" ry="3" fill="#cfe8f6"/>';return s;}
+  function bPark(p){var s=tileFill(p.gx,p.gy,'#bfe3b8');s+=isoTree(p.gx+.2,p.gy+.25,1);s+=isoTree(p.gx+.62,p.gy+.55,.85);s+=isoTree(p.gx+.3,p.gy+.68,.7);return s;}
+  function bGarden(p){var s=tileFill(p.gx,p.gy,'#cdebc2');var base=iso(p.gx+.5,p.gy+.5);
+    for(var i=0;i<5;i++){var px=base[0]-16+i*8,py=base[1]-i%2*4;s+='<circle cx="'+px+'" cy="'+py+'" r="3" fill="'+['#ff6f91','#ffd45e','#9b6dff','#ff914d','#ff6f91'][i]+'"/>';}
+    s+=isoTree(p.gx+.62,p.gy+.2,.6);return s;}
+  function bTrees(p){var s=tileFill(p.gx,p.gy,'#bfe3b8');s+=isoTree(p.gx+.3,p.gy+.3,.9)+isoTree(p.gx+.66,p.gy+.62,.75);return s;}
+  function bBeachHouse(p,built){var roofs=[{l:'#5bc0d6','d:':'#2f93a8'},{l:'#f2a65a','d':'#d97e2e'}];var r=(built&&built.style)===1?{l:'#f2a65a',d:'#d97e2e'}:{l:'#5bc0d6',d:'#2f93a8'};
+    return isoBox(p.gx+.24,p.gy+.24,.52,.52,12,'#fff3e2','#f3e3c8','#e6d2ad')+isoRoof(p.gx+.17,p.gy+.17,.66,.66,12,8,r.l,r.d);}
+  function bPier(p){var s=isoBox(p.gx+.1,p.gy+.35,.8,.3,4,'#c79a5e','#a87d44','#8f6836');s+=isoBox(p.gx+.75,p.gy+.3,.2,.4,10,'#e8d6a8','#d6c08a','#c4ad73');return s;}
+  function bKiosk(p){return isoBox(p.gx+.26,p.gy+.26,.48,.48,12,'#ffe6a6','#f3cd84','#e4bb6a')+isoRoof(p.gx+.2,p.gy+.2,.6,.6,12,7,'#ff8f6b','#e0674a');}
+
+  var BUILDERS={house:bHouse,apartment:bApartment,civic:bCivic,shop:bShop,market:bMarket,plaza:bPlaza,park:bPark,garden:bGarden,trees:bTrees,beach:bBeachHouse,pier:bPier,kiosk:bKiosk,palm:function(p){return tileFill(p.gx,p.gy,'#efe0b0')+isoPalm(p.gx+.3,p.gy+.3)+isoPalm(p.gx+.65,p.gy+.6);}};
+
+  function drawRuin(p){var s=isoBox(p.gx+.24,p.gy+.24,.52,.52,4,'#bcc1cb','#a4abb7','#8f97a4');
+    var c=iso(p.gx+.5,p.gy+.5);s+='<circle cx="'+(c[0]-6)+'" cy="'+(c[1]-2)+'" r="2.5" fill="#8f97a4"/><circle cx="'+(c[0]+5)+'" cy="'+(c[1]-4)+'" r="2" fill="#9aa1ad"/>';return s;}
+
+  /* cidades */
+  var CITIES=[
+    {name:"Bairro Esperança", ground:'#cdeccb', road:'#808895', plots:[
+      {id:'r1',gx:0,gy:0,type:'house',zone:'Residencial',name:'Restaurar uma casa',cost:40,unlock:0,hasStyle:true,benefit:'Uma casa colorida volta a ter vida.'},
+      {id:'r2',gx:1,gy:0,type:'house',zone:'Residencial',name:'Recuperar a casa vizinha',cost:55,unlock:1,hasStyle:true,benefit:'Mais uma família volta pra rua.'},
+      {id:'r3',gx:1,gy:1,type:'house',zone:'Residencial',name:'Reformar a casa da esquina',cost:70,unlock:1,hasStyle:true,benefit:'A rua residencial ganha forma.'},
+      {id:'r4',gx:0,gy:1,type:'apartment',zone:'Residencial',name:'Erguer o prédio de moradia',cost:130,unlock:2,benefit:'Um prédio dá altura ao bairro.'},
+      {id:'c1',gx:3,gy:0,type:'plaza',zone:'Comunitária',name:'Revitalizar a praça',cost:85,unlock:2,benefit:'Praça com banco, fonte e sombra.'},
+      {id:'c2',gx:4,gy:0,type:'civic',zone:'Comunitária',name:'Abrir o centro comunitário',cost:140,unlock:3,benefit:'Espaço pra atividades em grupo.'},
+      {id:'c3',gx:4,gy:1,type:'trees',zone:'Comunitária',name:'Arborizar o convívio',cost:60,unlock:3,benefit:'Sombra e ar pra comunidade.'},
+      {id:'v1',gx:0,gy:3,type:'trees',zone:'Área verde',name:'Plantar as primeiras árvores',cost:55,unlock:3,benefit:'O verde começa a voltar.'},
+      {id:'v2',gx:0,gy:4,type:'park',zone:'Área verde',name:'Recuperar o parque',cost:100,unlock:4,benefit:'Um parque pra respirar.'},
+      {id:'v3',gx:1,gy:4,type:'garden',zone:'Área verde',name:'Cultivar o canteiro',cost:65,unlock:4,benefit:'Flores e uma pequena horta.'},
+      {id:'m1',gx:3,gy:4,type:'shop',zone:'Comercial',name:'Reabrir a lojinha',cost:90,unlock:5,hasStyle:true,benefit:'O comércio local recomeça.'},
+      {id:'m2',gx:4,gy:4,type:'market',zone:'Comercial',name:'Montar o mercado de bairro',cost:130,unlock:6,benefit:'Feira e mercado movimentam a rua.'},
+      {id:'m3',gx:4,gy:3,type:'shop',zone:'Comercial',name:'Recuperar a fachada comercial',cost:75,unlock:6,hasStyle:true,benefit:'A esquina comercial ganha cor.'}
+    ], ambient:[{gx:3,gy:1,type:'tree'},{gx:1,gy:3,type:'tree'},{gx:3,gy:3,type:'lamp'}]},
+    {name:"Orla Nova", ground:'#efe0b0', road:'#c9b488', coast:true, plots:[
+      {id:'b1',gx:0,gy:0,type:'beach',zone:'Beira-mar',name:'Restaurar a casa de praia',cost:70,unlock:0,hasStyle:true,benefit:'Casinha litorânea reerguida.'},
+      {id:'b2',gx:1,gy:0,type:'beach',zone:'Beira-mar',name:'Recuperar o chalé vizinho',cost:85,unlock:1,hasStyle:true,benefit:'A orla ganha moradores.'},
+      {id:'b3',gx:3,gy:0,type:'kiosk',zone:'Orla',name:'Abrir o quiosque',cost:95,unlock:1,benefit:'Um ponto de encontro na areia.'},
+      {id:'b4',gx:0,gy:3,type:'palm',zone:'Natureza',name:'Plantar os coqueiros',cost:60,unlock:2,benefit:'Sombra e brisa na orla.'},
+      {id:'b5',gx:3,gy:4,type:'pier',zone:'Orla',name:'Construir o píer',cost:120,unlock:2,benefit:'Um píer pra ver o mar.'}
+    ], ambient:[{gx:4,gy:0,type:'palm2'},{gx:1,gy:3,type:'palm2'}]}
+  ];
+  function ambientDraw(a){if(a.type==='tree')return isoTree(a.gx+.25,a.gy+.25,.7);if(a.type==='lamp')return isoLamp(a.gx+.45,a.gy+.3);if(a.type==='palm2')return isoPalm(a.gx+.4,a.gy+.4);return '';}
+
+  function cityBuilt(ci){return state.cities[ci];}
+  function builtCount(ci){return Object.keys(state.cities[ci]).length;}
+  function cityAvailable(p,ci){return builtCount(ci)>=p.unlock;}
+
+  function renderCity(){
+    var C=CITIES[state.cityIndex], built=cityBuilt(state.cityIndex);
+    var s='<svg viewBox="0 0 360 214" width="100%" height="100%">';
+    // água na cidade litorânea
+    if(C.coast){s+='<rect x="0" y="0" width="360" height="214" fill="#bfe6ef"/>';}
+    // ground diamond
+    s+=poly([iso(0,0),iso(5,0),iso(5,5),iso(0,5)], C.ground);
+    // tiles: estradas em gx==2 / gy==2
+    for(var gy=0;gy<5;gy++)for(var gx=0;gx<5;gx++){
+      if(gx===2||gy===2) s+=tileFill(gx,gy,C.road);
+    }
+    // faixa central da rua
+    s+='<line x1="'+iso(2.5,0)[0]+'" y1="'+iso(2.5,0)[1]+'" x2="'+iso(2.5,5)[0]+'" y2="'+iso(2.5,5)[1]+'" stroke="#e9e3c9" stroke-width="1.3" stroke-dasharray="4 5" opacity=".6"/>';
+    // objetos (plots + ambient) ordenados por profundidade
+    var objs=[];
+    C.plots.forEach(function(p){objs.push({key:p.gx+p.gy, sub:p.gx, draw: built[p.id]?BUILDERS[p.type](p,built[p.id]):drawRuin(p)});});
+    (C.ambient||[]).forEach(function(a){objs.push({key:a.gx+a.gy, sub:a.gx, draw:ambientDraw(a)});});
+    objs.sort(function(a,b){return a.key-b.key || a.sub-b.sub;});
+    objs.forEach(function(o){s+=o.draw;});
+    s+='</svg>';
+    return s;
+  }
+
+  /* zonas / obras */
+  function renderZones(){
+    var C=CITIES[state.cityIndex], built=cityBuilt(state.cityIndex), wrap=$('zones');wrap.innerHTML='';
+    var zones=[];C.plots.forEach(function(p){if(zones.indexOf(p.zone)<0)zones.push(p.zone);});
+    zones.forEach(function(z){
+      var list=C.plots.filter(function(p){return p.zone===z;});
+      var doneN=list.filter(function(p){return built[p.id];}).length;
+      var head=document.createElement('div');head.className='zone-h';head.innerHTML='<span class="zt">'+z+'</span><span class="zc">'+doneN+'/'+list.length+'</span>';
+      wrap.appendChild(head);
+      list.forEach(function(p){
+        var done=!!built[p.id], avail=cityAvailable(p,state.cityIndex);
+        var el=document.createElement('div');el.className='obra'+(done?' done':'')+(!done&&!avail?' locked':'');
+        var right;
+        if(done)right='<span>✓</span>';
+        else if(!avail)right='<span class="obra-sub">🔒</span>';
+        else right='<span class="cost-pill'+(state.coins>=p.cost?'':' no')+'">'+coinMini()+p.cost+'</span>';
+        el.innerHTML='<div class="oi">'+zoneIcon(p.type)+'</div><div class="obra-main"><div class="obra-name">'+p.name+'</div><div class="obra-sub">'+(done?'Concluída':(avail?'Disponível':'Conclua '+p.unlock+(p.unlock===1?' obra':' obras')+' para liberar'))+'</div></div><div class="obra-right">'+right+'</div>';
+        el.addEventListener('click',function(){openObra(p.id);});
+        wrap.appendChild(el);
+      });
+    });
+  }
+  function coinMini(){return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px"><circle cx="12" cy="12" r="9" fill="#e0a800" opacity=".25"/><path d="M12 7v10M9.8 9.4h3a1.8 1.8 0 0 1 0 3.6h-2.4a1.8 1.8 0 0 0 0 3.6h3" stroke="#b5870a" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg> ';}
+  function zoneIcon(type){var map={house:'🏠',apartment:'🏢',civic:'🏛️',plaza:'⛲',trees:'🌳',park:'🌲',garden:'🌷',shop:'🏪',market:'🧺',beach:'🏖️',kiosk:'🥤',pier:'⚓',palm:'🌴'};return '<span style="font-size:19px">'+(map[type]||'🧱')+'</span>';}
+
+  function openObra(id){
+    var C=CITIES[state.cityIndex],built=cityBuilt(state.cityIndex);
+    var p=C.plots.filter(function(x){return x.id===id;})[0];if(!p)return;
+    var done=!!built[p.id], avail=cityAvailable(p,state.cityIndex);
+    var chosen=0;
+    var bd=document.createElement('div');bd.className='sheet-backdrop';
+    var hero='<div class="panel-hero">'+miniBuildingSVG(p, done?built[p.id]:{style:0})+'</div>';
+    var body='';
+    body+='<div class="panel-row"><span class="k">Estado</span><span class="v">'+(done?'Concluída':(avail?'Pronta para construir':'Bloqueada'))+'</span></div>';
+    body+='<div class="panel-row"><span class="k">Benefício</span><span class="v" style="max-width:60%;text-align:right">'+p.benefit+'</span></div>';
+    if(!done)body+='<div class="panel-row"><span class="k">Custo</span><span class="v">'+coinMini()+p.cost+' moedas</span></div>';
+    if(!done&&!avail)body+='<div class="panel-row"><span class="k">Requisito</span><span class="v">Conclua '+p.unlock+(p.unlock===1?' obra':' obras')+'</span></div>';
+    var styleHtml='';
+    if(!done&&avail&&p.hasStyle){
+      var opts=styleOptionsFor(p);
+      styleHtml='<p class="section-t" style="margin:14px 0 8px">Escolha o estilo</p><div class="style-grid" id="styleGrid">'+opts.map(function(o,i){return '<button class="style-opt'+(i===0?' sel':'')+'" data-i="'+i+'"><span class="swatch" style="background:'+o.c+'"></span>'+o.n+'</button>';}).join('')+'</div>';
+    }
+    var action='';
+    if(done)action='<button class="btn btn-outline" id="obraClose">Fechar</button>';
+    else if(!avail)action='<button class="btn btn-outline" id="obraClose">Entendi</button>';
+    else action='<button class="btn btn-primary" id="obraBuild" '+(state.coins>=p.cost?'':'disabled')+'>'+(state.coins>=p.cost?('Construir · '+p.cost+' moedas'):'Moedas insuficientes')+'</button><button class="btn btn-ghost" id="obraClose">Agora não</button>';
+    bd.innerHTML='<div class="sheet"><div class="grab"></div><h3>'+p.name+'</h3><p class="psub">'+p.zone+'</p>'+hero+body+styleHtml+action+'</div>';
+    $('device').appendChild(bd);
+    bd.addEventListener('click',function(e){if(e.target===bd)bd.remove();});
+    var cl=bd.querySelector('#obraClose');if(cl)cl.addEventListener('click',function(){bd.remove();});
+    var sg=bd.querySelector('#styleGrid');
+    if(sg)Array.prototype.forEach.call(sg.children,function(btn){btn.addEventListener('click',function(){chosen=+btn.getAttribute('data-i');Array.prototype.forEach.call(sg.children,function(c){c.classList.remove('sel');});btn.classList.add('sel');});});
+    var bb=bd.querySelector('#obraBuild');
+    if(bb)bb.addEventListener('click',function(){
+      if(state.coins<p.cost)return;
+      state.coins-=p.cost;built[p.id]={style:p.hasStyle?chosen:0};
+      bd.remove();updateAll();pulseCity();toast('Obra concluída! ✨');checkCityComplete();
+    });
+  }
+  function styleOptionsFor(p){
+    if(p.type==='house')return [{n:'Telhado vermelho',c:'#c0442b'},{n:'Telhado verde',c:'#248049'},{n:'Telhado azul',c:'#2f5fb0'}];
+    if(p.type==='shop')return [{n:'Fachada âmbar',c:'#f3cd84'},{n:'Fachada verde',c:'#bcd9b0'}];
+    if(p.type==='beach')return [{n:'Teto turquesa',c:'#2f93a8'},{n:'Teto coral',c:'#d97e2e'}];
+    return [{n:'Padrão',c:'#9aa1ad'}];
+  }
+  function miniBuildingSVG(p,built){
+    // desenha só o prédio centralizado num mini-svg
+    var saveOX=OX,saveOY=OY;OX=180;OY=150;
+    var svg='<svg viewBox="80 70 200 110" width="100%" height="100%">'+BUILDERS[p.type]({gx:1.6,gy:1.6,type:p.type},built)+'</svg>';
+    OX=saveOX;OY=saveOY;return svg;
+  }
+  function pulseCity(){var el=$('cityScene');if(!el)return;el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');}
+  function checkCityComplete(){
+    var ci=state.cityIndex,total=CITIES[ci].plots.length;
+    if(builtCount(ci)>=total && !state.cityDone[ci]){state.cityDone[ci]=true;updateAll();showCelebrate();}
+  }
+  function showCelebrate(){
+    var ci=state.cityIndex;$('celebrateWrap').classList.remove('hide');
+    $('celebTitle').textContent=CITIES[ci].name+' restaurada!';
+    if(ci+1<CITIES.length){$('celebText').textContent='Você reconstruiu toda a vila — um marco e tanto. Uma nova cidade abandonada está pronta pra receber o seu cuidado: a '+CITIES[ci+1].name+'.';$('nextCityBtn').classList.remove('hide');}
+    else{$('celebText').textContent='Você restaurou todas as cidades disponíveis. Que jornada!';$('nextCityBtn').classList.add('hide');}
+  }
+  $('nextCityBtn').addEventListener('click',function(){if(state.cityIndex+1<CITIES.length){state.cityIndex++;$('celebrateWrap').classList.add('hide');updateAll();pulseCity();$('vila').scrollTop=0;toast('Bem-vindo à '+CITIES[state.cityIndex].name+' 🌊');}});
+
+  /* ===== update ===== */
+  function updateAll(){
+    var first=state.name?state.name.split(' ')[0]:'Olá';var mult=multiplier(state.streak);var wither=state.plantMood==='wither';
+    $('hubName').textContent='Olá, '+first;$('hubStreak').textContent=state.streak;$('hubCoins').textContent=coinFmt(state.coins);$('hubSaved').textContent=money(savedTotal());$('hubEncourage').textContent=encourageMsg();
+    var stg=stageFromDays(state.total);
+    $('miniGarden').innerHTML=gardenSVG(stg,true,wither);$('miniCity').innerHTML=renderCity();
+    $('hubGardenSub').textContent=wither?'Sua planta está murcha — cuide dela no jardim.':subFor(stg);
+    $('hubPlaySub').textContent=CITIES[state.cityIndex].name+' · '+builtCount(state.cityIndex)+'/'+CITIES[state.cityIndex].plots.length+' restaurado.';
+    $('hubMissionText').textContent=MISSIONS[state.missionIndex];
+    var hm=$('hubMission'),hb=$('hubMissionBtn');
+    if(state.missionDone){hm.classList.add('mission-done');hb.textContent='Feito';hb.disabled=true;$('hubMissionLbl').textContent='Concluída hoje';}
+    else{hm.classList.remove('mission-done');hb.textContent='Concluir';hb.disabled=false;$('hubMissionLbl').textContent='Missão diária · +15 moedas';}
+    // vila
+    $('vCoins').textContent=coinFmt(state.coins);$('vMult').textContent='×'+fmtM(mult);$('econMult').textContent='×'+fmtM(mult);
+    $('cityName').textContent=CITIES[state.cityIndex].name;
+    var bc=builtCount(state.cityIndex),tot=CITIES[state.cityIndex].plots.length;
+    $('cityObj').textContent=bc+'/'+tot+' restaurado';$('objBar').style.width=(bc/tot*100)+'%';$('objLbl').textContent=bc+'/'+tot;
+    $('cityScene').innerHTML=renderCity();renderZones();
+    if(state.cityDone[state.cityIndex])showCelebrate();else $('celebrateWrap').classList.add('hide');
+    // jardim
+    $('gDay').textContent=state.total;$('gStreak').textContent=state.streak;$('gTotal').textContent=state.total;$('gRelapse').textContent=state.relapses;
+    $('gardenScene').innerHTML=gardenSVG(stg,false,wither);
+    $('stageLabel').textContent=wither?'Precisando de cuidado':STAGE_NAMES[stg];
+    $('stageLabel').className='stage-label'+(wither?' wither':'');
+    $('retomadaCard').classList.toggle('hide',!wither);
+    $('gMoney').textContent=money(savedTotal());$('gWeek').textContent=money(state.weeklySpend);$('gMonth').textContent=money(state.weeklySpend*4.3);
+  }
+  function encourageMsg(){if(state.plantMood==='wither')return 'Recomeçar faz parte. Sua cidade e seu jardim continuam de pé.';if(state.streak>=14)return 'Duas semanas firme — multiplicador no máximo!';if(state.streak>=7)return 'Uma semana inteira. Suas moedas rendem mais agora.';return 'Um passo de cada vez. Hoje já conta.';}
+  function subFor(st){return ['Plante o primeiro dia cuidando de você.','Seu primeiro broto apareceu.','A muda está crescendo.','Sua planta está firme e forte.','Um botão começou a florir!','Seu jardim está em plena flor.'][st];}
+
+  /* ações */
+  function addDays(n){var earned=0;for(var i=0;i<n;i++){state.streak++;state.total++;earned+=Math.round(dailySpend()*multiplier(state.streak));}state.coins+=earned;state.plantMood='healthy';if(n>=1)state.missionDone=false;state.missionIndex=(state.missionIndex+n)%MISSIONS.length;updateAll();toast('+'+coinFmt(earned)+' moedas · '+(n===1?'1 dia':n+' dias')+' 🌱');}
+  $('addDay').addEventListener('click',function(){addDays(1);});
+  $('addWeek').addEventListener('click',function(){addDays(7);});
+  $('giveCoins').addEventListener('click',function(){state.coins+=300;updateAll();toast('+300 moedas (demo)');});
+  $('hubMissionBtn').addEventListener('click',function(){if(state.missionDone)return;state.missionDone=true;state.coins+=15;updateAll();toast('Missão concluída · +15 moedas 💛');});
+  $('finishCity').addEventListener('click',function(){var C=CITIES[state.cityIndex],built=cityBuilt(state.cityIndex);C.plots.forEach(function(p){if(!built[p.id])built[p.id]={style:0};});updateAll();pulseCity();checkCityComplete();toast('Cidade concluída (demo)');});
+
+  $('relapseBtn').addEventListener('click',function(){openRelapse();});
+  function openRelapse(){
+    var bd=document.createElement('div');bd.className='sheet-backdrop';
+    bd.innerHTML='<div class="sheet"><div class="grab"></div><h3>Tudo bem, isso faz parte</h3><p class="psub">Registrar uma recaída não apaga o que você construiu. Sua cidade continua inteira e suas moedas permanecem. Sua planta vai murchar por um tempo, mas sem perder o tamanho — e o multiplicador recomeça do ×1, voltando a crescer conforme você retoma.</p><button class="btn btn-navy" id="confirmRelapse">Registrar e seguir em frente</button><button class="btn btn-ghost" id="cancelRelapse">Agora não</button></div>';
+    $('device').appendChild(bd);
+    bd.querySelector('#cancelRelapse').addEventListener('click',function(){bd.remove();});
+    bd.addEventListener('click',function(e){if(e.target===bd)bd.remove();});
+    bd.querySelector('#confirmRelapse').addEventListener('click',function(){state.relapses++;state.streak=0;state.plantMood='wither';state.missionDone=false;updateAll();bd.remove();toast('Você registrou. Estamos com você. 💛');});
+  }
+  $('retomadaBtn').addEventListener('click',function(){openRetomada();});
+  function openRetomada(){
+    var action=RETOMADA_ACTIONS[Math.floor(Math.random()*RETOMADA_ACTIONS.length)];
+    var bd=document.createElement('div');bd.className='sheet-backdrop';
+    bd.innerHTML='<div class="sheet"><div class="grab"></div><h3>Missão de retomada</h3><p class="psub">Um gesto pequeno de cuidado, no seu tempo. Isto não conta como um novo dia — é só pra ajudar você e seu jardim a recuperarem o fôlego.</p><div class="card" style="margin-bottom:14px"><b>'+action+'</b></div><button class="btn btn-primary" id="doneRetomada">Concluí, me sinto melhor</button><button class="btn btn-ghost" id="cancelRetomada">Agora não</button></div>';
+    $('device').appendChild(bd);
+    bd.querySelector('#cancelRetomada').addEventListener('click',function(){bd.remove();});
+    bd.addEventListener('click',function(e){if(e.target===bd)bd.remove();});
+    bd.querySelector('#doneRetomada').addEventListener('click',function(){state.plantMood='healthy';state.coins+=10;updateAll();bd.remove();toast('Que bom te ver de volta 🌱 +10 moedas de autocuidado');});
+  }
+
+  /* chat */
+  var CHAT_SUGGESTS=["Como funciona o vício em apostas?","Tô com vontade de apostar agora","Como ajudo um amigo que aposta?","O app substitui tratamento?","Como ganho moedas?"];
+  var CHAT_RULES=[
+    {k:["vontade","agora","apostar agora","urgênci","urgenci","recair","não aguento","nao aguento","vou apostar"],r:"Essa vontade forte é real, e ela costuma passar — em geral em alguns minutos. Experimente respirar fundo com o círculo da aba <b>Ajuda</b>, beber um copo d'água e sair do lugar onde você está. Lembre que cada dia firme reconstrói sua cidade. Se estiver muito difícil, o <b>CVV (188)</b> atende 24h.",res:"Abrir aba Ajuda",act:"Ajuda"},
+    {k:["vício","vicio","como funciona","dependênc","dependenc","por que aposto"],r:"Apostas são desenhadas pra prender a atenção: recompensas imprevisíveis ativam o cérebro de um jeito parecido com outras compulsões, e a sensação de 'quase ganhei' faz querer tentar de novo. Perceber esse mecanismo já ajuda a retomar o controle."},
+    {k:["amigo","amiga","alguém","alguem","ajudar","parente","filho","marido","esposa"],r:"O mais importante é acolher sem julgar. Evite acusar ou controlar; prefira dizer que você se importa e está disponível. Ofereça companhia pra procurar ajuda (como o CAPS ou os Jogadores Anônimos) e cuide também de você."},
+    {k:["substitui","tratamento","médico","medico","terapia","profissional","psicólog","psicolog"],r:"Não. O Rolê que Rende é um apoio pra reflexão e hábitos no dia a dia, mas não substitui acompanhamento profissional. Procure um psicólogo, o CAPS ou os Jogadores Anônimos — você encontra na aba <b>Ajuda</b>.",res:"Abrir aba Ajuda",act:"Ajuda"},
+    {k:["moeda","moedas","ganho","ganhar","cidade","vila","construir","multiplicador","multiplic"],r:"Cada R$ 1 que você deixa de apostar vira 1 moeda. Quanto mais dias seguidos, maior o multiplicador (×1,2 a partir de 3 dias, até ×3 com 30). Você gasta as moedas reconstruindo a sua <b>cidade</b>. Quer abrir a Vila?",res:"Abrir a Vila",act:"Vila"}
+  ];
+  var CHAT_FALLBACK="Obrigada por compartilhar isso comigo. Eu te ajudo com dúvidas sobre apostas, sobre como usar o app e sobre onde encontrar apoio. Se o momento estiver difícil, dá uma olhada na aba <b>Ajuda</b> — lá estão canais gratuitos e sigilosos, como o CVV (188).";
+  var chatStarted=false;
+  function initChat(){if(chatStarted)return;chatStarted=true;var first=state.name?state.name.split(' ')[0]:'';botSay("Oi"+(first?', '+first:'')+"! Eu sou a Rô. Posso tirar dúvidas sobre apostas e te ajudar a usar o app. Sobre o que você quer conversar?");renderSuggests();}
+  function renderSuggests(){var wrap=$('chatSuggests');wrap.innerHTML='';CHAT_SUGGESTS.forEach(function(sg){var b=document.createElement('button');b.textContent=sg;b.addEventListener('click',function(){meSay(sg);respond(sg);});wrap.appendChild(b);});}
+  function bubble(cls,html){var d=document.createElement('div');d.className='msg '+cls;d.innerHTML=html;$('chatLog').appendChild(d);scrollChat();return d;}
+  function meSay(t){bubble('me',escapeHtml(t));}
+  function botSay(html,resLabel,act){var extra=resLabel?'<span class="res" data-act="'+(act||'')+'">→ '+resLabel+'</span>':'';var d=bubble('bot',html+extra);if(resLabel){d.querySelector('.res').addEventListener('click',function(){navTo(act==='Vila'?'vila':'sos');});}}
+  function scrollChat(){var l=$('chatLog');l.scrollTop=l.scrollHeight;}
+  function respond(text){var low=text.toLowerCase(),match=null;for(var i=0;i<CHAT_RULES.length;i++){if(CHAT_RULES[i].k.some(function(k){return low.indexOf(k)>=0;})){match=CHAT_RULES[i];break;}}showTyping();setTimeout(function(){hideTyping();if(match)botSay(match.r,match.res,match.act);else botSay(CHAT_FALLBACK,"Abrir aba Ajuda","Ajuda");},650);}
+  var typingEl=null;function showTyping(){typingEl=bubble('bot','<span class="typing"><i></i><i></i><i></i></span>');}function hideTyping(){if(typingEl){typingEl.remove();typingEl=null;}}
+  $('chatForm').addEventListener('submit',function(e){e.preventDefault();var v=$('chatInput').value.trim();if(!v)return;meSay(v);$('chatInput').value='';respond(v);});
+  function escapeHtml(s){return s.replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  Array.prototype.forEach.call(document.querySelectorAll('.copy-btn'),function(b){b.addEventListener('click',function(){var txt=b.getAttribute('data-copy');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast('Número 188 copiado');}).catch(function(){toast('Número: 188');});}else toast('Número: 188');});});
+
+  /* nav */
+  var SCREENS=['welcome','survey','profile','hub','vila','garden','chat','sos'];
+  var TABS={hub:1,vila:1,chat:1,sos:1};
+  var TABBAR_ON={hub:1,vila:1,garden:1,chat:1,sos:1};
+  function show(id){SCREENS.forEach(function(sc){$(sc).hidden=(sc!==id);});$('tabbar').classList.toggle('hide',!TABBAR_ON[id]);$('restartBtn').classList.toggle('hide',id!=='hub');Array.prototype.forEach.call($('tabbar').children,function(btn){btn.classList.toggle('active',btn.getAttribute('data-nav')===id);});animate(id);var el=$(id);if(el)el.scrollTop=0;if(id==='chat')initChat();if(id==='survey')renderQuestion();}
+  function navTo(id){show(id);}
+  function animate(id){var el=$(id);if(!el)return;el.classList.remove('enter');void el.offsetWidth;el.classList.add('enter');}
+  Array.prototype.forEach.call($('tabbar').children,function(btn){btn.addEventListener('click',function(){navTo(btn.getAttribute('data-nav'));});});
+  $('hubPlay').addEventListener('click',function(){navTo('vila');});
+  $('hubGardenCta').addEventListener('click',function(){navTo('garden');});
+  $('gardenBack').addEventListener('click',function(){navTo('hub');});
+  $('hubChat').addEventListener('click',function(){navTo('chat');});
+  $('hubSos').addEventListener('click',function(){navTo('sos');});
+  $('toHub').addEventListener('click',function(){updateAll();show('hub');});
+  $('restartBtn').addEventListener('click',function(){resetAll();});
+
+  /* welcome */
+  $('welcomeForm').addEventListener('submit',function(e){e.preventDefault();var nm=$('nm').value.trim(),em=$('em').value.trim(),ok=true;if(nm.length<2){$('nmErr').textContent='Conta pra gente como te chamar.';ok=false;}else $('nmErr').textContent='';if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){$('emErr').textContent='Digite um e-mail válido.';ok=false;}else $('emErr').textContent='';if(!ok)return;state.name=nm;state.email=em;qIndex=0;state.answers={};show('survey');});
+  $('demoBtn').addEventListener('click',function(){
+    state.name='Alex (exemplo)';state.email='exemplo@role.app';state.answers={freq:2,spend:100,impact:1,tries:1,feel:2,trigger:1,goal:1};
+    state.weeklySpend=100;state.streak=12;state.total=12;state.relapses=1;state.coins=240;state.plantMood='healthy';
+    state.cityIndex=0;state.cities=[{r1:{style:0},r2:{style:1}},{}];state.cityDone=[false,false];state.missionDone=false;state.missionIndex=2;
+    computeProfile();updateAll();show('hub');toast('Demonstração com dados de exemplo');
+  });
+  function resetAll(){state={name:'',email:'',answers:{},weeklySpend:0,streak:1,total:1,relapses:0,coins:0,plantMood:'healthy',cityIndex:0,cities:[{},{}],cityDone:[false,false],missionDone:false,missionIndex:0};qIndex=0;chatStarted=false;$('chatLog').innerHTML='';$('chatInput').value='';$('nm').value='';$('em').value='';$('nmErr').textContent='';$('emErr').textContent='';$('celebrateWrap').classList.add('hide');show('welcome');}
+
+  var toastT=null;function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show');},2300);}
+
+  function start(){show('welcome');updateAll();}
+  if(window.claude&&window.claude.hot){window.claude.hot.ready?window.claude.hot.ready(function(){start();}):start();}else start();
+})();
+</script>

@@ -6,7 +6,9 @@ import ObrasList from './components/ObrasList';
 import { CITIES } from './data/cities';
 import CityView from './scene/CityView';
 import { builtCount, isCityComplete, useVilaStore } from '@/store/useVilaStore';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 // Bloco da vila para a tela Início: cidade com câmera e lista de obras. O painel da
 // obra abre como rota (app/obra.tsx).
@@ -16,6 +18,7 @@ export default function VilaSection({
   mapOverlay,
   belowMap,
 }: { mapOverlay?: ReactNode; belowMap?: ReactNode } = {}) {
+  const styles = useThemedStyles(makeStyles);
   const { cityIndex, built: builtByCity, nextCity } = useVilaStore();
   const city = CITIES[cityIndex];
   const built = builtByCity[cityIndex];
@@ -86,7 +89,8 @@ export default function VilaSection({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   c: { gap: spacing.md },
   overlay: { position: 'absolute', top: 10, right: 10 },
   notice: {
@@ -97,7 +101,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: colors.green,
   },
-  noticeTxt: { color: '#fff', fontWeight: '700', fontSize: 13 },
+  noticeTxt: { color: '#fff', fontWeight: '700', fontSize: fs(13) },
   doneCard: {
     padding: spacing.md,
     gap: 6,
@@ -105,17 +109,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.greenSoft,
     alignItems: 'center',
   },
-  doneTitle: { fontSize: 16, fontWeight: '700', color: colors.green600 },
-  doneTxt: { fontSize: 13, color: colors.muted, textAlign: 'center' },
+  doneTitle: { fontSize: fs(16), fontWeight: '700', color: colors.green600 },
+  doneTxt: { fontSize: fs(13), color: colors.muted, textAlign: 'center' },
   doneBtn: {
     marginTop: 6,
     minHeight: 44,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.md,
-    backgroundColor: colors.blue,
+    backgroundColor: colors.brand,
     justifyContent: 'center',
   },
-  doneBtnTxt: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  doneBtnTxt: { color: '#fff', fontWeight: '700', fontSize: fs(15) },
   listHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  h2: { fontSize: 18, fontWeight: '700', color: colors.ink },
+  h2: { fontSize: fs(18), fontWeight: '700', color: colors.ink },
 });
