@@ -5,9 +5,7 @@ import CityHeader from './components/CityHeader';
 import ObrasList from './components/ObrasList';
 import { CITIES } from './data/cities';
 import CityView from './scene/CityView';
-import { useGameStore } from '@/store/useGameStore';
 import { builtCount, isCityComplete, useVilaStore } from '@/store/useVilaStore';
-import { formatCoins } from '@/lib/format';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 // Bloco da vila para a tela Início: cidade com câmera e lista de obras. O painel da
@@ -18,7 +16,6 @@ export default function VilaSection({
   mapOverlay,
   belowMap,
 }: { mapOverlay?: ReactNode; belowMap?: ReactNode } = {}) {
-  const coins = useGameStore((s) => s.coins);
   const { cityIndex, built: builtByCity, nextCity } = useVilaStore();
   const city = CITIES[cityIndex];
   const built = builtByCity[cityIndex];
@@ -82,19 +79,9 @@ export default function VilaSection({
         <Text style={styles.h2} accessibilityRole="header">
           Construir a vila
         </Text>
-        <Text style={styles.coins}>● {formatCoins(coins)} moedas</Text>
       </View>
       <ObrasList city={city} built={built} onOpen={openObra} />
 
-      {__DEV__ && (
-        <Pressable
-          onPress={() => useGameStore.setState((s) => ({ coins: s.coins + 300 }))}
-          accessibilityRole="button"
-          style={styles.dev}
-        >
-          <Text style={styles.devTxt}>+300 moedas (só em desenvolvimento)</Text>
-        </Pressable>
-      )}
     </View>
   );
 }
@@ -131,15 +118,4 @@ const styles = StyleSheet.create({
   doneBtnTxt: { color: '#fff', fontWeight: '700', fontSize: 15 },
   listHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   h2: { fontSize: 18, fontWeight: '700', color: colors.ink },
-  coins: { fontSize: 14, fontWeight: '700', color: colors.goldInk },
-  dev: {
-    minHeight: 44,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: colors.faint,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  devTxt: { fontSize: 13, color: colors.muted },
 });
