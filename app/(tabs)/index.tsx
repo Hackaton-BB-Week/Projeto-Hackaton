@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 // ScrollView do gesture-handler: deixa o arraste/pinça da vila ganhar da rolagem da página.
 import { ScrollView } from 'react-native-gesture-handler';
 import { VilaSection } from '@/features/vila';
+import { DailyActions, PlantBadge, PlantSheets, RecoveryBanner } from '@/features/planta';
 import { useProfile } from '@/hooks/useProfile';
 import { formatBRL, formatCoins } from '@/lib/format';
 import { colors } from '@/theme/tokens';
@@ -12,17 +13,29 @@ import { MissionsShortcut } from '@/features/missoes/components/MissionsShortcut
 export default function Hub() {
   const { coins, preserved, multiplier } = useProfile();
   return (
-    <ScrollView style={styles.scroll} contentContainerStyle={styles.c}>
-      <View style={styles.hud}>
-        <Text style={styles.h}>Olá!</Text>
-        <Text style={styles.m}>Moedas: {formatCoins(coins)}</Text>
-        <Text style={styles.m}>Preservado: {formatBRL(preserved)}</Text>
-        <Text style={styles.m}>Multiplicador: x{multiplier}</Text>
-        <MissionsShortcut />
-        <FinanceShortcut />
-      </View>
-      <VilaSection />
-    </ScrollView>
+    <>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.c}>
+        <View style={styles.hud}>
+          <Text style={styles.h}>Olá!</Text>
+          <Text style={styles.m}>Moedas: {formatCoins(coins)}</Text>
+          <Text style={styles.m}>Preservado: {formatBRL(preserved)}</Text>
+          <Text style={styles.m}>Multiplicador: x{multiplier}</Text>
+          <MissionsShortcut />
+          <FinanceShortcut />
+        </View>
+        <VilaSection
+          mapOverlay={<PlantBadge />}
+          belowMap={
+            <>
+              <RecoveryBanner />
+              <DailyActions />
+            </>
+          }
+        />
+      </ScrollView>
+      {/* Fora do ScrollView: no Android, um Modal dentro dele abre encolhido. */}
+      <PlantSheets />
+    </>
   );
 }
 

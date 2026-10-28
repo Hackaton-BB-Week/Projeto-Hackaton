@@ -13,6 +13,7 @@
     "chat:dev": "deno run --watch --allow-net --allow-env --env-file=supabase/functions/.env supabase/functions/chat/index.ts"
   },
   "dependencies": {
+    "@expo-google-fonts/bricolage-grotesque": "^0.4.1",
     "@expo/vector-icons": "~14.0.4",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/netinfo": "11.4.1",

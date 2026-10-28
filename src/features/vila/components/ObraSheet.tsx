@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
+import { useSwipeToClose } from '@/hooks/useSwipeToClose';
 import { styleOptionsFor, type Plot } from '../data/cities';
 import { BuildingPreview } from '../scene/CityScene';
 import { isAvailable, type BuiltMap } from '@/store/useVilaStore';
@@ -26,6 +29,8 @@ export default function ObraSheet({
   bottomInset = 0,
 }: Props) {
   const [style, setStyle] = useState(0);
+  // Fecha deslizando para baixo, o mesmo caminho por onde entrou.
+  const swipe = useSwipeToClose(onClose);
   useEffect(() => setStyle(0), [plot.id]);
 
   const done = built[plot.id];
@@ -36,9 +41,14 @@ export default function ObraSheet({
 
   return (
     <View style={styles.root}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Fechar painel" />
-      <View
-        style={[styles.sheet, { paddingBottom: spacing.xl + bottomInset }]}
+      {/* O fundo clareia junto com o arraste. */}
+      <Animated.View style={[styles.backdrop, swipe.backdropStyle]}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={swipe.dismiss} accessibilityLabel="Fechar painel" />
+      </Animated.View>
+      <GestureDetector gesture={swipe.gesture}>
+      <Animated.View
+        onLayout={swipe.onLayout}
+        style={[styles.sheet, { paddingBottom: spacing.xl + bottomInset }, swipe.panelStyle]}
         accessibilityViewIsModal
       >
         <View style={styles.grab} />
@@ -87,12 +97,13 @@ export default function ObraSheet({
               hint={canPay ? undefined : `Você tem ${coins} de ${plot.cost} moedas.`}
               onPress={() => onBuild(plot.id, style)}
             />
-            <Button label="Agora não" onPress={onClose} />
+            <Button label="Agora não" onPress={swipe.dismiss} />
           </>
         ) : (
-          <Button label={done ? 'Fechar' : 'Entendi'} onPress={onClose} />
+          <Button label={done ? 'Fechar' : 'Entendi'} onPress={swipe.dismiss} />
         )}
-      </View>
+      </Animated.View>
+      </GestureDetector>
     </View>
   );
 }
