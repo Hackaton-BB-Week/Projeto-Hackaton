@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 // ScrollView do gesture-handler: deixa o arraste/pinça da vila ganhar da rolagem da página.
 import { ScrollView } from 'react-native-gesture-handler';
 import { VilaSection } from '@/features/vila';
+import { DailyActions, PlantBadge, PlantSheets, RecoveryBanner } from '@/features/planta';
 import { useProfile } from '@/hooks/useProfile';
 import { formatBRL, formatCoins } from '@/lib/format';
 import { colors } from '@/theme/tokens';
@@ -12,19 +13,31 @@ import { MenuButton } from '@/features/menu/MenuButton';
 export default function Hub() {
   const { coins, preserved, multiplier } = useProfile();
   return (
-    <ScrollView style={styles.scroll} contentContainerStyle={styles.c}>
-      <View style={styles.hud}>
-        <View style={styles.top}>
-          <MenuButton />
-          <Text style={styles.h}>Olá!</Text>
+    <>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.c}>
+        <View style={styles.hud}>
+          <View style={styles.top}>
+            <MenuButton />
+            <Text style={styles.h}>Olá!</Text>
+          </View>
+          <Text style={styles.m}>Moedas: {formatCoins(coins)}</Text>
+          <Text style={styles.m}>Preservado: {formatBRL(preserved)}</Text>
+          <Text style={styles.m}>Multiplicador: x{multiplier}</Text>
+          <FinanceShortcut />
         </View>
-        <Text style={styles.m}>Moedas: {formatCoins(coins)}</Text>
-        <Text style={styles.m}>Preservado: {formatBRL(preserved)}</Text>
-        <Text style={styles.m}>Multiplicador: x{multiplier}</Text>
-        <FinanceShortcut />
-      </View>
-      <VilaSection />
-    </ScrollView>
+        <VilaSection
+          mapOverlay={<PlantBadge />}
+          belowMap={
+            <>
+              <RecoveryBanner />
+              <DailyActions />
+            </>
+          }
+        />
+      </ScrollView>
+      {/* Fora do ScrollView: no Android, um Modal dentro dele abre encolhido. */}
+      <PlantSheets />
+    </>
   );
 }
 

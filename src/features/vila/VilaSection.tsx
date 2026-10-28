@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { router } from 'expo-router';
 import { AccessibilityInfo, Pressable, StyleSheet, Text, View } from 'react-native';
 import CityHeader from './components/CityHeader';
@@ -13,7 +13,11 @@ import { colors, radius, spacing } from '@/theme/tokens';
 // Bloco da vila para a tela Início: cidade com câmera e lista de obras. O painel da
 // obra abre como rota (app/obra.tsx).
 // É autossuficiente (lê e grava nos stores), então a Home só precisa de <VilaSection />.
-export default function VilaSection() {
+// `mapOverlay` fica sobre o canto superior direito do mapa; `belowMap` logo abaixo dele.
+export default function VilaSection({
+  mapOverlay,
+  belowMap,
+}: { mapOverlay?: ReactNode; belowMap?: ReactNode } = {}) {
   const coins = useGameStore((s) => s.coins);
   const { cityIndex, built: builtByCity, nextCity } = useVilaStore();
   const city = CITIES[cityIndex];
@@ -46,7 +50,11 @@ export default function VilaSection() {
   return (
     <View style={styles.c}>
       <CityHeader name={city.name} done={done} total={city.plots.length} />
-      <CityView cityIndex={cityIndex} built={built} onPlotPress={openObra} />
+      <View>
+        <CityView cityIndex={cityIndex} built={built} onPlotPress={openObra} />
+        {mapOverlay && <View style={styles.overlay}>{mapOverlay}</View>}
+      </View>
+      {belowMap}
       {notice && (
         <View style={styles.notice} accessibilityLiveRegion="polite">
           <Text style={styles.noticeTxt}>{notice}</Text>
@@ -93,6 +101,7 @@ export default function VilaSection() {
 
 const styles = StyleSheet.create({
   c: { gap: spacing.md },
+  overlay: { position: 'absolute', top: 10, right: 10 },
   notice: {
     alignSelf: 'center',
     marginTop: -spacing.sm,

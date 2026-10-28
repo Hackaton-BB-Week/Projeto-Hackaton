@@ -1,4 +1,6 @@
-import { create } from 'zustand';
+import { create, type StateCreator } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ----- Regras da economia (puras, testáveis) -----
 export const MULTIPLIER_TIERS = [
@@ -37,7 +39,7 @@ interface GameState {
   spendCoins: (cost: number) => boolean;
 }
 
-export const useGameStore = create<GameState>((set, get) => ({
+const gameStore: StateCreator<GameState> = (set, get) => ({
   weeklySpend: 0,
   streak: 1,
   total: 1,
@@ -81,4 +83,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     set((s) => ({ coins: s.coins - cost }));
     return true;
   },
-}));
+});
+
+// Salvo no aparelho: sequência, dias e moedas não podem sumir ao fechar o app.
+export const useGameStore = create<GameState>()(
+  persist(gameStore, { name: 'rqr-game', storage: createJSONStorage(() => AsyncStorage) }),
+);
