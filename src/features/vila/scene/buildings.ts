@@ -168,9 +168,9 @@ const BUILDERS: Record<BuildingType, Builder> = {
   pier: (d, p) => {
     for (const ey of [0.12, 0.48, 0.84])
       for (const ex of [0.37, 0.59])
-        d.box(p.gx + ex, p.gy + ey, 0.04, 0.04, 5, '#a37b3f', '#8a6534', '#6e4f27');
-    d.box(p.gx + 0.35, p.gy - 0.05, 0.3, 0.97, 2, '#d8a86a', '#bd8f4f', '#a37b3f', 5);
-    d.box(p.gx + 0.46, p.gy + 0.8, 0.08, 0.08, 4, '#8a6534', '#7a5a2e', '#6e4f27', 7);
+        d.box(p.gx + ex, p.gy + ey, 0.04, 0.04, 1.5, '#a37b3f', '#8a6534', '#6e4f27');
+    d.box(p.gx + 0.35, p.gy - 0.05, 0.3, 0.97, 1.5, '#d8a86a', '#bd8f4f', '#a37b3f', 1.5);
+    d.box(p.gx + 0.46, p.gy + 0.8, 0.08, 0.08, 4, '#8a6534', '#7a5a2e', '#6e4f27', 3);
   },
   plaza: (d, p) => {
     d.shadow(p.gx + 0.16, p.gy + 0.16, 0.68, 0.68);
