@@ -1,5 +1,7 @@
 import { Pressable, View, Text, StyleSheet } from 'react-native';
-import { colors, radius } from '@/theme/tokens';
+import { radius } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 // Opção de resposta com "radio" (espelha .opt do protótipo).
 export function OptionButton({
@@ -11,6 +13,7 @@ export function OptionButton({
   selected: boolean;
   onPress: () => void;
 }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <Pressable
       onPress={onPress}
@@ -27,7 +30,8 @@ export function OptionButton({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   opt: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -40,7 +44,7 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
     backgroundColor: colors.surface,
   },
-  optSel: { borderColor: colors.blue, backgroundColor: '#eef3fd' },
+  optSel: { borderColor: colors.brand, backgroundColor: '#eef3fd' },
   radio: {
     width: 20,
     height: 20,
@@ -50,7 +54,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  radioSel: { borderColor: colors.blue },
-  dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.blue },
-  label: { flex: 1, fontSize: 14.5, fontWeight: '500', color: colors.ink },
+  radioSel: { borderColor: colors.brand },
+  dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.brand },
+  label: { flex: 1, fontSize: fs(14.5), fontWeight: '500', color: colors.ink },
 });

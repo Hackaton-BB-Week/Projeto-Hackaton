@@ -1,7 +1,9 @@
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import { QUESTIONS } from './questions';
 import { useSurveyStore } from './useSurveyStore';
 import { OptionButton } from './components/OptionButton';
@@ -9,6 +11,7 @@ import { OnboardingButton } from './components/OnboardingButton';
 
 // Pesquisa inicial: uma pergunta por vez, com progresso. Visual de #obSurvey.
 export function SurveyScreen() {
+  const styles = useThemedStyles(makeStyles);
   const { index, answers, answer, setIndex } = useSurveyStore();
   const q = QUESTIONS[index];
   const selected = answers[q.key];
@@ -79,23 +82,24 @@ export function SurveyScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  c: { flex: 1, backgroundColor: colors.sky },
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
+  c: { flex: 1, backgroundColor: colors.bg },
   top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 18, paddingTop: 16, paddingBottom: 8 },
   back: {
     width: 44,
     height: 44,
     borderRadius: radius.sm,
-    backgroundColor: colors.sky2,
+    backgroundColor: colors.surface2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backTxt: { fontSize: 26, lineHeight: 28, color: colors.ink, fontWeight: '600' },
-  bar: { flex: 1, height: 8, borderRadius: 999, backgroundColor: colors.sky2, overflow: 'hidden' },
+  backTxt: { fontSize: fs(26), lineHeight: fs(28), color: colors.ink, fontWeight: '600' },
+  bar: { flex: 1, height: 8, borderRadius: 999, backgroundColor: colors.surface2, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: 999, backgroundColor: colors.gold },
-  count: { minWidth: 34, textAlign: 'right', fontSize: 12.5, fontWeight: '700', color: colors.muted },
+  count: { minWidth: 34, textAlign: 'right', fontSize: fs(12.5), fontWeight: '700', color: colors.muted },
   body: { paddingHorizontal: 18, paddingTop: 14, paddingBottom: spacing.md },
-  h2: { fontSize: 23, fontWeight: '700', color: colors.ink, marginBottom: 16, lineHeight: 27 },
+  h2: { fontSize: fs(23), fontWeight: '700', color: colors.ink, marginBottom: 16, lineHeight: fs(27) },
   options: { gap: 9 },
   foot: { paddingHorizontal: 18, paddingTop: spacing.md, paddingBottom: 18 },
 });

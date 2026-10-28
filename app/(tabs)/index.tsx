@@ -5,7 +5,8 @@ import { VilaSection } from '@/features/vila';
 import { DailyActions, PlantBadge, PlantSheets, RecoveryBanner } from '@/features/planta';
 import { useProfile } from '@/hooks/useProfile';
 import { formatBRL, formatCoins } from '@/lib/format';
-import { colors } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import { FinanceShortcut } from '@/features/financeiro/components/FinanceShortcut';
 import { PreJogoShortcut } from '@/features/prejogo/components/PreJogoShortcut';
 import { MenuButton } from '@/features/menu/MenuButton';
@@ -13,6 +14,7 @@ import { MissionsShortcut } from '@/features/missoes/components/MissionsShortcut
 
 // Hub (stub). Mostra as métricas derivadas do store.
 export default function Hub() {
+  const styles = useThemedStyles(makeStyles);
   const { coins, preserved, multiplier } = useProfile();
   return (
     <>
@@ -45,11 +47,12 @@ export default function Hub() {
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: colors.sky },
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
+  scroll: { flex: 1, backgroundColor: colors.bg },
   c: { padding: 20, paddingTop: 56, gap: 20 },
   hud: { gap: 8 },
   top: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  h: { fontSize: 24, fontWeight: '700', color: colors.ink },
-  m: { fontSize: 15, color: colors.muted },
+  h: { fontSize: fs(24), fontWeight: '700', color: colors.ink },
+  m: { fontSize: fs(15), color: colors.muted },
 });

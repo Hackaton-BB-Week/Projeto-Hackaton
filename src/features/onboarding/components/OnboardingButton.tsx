@@ -1,5 +1,7 @@
 import { Pressable, Text, StyleSheet } from 'react-native';
-import { colors, radius } from '@/theme/tokens';
+import { radius } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 type Variant = 'primary' | 'navy' | 'ghost';
 
@@ -15,6 +17,7 @@ export function OnboardingButton({
   variant?: Variant;
   disabled?: boolean;
 }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <Pressable
       onPress={onPress}
@@ -34,7 +37,8 @@ export function OnboardingButton({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   base: {
     minHeight: 50,
     borderRadius: radius.md,
@@ -48,8 +52,8 @@ const styles = StyleSheet.create({
   ghost: { backgroundColor: 'transparent', paddingVertical: 12 },
   pressed: { opacity: 0.85 },
   disabled: { opacity: 0.5 },
-  txt: { fontSize: 15, fontWeight: '700' },
+  txt: { fontSize: fs(15), fontWeight: '700' },
   primaryTxt: { color: colors.goldInk },
   navyTxt: { color: '#fff' },
-  ghostTxt: { color: colors.blue, fontWeight: '600' },
+  ghostTxt: { color: colors.brand, fontWeight: '600' },
 });

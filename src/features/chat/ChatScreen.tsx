@@ -11,12 +11,16 @@ import {
   StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import { useTheme, type Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import { useChat } from './useChat';
 import { MessageBubble } from './components/MessageBubble';
 import { CrisisCard } from './components/CrisisCard';
 
 export function ChatScreen() {
+  const styles = useThemedStyles(makeStyles);
+  const { colors } = useTheme();
   const { messages, status, sending, online, send, retry, showCrisis, hideCrisis } = useChat();
   const [draft, setDraft] = useState('');
   const listRef = useRef<FlatList>(null);
@@ -73,7 +77,7 @@ export function ChatScreen() {
           ListFooterComponent={
             status !== 'idle' ? (
               <View style={styles.typing} accessibilityLiveRegion="polite">
-                <ActivityIndicator color={colors.blue} />
+                <ActivityIndicator color={colors.brand} />
                 <Text style={styles.typingTxt}>
                   {status === 'waiting'
                     ? 'Sem conexão. Aguardando a internet voltar…'
@@ -112,7 +116,8 @@ export function ChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   c: { flex: 1, backgroundColor: colors.surface },
   flex: { flex: 1 },
   header: {
@@ -123,13 +128,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
   },
-  h: { fontSize: 20, fontWeight: '700', color: colors.ink },
-  disclaimer: { fontSize: 13, lineHeight: 18, color: colors.muted },
+  h: { fontSize: fs(20), fontWeight: '700', color: colors.ink },
+  disclaimer: { fontSize: fs(13), lineHeight: fs(18), color: colors.muted },
   list: { padding: spacing.md, gap: spacing.sm },
   offlineBar: { backgroundColor: colors.danger, paddingVertical: 6, paddingHorizontal: spacing.lg },
-  offlineTxt: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  offlineTxt: { color: '#fff', fontSize: fs(13), fontWeight: '600' },
   typing: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingVertical: 4 },
-  typingTxt: { color: colors.muted, fontSize: 14 },
+  typingTxt: { color: colors.muted, fontSize: fs(14) },
   inputRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -144,9 +149,9 @@ const styles = StyleSheet.create({
     maxHeight: 120,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
-    fontSize: 16,
+    fontSize: fs(16),
     color: colors.ink,
-    backgroundColor: colors.sky,
+    backgroundColor: colors.bg,
     borderRadius: radius.md,
   },
   send: {
@@ -157,5 +162,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gold,
   },
   sendOff: { opacity: 0.5 },
-  sendTxt: { color: colors.goldInk, fontWeight: '700', fontSize: 15 },
+  sendTxt: { color: colors.goldInk, fontWeight: '700', fontSize: fs(15) },
 });

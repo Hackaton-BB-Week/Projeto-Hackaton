@@ -5,6 +5,8 @@ import type { BuiltMap } from '@/store/useVilaStore';
 import { drawAmbient, drawBuilding, drawRuin } from './buildings';
 import { drawGround } from './ground';
 import { Painter } from './painter';
+import { useSettingsStore } from '@/store/useSettingsStore';
+import { tintFor } from '@/theme/colorblind';
 
 interface Props {
   cityIndex: number;
@@ -17,9 +19,12 @@ interface Props {
 // para que os prédios da frente cubram os de trás. O toque nos lotes é tratado em CityView.
 function CityScene({ cityIndex, built, width, height }: Props) {
   const city = CITIES[cityIndex];
+  // Modo daltonismo: telhados, árvores, gramado etc. passam pelo filtro de cor.
+  const colorblind = useSettingsStore((s) => s.colorblind);
 
   const content = useMemo(() => {
-    const ground = new Painter(city.ox, city.oy);
+    const tint = tintFor(colorblind);
+    const ground = new Painter(city.ox, city.oy, tint);
     drawGround(ground, city);
 
     const objects = [
@@ -45,13 +50,13 @@ function CityScene({ cityIndex, built, width, height }: Props) {
       <>
         <G>{ground.els}</G>
         {objects.map((o, i) => {
-          const d = new Painter(city.ox, city.oy);
+          const d = new Painter(city.ox, city.oy, tint);
           o.draw(d);
           return <G key={o.plot ?? `a${i}`}>{d.els}</G>;
         })}
       </>
     );
-  }, [city, built]);
+  }, [city, built, colorblind]);
 
   const b = city.bounds;
   return (
@@ -79,11 +84,12 @@ export function BuildingPreview({
   size: number;
   tight?: boolean;
 }) {
+  const colorblind = useSettingsStore((s) => s.colorblind);
   const els = useMemo(() => {
-    const d = new Painter(170, 120);
+    const d = new Painter(170, 120, tintFor(colorblind));
     drawBuilding(d, type, { gx: 1.6, gy: 1.6 }, style);
     return d.els;
-  }, [type, style]);
+  }, [type, style, colorblind]);
   return (
     <Svg
       width={size}
