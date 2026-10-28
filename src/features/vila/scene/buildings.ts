@@ -166,7 +166,9 @@ const BUILDERS: Record<BuildingType, Builder> = {
   // Píer: deck de madeira saindo da areia (atrás) para o mar, apoiado em estacas,
   // com um poste de amarração na ponta.
   pier: (d, p) => {
-    for (const ey of [0.12, 0.48, 0.84])
+    // 8 estacas: a primeira e a última fileira ficam nas pontas do deck (gy -0,05 a 0,92),
+    // para os quatro cantos terem apoio.
+    for (const ey of [-0.03, 0.27, 0.57, 0.86])
       for (const ex of [0.37, 0.59])
         d.box(p.gx + ex, p.gy + ey, 0.04, 0.04, 1.5, '#a37b3f', '#8a6534', '#6e4f27');
     d.box(p.gx + 0.35, p.gy - 0.05, 0.3, 0.97, 1.5, '#d8a86a', '#bd8f4f', '#a37b3f', 1.5);
