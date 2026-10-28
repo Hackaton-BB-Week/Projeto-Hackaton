@@ -26,8 +26,8 @@ export function useTheme() {
   const { themeMode, fontSize, colorblind, reduceMotion } = useSettingsStore();
   const systemReduceMotion = useSystemReduceMotion();
 
-  // O app abre claro; fica escuro só quando a pessoa liga "Modo escuro" nas Configurações.
-  // ('system' segue o celular, para quem preferir.)
+  // Padrão ('system'): segue o modo do celular. Se a pessoa escolher nas Configurações,
+  // vale a escolha dela ('light' ou 'dark').
   const isDark = themeMode === 'dark' || (themeMode === 'system' && scheme === 'dark');
 
   return useMemo(() => {
