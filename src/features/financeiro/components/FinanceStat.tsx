@@ -12,7 +12,14 @@ export function FinanceStat({ value, label, color }: { value: string; label: str
 }
 
 const styles = StyleSheet.create({
-  c: { flex: 1, backgroundColor: colors.sky, borderRadius: radius.sm, padding: spacing.sm + 2 },
+  c: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: radius.sm,
+    padding: spacing.sm + 2,
+  },
   v: { fontSize: 18, fontWeight: '700', fontVariant: ['tabular-nums'] },
   l: { fontSize: 11, color: colors.muted, marginTop: 2 },
 });
