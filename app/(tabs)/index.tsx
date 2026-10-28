@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useProfile } from '@/hooks/useProfile';
 import { formatBRL, formatCoins } from '@/lib/format';
 import { colors } from '@/theme/tokens';
+import { FinanceShortcut } from '@/features/financeiro/components/FinanceShortcut';
 
 // Hub (stub). Mostra as métricas derivadas do store.
 export default function Hub() {
@@ -12,6 +13,7 @@ export default function Hub() {
       <Text style={styles.m}>Moedas: {formatCoins(coins)}</Text>
       <Text style={styles.m}>Preservado: {formatBRL(preserved)}</Text>
       <Text style={styles.m}>Multiplicador: x{multiplier}</Text>
+      <FinanceShortcut />
     </View>
   );
 }
