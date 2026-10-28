@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { useSwipeToClose } from '@/hooks/useSwipeToClose';
+import { useSettingsStore } from '@/store/useSettingsStore';
+import { tintFor } from '@/theme/colorblind';
 import { styleOptionsFor, type Plot } from '../data/cities';
 import { BuildingPreview } from '../scene/CityScene';
 import { isAvailable, type BuiltMap } from '@/store/useVilaStore';
@@ -32,6 +34,7 @@ export default function ObraSheet({
 }: Props) {
   const styles = useThemedStyles(makeStyles);
   const [style, setStyle] = useState(0);
+  const tint = tintFor(useSettingsStore((s) => s.colorblind));
   // Fecha deslizando para baixo, o mesmo caminho por onde entrou.
   const swipe = useSwipeToClose(onClose);
   useEffect(() => setStyle(0), [plot.id]);
@@ -83,7 +86,7 @@ export default function ObraSheet({
                   accessibilityState={{ checked: style === i }}
                   style={[styles.styleOpt, style === i && styles.styleSel]}
                 >
-                  <View style={[styles.swatch, { backgroundColor: o.color }]} />
+                  <View style={[styles.swatch, { backgroundColor: tint(o.color) }]} />
                   <Text style={styles.styleTxt}>{o.name}</Text>
                 </Pressable>
               ))}
