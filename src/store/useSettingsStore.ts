@@ -23,7 +23,7 @@ interface SettingsState {
 }
 
 const DEFAULTS = {
-  themeMode: 'system' as ThemeMode,
+  themeMode: 'light' as ThemeMode,
   fontSize: 'default' as FontSize,
   colorblind: false,
   reduceMotion: false,
@@ -39,6 +39,16 @@ export const useSettingsStore = create<SettingsState>()(
       setReduceMotion: (reduceMotion) => set({ reduceMotion }),
       reset: () => set(DEFAULTS),
     }),
-    { name: 'rqr-settings', storage: createJSONStorage(() => AsyncStorage) },
+    {
+      name: 'rqr-settings',
+      storage: createJSONStorage(() => AsyncStorage),
+      // v1: o app passa a abrir claro; quem tinha "seguir o sistema" salvo começa no claro.
+      version: 1,
+      migrate: (saved, version) => {
+        const s = saved as Partial<SettingsState>;
+        if (version < 1 && s.themeMode === 'system') s.themeMode = 'light';
+        return s as SettingsState;
+      },
+    },
   ),
 );
