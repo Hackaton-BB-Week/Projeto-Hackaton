@@ -3,8 +3,6 @@ import { AccessibilityInfo, useColorScheme } from 'react-native';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { FONT_SCALE, getPalette } from './themes';
 
-const DARK_MODE_ENABLED = false;
-
 /** Acompanha "Reduzir movimento" do sistema operacional. */
 function useSystemReduceMotion() {
   const [enabled, setEnabled] = useState(false);
@@ -28,9 +26,9 @@ export function useTheme() {
   const { themeMode, fontSize, colorblind, reduceMotion } = useSettingsStore();
   const systemReduceMotion = useSystemReduceMotion();
 
-  // Por enquanto o app é só claro. Para reativar o modo escuro, troque para true.
-  const isDark =
-    DARK_MODE_ENABLED && (themeMode === 'system' ? scheme === 'dark' : themeMode === 'dark');
+  // O app abre claro; fica escuro só quando a pessoa liga "Modo escuro" nas Configurações.
+  // ('system' segue o celular, para quem preferir.)
+  const isDark = themeMode === 'dark' || (themeMode === 'system' && scheme === 'dark');
 
   return useMemo(() => {
     const scale = FONT_SCALE[fontSize];
