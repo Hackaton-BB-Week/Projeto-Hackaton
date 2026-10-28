@@ -1,7 +1,9 @@
 import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import { useTheme, type Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import { formatBRL } from '@/lib/format';
 import { useFinance } from './useFinance';
 import { FinanceStat } from './components/FinanceStat';
@@ -11,6 +13,8 @@ import { FinanceForm } from './components/FinanceForm';
 
 // Painel financeiro: o que as apostas custavam e para onde esse dinheiro pode ir.
 export function FinanceScreen() {
+  const styles = useThemedStyles(makeStyles);
+  const { colors } = useTheme();
   const f = useFinance();
 
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
@@ -51,7 +55,7 @@ export function FinanceScreen() {
             <FinanceStat
               value={formatBRL(f.saved)}
               label="guardado de fato (você informa)"
-              color={colors.blue}
+              color={colors.brand}
             />
           </View>
 
@@ -78,8 +82,9 @@ export function FinanceScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  c: { flex: 1, backgroundColor: colors.sky },
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
+  c: { flex: 1, backgroundColor: colors.bg },
   flex: { flex: 1 },
   header: {
     flexDirection: 'row',
@@ -95,14 +100,14 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: radius.sm,
-    backgroundColor: colors.sky,
+    backgroundColor: colors.bg,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backTxt: { fontSize: 26, lineHeight: 28, color: colors.ink, fontWeight: '600' },
-  h: { fontSize: 17, fontWeight: '700', color: colors.ink, flex: 1 },
+  backTxt: { fontSize: fs(26), lineHeight: fs(28), color: colors.ink, fontWeight: '600' },
+  h: { fontSize: fs(17), fontWeight: '700', color: colors.ink, flex: 1 },
   body: { padding: 18, paddingBottom: 32, gap: 14 },
-  lead: { fontSize: 14, lineHeight: 21, color: colors.muted },
+  lead: { fontSize: fs(14), lineHeight: fs(21), color: colors.muted },
   statRow: { flexDirection: 'row', gap: 10 },
   card: {
     backgroundColor: colors.surface,
@@ -111,5 +116,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.md,
   },
-  eyebrow: { fontSize: 13, fontWeight: '700', color: colors.ink, marginBottom: spacing.sm },
+  eyebrow: { fontSize: fs(13), fontWeight: '700', color: colors.ink, marginBottom: spacing.sm },
 });

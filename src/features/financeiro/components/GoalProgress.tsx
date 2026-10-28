@@ -1,8 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 // Progresso do valor guardado em direção à meta. Só aparece quando há meta.
 export function GoalProgress({ percent }: { percent: number }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View
       accessible
@@ -21,10 +23,11 @@ export function GoalProgress({ percent }: { percent: number }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  t: { fontSize: 13, fontWeight: '700', color: colors.ink },
-  v: { fontSize: 13, color: colors.ink, fontVariant: ['tabular-nums'] },
-  track: { height: 12, borderRadius: 999, backgroundColor: colors.sky, overflow: 'hidden' },
+  t: { fontSize: fs(13), fontWeight: '700', color: colors.ink },
+  v: { fontSize: fs(13), color: colors.ink, fontVariant: ['tabular-nums'] },
+  track: { height: 12, borderRadius: 999, backgroundColor: colors.bg, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: 999, backgroundColor: colors.gold },
 });
