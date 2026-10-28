@@ -23,6 +23,7 @@ interface SettingsState {
 }
 
 const DEFAULTS = {
+  // Padrão: segue o celular (claro ou escuro). Ao mexer no interruptor, vale a escolha da pessoa.
   themeMode: 'system' as ThemeMode,
   fontSize: 'default' as FontSize,
   colorblind: false,
@@ -39,6 +40,16 @@ export const useSettingsStore = create<SettingsState>()(
       setReduceMotion: (reduceMotion) => set({ reduceMotion }),
       reset: () => set(DEFAULTS),
     }),
-    { name: 'rqr-settings', storage: createJSONStorage(() => AsyncStorage) },
+    {
+      name: 'rqr-settings',
+      storage: createJSONStorage(() => AsyncStorage),
+      // v2: volta a seguir o celular por padrão (a v1 forçava o claro).
+      version: 2,
+      migrate: (saved, version) => {
+        const s = saved as Partial<SettingsState>;
+        if (version < 2) s.themeMode = 'system';
+        return s as SettingsState;
+      },
+    },
   ),
 );

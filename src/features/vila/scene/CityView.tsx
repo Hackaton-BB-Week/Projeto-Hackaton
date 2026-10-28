@@ -4,13 +4,14 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import { CITIES, type BuildingType } from '../data/cities';
 import type { BuiltMap } from '@/store/useVilaStore';
-import { colors, radius } from '@/theme/tokens';
+import { radius } from '@/theme/tokens';
+import { useTheme, type Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import CityScene from './CityScene';
 import { HH, HW } from './painter';
 
@@ -69,8 +70,10 @@ function plotAt(cityIndex: number, built: BuiltMap, x: number, y: number) {
 }
 
 export default function CityView({ cityIndex, built, height = 280, onPlotPress }: Props) {
+  const styles = useThemedStyles(makeStyles);
   const [width, setWidth] = useState(0);
-  const reduceMotion = useReducedMotion();
+  // Segue "Reduzir animações" do app e do celular.
+  const { reduceMotion } = useTheme();
   const scale = useSharedValue(START_ZOOM);
   const tx = useSharedValue(0);
   const ty = useSharedValue(0);
@@ -224,6 +227,7 @@ function ZoomButton({
   a11y: string;
   onPress: () => void;
 }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <Pressable
       onPress={onPress}
@@ -236,11 +240,12 @@ function ZoomButton({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   viewport: {
     overflow: 'hidden',
     borderRadius: radius.lg,
-    backgroundColor: colors.sky2,
+    backgroundColor: colors.surface2,
   },
   clip: { overflow: 'hidden' },
   zoom: { position: 'absolute', right: 10, bottom: 10, gap: 8 },
@@ -252,5 +257,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  zoomTxt: { fontSize: 22, fontWeight: '700', color: colors.navy },
+  zoomTxt: { fontSize: fs(22), fontWeight: '700', color: colors.navy },
 });

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import { useTheme, type Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import { parseMoneyInput } from '../finance';
 import type { FinanceUpdate } from '../useFinance';
 
@@ -23,6 +25,8 @@ export function FinanceForm({
   initial: FinanceUpdate;
   onSave: (v: FinanceUpdate) => void;
 }) {
+  const styles = useThemedStyles(makeStyles);
+  const { colors } = useTheme();
   const [draft, setDraft] = useState<Record<FieldKey, string>>(() => ({
     weeklySpend: toText(initial.weeklySpend),
     saved: toText(initial.saved),
@@ -94,12 +98,13 @@ export function FinanceForm({
   );
 }
 
-const styles = StyleSheet.create({
-  eyebrow: { fontSize: 13, fontWeight: '700', color: colors.ink, marginBottom: spacing.sm },
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
+  eyebrow: { fontSize: fs(13), fontWeight: '700', color: colors.ink, marginBottom: spacing.sm },
   field: { gap: 7, marginBottom: 14 },
-  label: { fontSize: 13, fontWeight: '600', color: colors.ink },
+  label: { fontSize: fs(13), fontWeight: '600', color: colors.ink },
   input: {
-    fontSize: 15,
+    fontSize: fs(15),
     paddingVertical: 13,
     paddingHorizontal: 14,
     minHeight: 48,
@@ -118,6 +123,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   btnPressed: { opacity: 0.85 },
-  btnTxt: { color: colors.goldInk, fontWeight: '700', fontSize: 15 },
+  btnTxt: { color: colors.goldInk, fontWeight: '700', fontSize: fs(15) },
   ok: { textAlign: 'center', color: colors.green600, fontWeight: '600', marginTop: spacing.sm },
 });

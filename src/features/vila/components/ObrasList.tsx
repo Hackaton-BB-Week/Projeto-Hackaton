@@ -2,7 +2,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { City, Plot } from '../data/cities';
 import { BuildingPreview } from '../scene/CityScene';
 import { isAvailable, type BuiltMap } from '@/store/useVilaStore';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import { useTheme, type Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 interface Props {
   city: City;
@@ -14,6 +16,7 @@ const obrasText = (n: number) => `${n} ${n === 1 ? 'obra' : 'obras'}`;
 
 // Lista "Construir a vila", agrupada por zona, igual ao protótipo.
 export default function ObrasList({ city, built, onOpen }: Props) {
+  const styles = useThemedStyles(makeStyles);
   const zones = [...new Set(city.plots.map((p) => p.zone))];
   return (
     <View style={styles.c}>
@@ -41,6 +44,8 @@ export default function ObrasList({ city, built, onOpen }: Props) {
 }
 
 function ObraCard({ plot, built, onPress }: { plot: Plot; built: BuiltMap; onPress: () => void }) {
+  const styles = useThemedStyles(makeStyles);
+  const { colors } = useTheme();
   const done = !!built[plot.id];
   const available = isAvailable(plot, built);
   const status = done
@@ -79,12 +84,13 @@ function ObraCard({ plot, built, onPress }: { plot: Plot; built: BuiltMap; onPre
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   c: { gap: spacing.md },
   zone: { gap: spacing.sm },
   zoneHead: { flexDirection: 'row', justifyContent: 'space-between' },
-  zoneTitle: { fontSize: 13, fontWeight: '700', color: colors.navy, textTransform: 'uppercase' },
-  zoneCount: { fontSize: 13, fontWeight: '600', color: colors.muted },
+  zoneTitle: { fontSize: fs(13), fontWeight: '700', color: colors.navy, textTransform: 'uppercase' },
+  zoneCount: { fontSize: fs(13), fontWeight: '600', color: colors.muted },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   card: {
     flexBasis: '31%',
@@ -102,13 +108,13 @@ const styles = StyleSheet.create({
   cardLocked: { opacity: 0.6 },
   thumb: { height: 64, justifyContent: 'center', overflow: 'hidden' },
   thumbGhost: { opacity: 0.45 },
-  name: { fontSize: 12.5, fontWeight: '600', color: colors.ink, textAlign: 'center' },
-  status: { fontSize: 12, color: colors.muted, fontWeight: '600' },
+  name: { fontSize: fs(12.5), fontWeight: '600', color: colors.ink, textAlign: 'center' },
+  status: { fontSize: fs(12), color: colors.muted, fontWeight: '600' },
   costPill: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 999,
     backgroundColor: colors.gold,
   },
-  costTxt: { fontSize: 12, fontWeight: '700', color: colors.goldInk },
+  costTxt: { fontSize: fs(12), fontWeight: '700', color: colors.goldInk },
 });

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, type TextInputProps } from 'react-native';
-import { colors } from '@/theme/tokens';
+import { useTheme, type Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 // Campo com rótulo e mensagem de erro (espelha .field do protótipo).
 export function TextField({
@@ -8,6 +9,8 @@ export function TextField({
   error,
   ...input
 }: TextInputProps & { label: string; error?: string | null }) {
+  const styles = useThemedStyles(makeStyles);
+  const { colors } = useTheme();
   const [focused, setFocused] = useState(false);
   return (
     <View style={styles.field}>
@@ -34,11 +37,12 @@ export function TextField({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   field: { gap: 7, marginBottom: 6 },
-  label: { fontSize: 13, fontWeight: '600', color: colors.ink },
+  label: { fontSize: fs(13), fontWeight: '600', color: colors.ink },
   input: {
-    fontSize: 15,
+    fontSize: fs(15),
     paddingVertical: 13,
     paddingHorizontal: 14,
     minHeight: 48,
@@ -48,7 +52,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     color: colors.ink,
   },
-  focused: { borderColor: colors.blue },
+  focused: { borderColor: colors.brand },
   invalid: { borderColor: colors.danger },
-  err: { fontSize: 12, color: colors.danger, minHeight: 16 },
+  err: { fontSize: fs(12), color: colors.danger, minHeight: 16 },
 });

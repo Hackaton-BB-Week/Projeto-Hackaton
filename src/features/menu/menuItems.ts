@@ -37,6 +37,8 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     title: 'Configurações',
-    items: [{ id: 'configuracoes', label: 'Configurações', icon: 'sliders', href: null }],
+    items: [
+      { id: 'configuracoes', label: 'Configurações', icon: 'sliders', href: '/configuracoes' },
+    ],
   },
 ];

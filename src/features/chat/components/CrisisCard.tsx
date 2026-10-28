@@ -1,9 +1,12 @@
 import { View, Text, Pressable, StyleSheet, Linking } from 'react-native';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import { EMERGENCY_CHANNELS } from '../crisis';
 
 // Cartão fixo com os canais de emergência. Aparece quando a mensagem tem sinal de crise.
 export function CrisisCard({ onClose }: { onClose: () => void }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.card} accessibilityRole="alert">
       <Text style={styles.title}>Você não está sozinho</Text>
@@ -29,7 +32,8 @@ export function CrisisCard({ onClose }: { onClose: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   card: {
     margin: spacing.md,
     padding: spacing.md,
@@ -39,8 +43,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.danger,
   },
-  title: { fontSize: 18, fontWeight: '700', color: colors.ink },
-  body: { fontSize: 15, lineHeight: 21, color: colors.ink },
+  title: { fontSize: fs(18), fontWeight: '700', color: colors.ink },
+  body: { fontSize: fs(15), lineHeight: fs(21), color: colors.ink },
   btn: {
     backgroundColor: colors.danger,
     borderRadius: radius.md,
@@ -48,7 +52,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     minHeight: 48,
   },
-  btnTxt: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  btnDetail: { color: '#ffe3dc', fontSize: 13 },
-  close: { textAlign: 'center', color: colors.muted, fontSize: 14, paddingTop: 4 },
+  btnTxt: { color: '#fff', fontSize: fs(16), fontWeight: '700' },
+  btnDetail: { color: '#ffe3dc', fontSize: fs(13) },
+  close: { textAlign: 'center', color: colors.muted, fontSize: fs(14), paddingTop: 4 },
 });

@@ -7,8 +7,9 @@ import {
   BricolageGrotesque_700Bold,
   BricolageGrotesque_800ExtraBold,
 } from '@expo-google-fonts/bricolage-grotesque';
-import { colors, spacing } from '@/theme/tokens';
-import { useTheme } from '@/theme/useTheme';
+import { spacing } from '@/theme/tokens';
+import { useTheme, type Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import { TextField } from './components/TextField';
 import { OnboardingButton } from './components/OnboardingButton';
 import { HeroScene } from './components/welcome/HeroScene';
@@ -20,6 +21,7 @@ import { validateEmail, validateName } from './validation';
 // Boas-vindas + login local (nome e e-mail). Visual de #obWelcome no protótipo
 // com a cena de abertura (moeda, girassol e casinhas da vila).
 export function WelcomeScreen() {
+  const styles = useThemedStyles(makeStyles);
   const { submitIdentity, startDemo } = useOnboarding();
   const { reduceMotion } = useTheme();
   const [fontsLoaded] = useFonts({ BricolageGrotesque_700Bold, BricolageGrotesque_800ExtraBold });
@@ -117,7 +119,8 @@ export function WelcomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
   c: { flex: 1, backgroundColor: '#0f2353' },
   flex: { flex: 1 },
   scroll: { flexGrow: 1 },
@@ -136,12 +139,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  brandName: { color: '#fff', fontSize: 20, fontWeight: '800', letterSpacing: -0.6 },
+  brandName: { color: '#fff', fontSize: fs(20), fontWeight: '800', letterSpacing: -0.6 },
   hero: { flex: 1, justifyContent: 'center', gap: 18, paddingHorizontal: spacing.lg, paddingVertical: 20 },
-  h1: { color: '#fff', fontSize: 31, fontWeight: '800', lineHeight: 35, letterSpacing: -0.8 },
+  h1: { color: '#fff', fontSize: fs(31), fontWeight: '800', lineHeight: fs(35), letterSpacing: -0.8 },
   displayFont: { fontFamily: 'BricolageGrotesque_800ExtraBold', fontWeight: 'normal' },
   displayFontBold: { fontFamily: 'BricolageGrotesque_700Bold', fontWeight: 'normal' },
-  lead: { color: '#bcd0f5', fontSize: 14.5, lineHeight: 23 },
+  lead: { color: '#bcd0f5', fontSize: fs(14.5), lineHeight: fs(23) },
   form: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: 28,
@@ -151,5 +154,5 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
     gap: 4,
   },
-  note: { fontSize: 12, color: colors.faint, textAlign: 'center', marginTop: 10, lineHeight: 18 },
+  note: { fontSize: fs(12), color: colors.faint, textAlign: 'center', marginTop: 10, lineHeight: fs(18) },
 });
