@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { VilaSection } from '@/features/vila';
 import { useProfile } from '@/hooks/useProfile';
 import { formatBRL, formatCoins } from '@/lib/format';
 import { colors } from '@/theme/tokens';
@@ -7,17 +8,22 @@ import { colors } from '@/theme/tokens';
 export default function Hub() {
   const { coins, preserved, multiplier } = useProfile();
   return (
-    <View style={styles.c}>
-      <Text style={styles.h}>Olá!</Text>
-      <Text style={styles.m}>Moedas: {formatCoins(coins)}</Text>
-      <Text style={styles.m}>Preservado: {formatBRL(preserved)}</Text>
-      <Text style={styles.m}>Multiplicador: x{multiplier}</Text>
-    </View>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.c}>
+      <View style={styles.hud}>
+        <Text style={styles.h}>Olá!</Text>
+        <Text style={styles.m}>Moedas: {formatCoins(coins)}</Text>
+        <Text style={styles.m}>Preservado: {formatBRL(preserved)}</Text>
+        <Text style={styles.m}>Multiplicador: x{multiplier}</Text>
+      </View>
+      <VilaSection />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  c: { flex: 1, backgroundColor: colors.sky, padding: 20, gap: 8, justifyContent: 'center' },
+  scroll: { flex: 1, backgroundColor: colors.sky },
+  c: { padding: 20, paddingTop: 56, gap: 20 },
+  hud: { gap: 8 },
   h: { fontSize: 24, fontWeight: '700', color: colors.ink },
   m: { fontSize: 15, color: colors.muted },
 });

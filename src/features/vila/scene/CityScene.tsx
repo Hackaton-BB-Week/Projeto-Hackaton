@@ -67,15 +67,17 @@ function CityScene({ cityIndex, built, width, height }: Props) {
 
 export default memo(CityScene);
 
-/** Miniatura de um prédio, usada no painel da obra. */
+/** Miniatura de um prédio: `tight` enquadra só o prédio (cards); senão, com folga (painel). */
 export function BuildingPreview({
   type,
   style,
   size,
+  tight,
 }: {
   type: BuildingType;
   style: number;
   size: number;
+  tight?: boolean;
 }) {
   const els = useMemo(() => {
     const d = new Painter(170, 120);
@@ -83,7 +85,11 @@ export function BuildingPreview({
     return d.els;
   }, [type, style]);
   return (
-    <Svg width={size} height={(size * 150) / 208} viewBox="66 46 208 150">
+    <Svg
+      width={size}
+      height={tight ? (size * 70) / 56 : (size * 150) / 208}
+      viewBox={tight ? '142 118 56 70' : '66 46 208 150'}
+    >
       {els}
     </Svg>
   );
