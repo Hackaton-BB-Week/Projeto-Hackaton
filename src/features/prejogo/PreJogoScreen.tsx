@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useTheme } from '@/theme/useTheme';
 import { usePreJogo } from './usePreJogo';
-import { QuestionStep } from './components/QuestionStep';
+import { QuestionStep } from '@/components/QuestionStep';
 import { ResultView } from './components/ResultView';
 
 // Modo pré-jogo: 4 perguntas para pausar antes de apostar e um plano personalizado.

@@ -4,7 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useGameStore } from './useGameStore';
 
 // Login local (sem auth real, ver docs/MVP.md). Fica salvo no aparelho.
-export type Trigger = 'tedio' | 'recuperar' | 'ansiedade' | 'promo';
+// 'partida' (empolgação de uma partida) vem do "Refazer diagnóstico".
+export type Trigger = 'tedio' | 'recuperar' | 'ansiedade' | 'promo' | 'partida';
 
 interface UserState {
   name: string;
@@ -19,6 +20,8 @@ interface UserState {
 
   setIdentity: (name: string, email: string) => void;
   completeOnboarding: (v: { weeklySpend: number; trigger: Trigger; goal: number }) => void;
+  /** Resultado do "Refazer diagnóstico": atualiza gasto semanal e gatilho. */
+  updateDiagnosis: (v: { weeklySpend: number; trigger: Trigger }) => void;
   logout: () => void;
 }
 
@@ -35,6 +38,11 @@ export const useUserStore = create<UserState>()(
 
       setIdentity: (name, email) => set({ name, email }),
       completeOnboarding: (v) => set({ ...v, onboarded: true }),
+      updateDiagnosis: (v) => {
+        set(v);
+        // O gasto semanal também alimenta a economia de moedas.
+        useGameStore.getState().setWeeklySpend(v.weeklySpend);
+      },
       logout: () =>
         set({ name: '', email: '', weeklySpend: 0, trigger: null, goal: 0, onboarded: false }),
     }),

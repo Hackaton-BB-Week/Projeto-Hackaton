@@ -125,6 +125,7 @@ const SURVEY_TO_PULL: Record<Trigger, PullId> = {
   recuperar: 'recuperar',
   ansiedade: 'ansiedade',
   promo: 'promo',
+  partida: 'partida',
 };
 
 // ----- Ações (para onde levar a pessoa) -----

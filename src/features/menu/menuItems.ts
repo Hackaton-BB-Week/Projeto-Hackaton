@@ -31,7 +31,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         icon: 'check-square',
         href: '/aposta-ou-escolha',
       },
-      { id: 'diagnostico', label: 'Refazer diagnóstico', icon: 'compass', href: null },
+      { id: 'diagnostico', label: 'Refazer diagnóstico', icon: 'compass', href: '/diagnostico' },
       { id: 'ajuda', label: 'Ajuda e recursos', icon: 'life-buoy', href: '/ajuda' },
     ],
   },
