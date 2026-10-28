@@ -1,10 +1,4 @@
-import { View, Text } from 'react-native';
+import { StartingPointScreen } from '@/features/onboarding/StartingPointScreen';
 
-// Provisório: o resultado entra na sub-branch sub/login-ponto-de-partida.
-export default function PontoDePartida() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Ponto de partida (em construção)</Text>
-    </View>
-  );
-}
+// Ponto de partida: a tela mora em src/features/onboarding.
+export default StartingPointScreen;
