@@ -1,6 +1,8 @@
 import { router } from 'expo-router';
 import { useGameStore } from '@/store/useGameStore';
 import { useUserStore } from '@/store/useUserStore';
+import { usePlantStore } from '@/store/usePlantStore';
+import { dayNumber } from '@/features/planta/plant';
 import { useSurveyStore } from './useSurveyStore';
 import type { StartingPoint } from './profile';
 
@@ -20,6 +22,7 @@ export function useOnboarding() {
   const finishOnboarding = (sp: StartingPoint) => {
     completeOnboarding({ weeklySpend: sp.weekly, trigger: sp.trigger, goal: sp.goal });
     useGameStore.setState({ weeklySpend: sp.weekly, coins: 80, streak: 0, total: 0 });
+    usePlantStore.getState().reset();
     useSurveyStore.getState().reset();
     router.replace('/(tabs)');
   };
@@ -29,6 +32,8 @@ export function useOnboarding() {
     setIdentity(typedName.trim() || 'Alex (exemplo)', '');
     completeOnboarding({ weeklySpend: 100, trigger: 'recuperar', goal: 0 });
     useGameStore.setState({ weeklySpend: 100, streak: 6, total: 6, coins: 180 });
+    // Como no protótipo: o último dia registrado foi ontem, então hoje dá pra registrar.
+    usePlantStore.getState().reset(dayNumber() - 1);
     router.replace('/(tabs)');
   };
 

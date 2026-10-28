@@ -74,8 +74,8 @@ export default function CityView({ cityIndex, built, height = 280, onPlotPress }
   const scale = useSharedValue(START_ZOOM);
   const tx = useSharedValue(0);
   const ty = useSharedValue(0);
-  const start = useSharedValue({ s: START_ZOOM, x: 0, y: 0 });
-  const pinching = useSharedValue(false);
+  const lastPan = useSharedValue({ x: 0, y: 0, n: 0 });
+  const lastPinch = useSharedValue(1);
 
   useEffect(() => {
     scale.value = START_ZOOM;
@@ -104,38 +104,42 @@ export default function CityView({ cityIndex, built, height = 280, onPlotPress }
   );
 
   // minDistance baixo: o mapa assume o arraste antes de a página começar a rolar.
+  // Arraste e pinça trabalham por incrementos (o quanto mudou desde o último quadro).
+  // Assim, quando um dedo sai da tela, nada "pula": o quadro em que o número de
+  // dedos muda é ignorado, porque o ponto médio dos dedos salta nesse momento.
   const pan = Gesture.Pan()
     .minDistance(4)
-    .onStart(() => {
-      start.value = { s: scale.value, x: tx.value, y: ty.value };
+    .onStart((e) => {
+      lastPan.value = { x: e.translationX, y: e.translationY, n: e.numberOfPointers };
     })
     .onUpdate((e) => {
-      if (pinching.value) return;
+      const last = lastPan.value;
+      lastPan.value = { x: e.translationX, y: e.translationY, n: e.numberOfPointers };
+      if (e.numberOfPointers !== last.n) return;
       const limX = ((scale.value - 1) * width) / 2;
       const limY = ((scale.value - 1) * height) / 2;
-      tx.value = clamp(start.value.x + e.translationX, -limX, limX);
-      ty.value = clamp(start.value.y + e.translationY, -limY, limY);
+      tx.value = clamp(tx.value + e.translationX - last.x, -limX, limX);
+      ty.value = clamp(ty.value + e.translationY - last.y, -limY, limY);
     });
 
   const pinch = Gesture.Pinch()
-    .onStart(() => {
-      pinching.value = true;
-      start.value = { s: scale.value, x: tx.value, y: ty.value };
+    .onStart((e) => {
+      lastPinch.value = e.scale;
     })
     .onUpdate((e) => {
-      const s = clamp(start.value.s * e.scale, MIN_ZOOM, MAX_ZOOM);
-      const k = s / start.value.s;
+      if (e.numberOfPointers < 2) return;
+      const factor = e.scale / lastPinch.value;
+      lastPinch.value = e.scale;
+      const s = clamp(scale.value * factor, MIN_ZOOM, MAX_ZOOM);
+      const k = s / scale.value;
       // Mantém parado o ponto entre os dedos.
       const fx = e.focalX - width / 2;
       const fy = e.focalY - height / 2;
       const limX = ((s - 1) * width) / 2;
       const limY = ((s - 1) * height) / 2;
       scale.value = s;
-      tx.value = clamp(fx - (fx - start.value.x) * k, -limX, limX);
-      ty.value = clamp(fy - (fy - start.value.y) * k, -limY, limY);
-    })
-    .onEnd(() => {
-      pinching.value = false;
+      tx.value = clamp(fx - (fx - tx.value) * k, -limX, limX);
+      ty.value = clamp(fy - (fy - ty.value) * k, -limY, limY);
     });
 
   const tap = Gesture.Tap()
