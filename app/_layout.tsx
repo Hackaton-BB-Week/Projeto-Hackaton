@@ -15,7 +15,8 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
             name="obra"
-            options={{ presentation: 'transparentModal', animation: 'slide_from_bottom' }}
+            // Sem animação da rota: o painel da obra anima sozinho (fundo + deslize).
+            options={{ presentation: 'transparentModal', animation: 'none' }}
           />
         </Stack>
         <SideMenu />

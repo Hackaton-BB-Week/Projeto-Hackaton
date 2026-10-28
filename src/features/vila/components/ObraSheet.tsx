@@ -19,7 +19,8 @@ interface Props {
 }
 
 // Painel de uma obra: estado, benefício, custo, requisito, estilo e botão de construir.
-// Aparece por cima do app pela rota app/obra.tsx (apresentação transparentModal).
+// Aparece por cima do app pela rota app/obra.tsx (transparentModal, sem animação da rota):
+// o próprio painel sobe e o fundo escurece aos poucos, igual ao painel da planta.
 export default function ObraSheet({
   plot,
   built,
@@ -30,7 +31,7 @@ export default function ObraSheet({
 }: Props) {
   const [style, setStyle] = useState(0);
   // Fecha deslizando para baixo, o mesmo caminho por onde entrou.
-  const swipe = useSwipeToClose(onClose);
+  const swipe = useSwipeToClose(onClose, { animateIn: true });
   useEffect(() => setStyle(0), [plot.id]);
 
   const done = built[plot.id];
