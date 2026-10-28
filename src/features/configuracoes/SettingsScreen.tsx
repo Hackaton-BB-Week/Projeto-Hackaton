@@ -10,6 +10,7 @@ import type { FontSize } from '@/theme/themes';
 import { useTheme } from '@/theme/useTheme';
 import { SettingRow } from './components/SettingRow';
 import { SettingSwitch } from './components/SettingSwitch';
+import { ColorPreview } from './components/ColorPreview';
 
 const FONT_OPTIONS: { value: FontSize; label: string; a11y: string }[] = [
   { value: 'small', label: 'A-', a11y: 'Fonte pequena' },
@@ -77,7 +78,7 @@ export function SettingsScreen() {
             first
             large
             title="Modo para daltonismo"
-            description="Troca verde e vermelho por azul e laranja, mais fáceis de diferenciar."
+            description="Troca verde e vermelho por cores mais fáceis de diferenciar, no app e na vila."
           >
             <SettingSwitch
               label="Modo para daltonismo"
@@ -85,6 +86,7 @@ export function SettingsScreen() {
               onChange={s.setColorblind}
             />
           </SettingRow>
+          <ColorPreview />
           <SettingRow
             large
             title="Reduzir animações"

@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react';
+import { noTint, type Tint } from '@/theme/colorblind';
 import { Circle, Ellipse, Line, Polygon, Polyline, Rect } from 'react-native-svg';
 
 // Desenho isométrico da vila, portado do protótipo. Cada célula da grade (gx, gy)
@@ -18,7 +19,15 @@ export class Painter {
   constructor(
     private ox: number,
     private oy: number,
+    /** Filtro de cor (modo daltonismo). Toda cor desenhada passa por ele. */
+    private tint: Tint = noTint,
   ) {}
+
+  private t(c: string): string;
+  private t(c: string | undefined): string | undefined;
+  private t(c: string | undefined) {
+    return c === undefined ? c : this.tint(c);
+  }
 
   private key() {
     return `e${this.n++}`;
@@ -29,7 +38,7 @@ export class Painter {
   }
 
   poly(a: Pt[], fill: string) {
-    this.els.push(<Polygon key={this.key()} points={pts(a)} fill={fill} />);
+    this.els.push(<Polygon key={this.key()} points={pts(a)} fill={this.t(fill)} />);
   }
 
   rect(
@@ -49,7 +58,7 @@ export class Painter {
         width={width}
         height={height}
         rx={rx}
-        fill={fill}
+        fill={this.t(fill)}
         transform={transform}
       />,
     );
@@ -71,8 +80,8 @@ export class Painter {
         cy={cy}
         rx={rx}
         ry={ry}
-        fill={fill}
-        stroke={stroke}
+        fill={this.t(fill)}
+        stroke={this.t(stroke)}
         strokeWidth={strokeWidth}
       />,
     );
@@ -85,8 +94,8 @@ export class Painter {
         cx={cx}
         cy={cy}
         r={r}
-        fill={fill}
-        stroke={stroke}
+        fill={this.t(fill)}
+        stroke={this.t(stroke)}
         strokeWidth={strokeWidth}
       />,
     );
@@ -100,7 +109,7 @@ export class Painter {
         y1={a[1]}
         x2={b[0]}
         y2={b[1]}
-        stroke={stroke}
+        stroke={this.t(stroke)}
         strokeWidth={strokeWidth}
         strokeDasharray={dash}
       />,

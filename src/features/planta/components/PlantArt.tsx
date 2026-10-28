@@ -9,9 +9,16 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
+import { useSettingsStore } from '@/store/useSettingsStore';
+import { tintFor } from '@/theme/colorblind';
 
 // Desenho da planta por estágio (porta do plantMiniSVG do protótipo).
 const AnimatedG = Animated.createAnimatedComponent(G);
+
+/** Filtro do modo daltonismo para as cores da planta. */
+function useTint() {
+  return tintFor(useSettingsStore((s) => s.colorblind));
+}
 
 const STEM_TOP = [150, 124, 100, 76, 58, 44];
 
@@ -22,8 +29,9 @@ function leaf(x: number, y: number, dir: -1 | 1, s: number) {
 }
 
 function Flower({ cx, cy, s, wither }: { cx: number; cy: number; s: number; wither: boolean }) {
-  const petal = wither ? '#e0a24a' : '#ffd45e';
-  const center = wither ? '#c97b1e' : '#ff9f1c';
+  const c = useTint();
+  const petal = wither ? c('#e0a24a') : c('#ffd45e');
+  const center = wither ? c('#c97b1e') : c('#ff9f1c');
   return (
     <G>
       {Array.from({ length: 6 }, (_, i) => {
@@ -54,6 +62,7 @@ export function PlantArt({
   size?: number;
   animate?: boolean;
 }) {
+  const c = useTint();
   const rot = useSharedValue(wither ? 4 : 0);
 
   useEffect(() => {
@@ -83,18 +92,18 @@ export function PlantArt({
 
   const st = Math.max(0, Math.min(5, stage));
   const top = STEM_TOP[st];
-  const stem = wither ? '#8a6a3a' : '#1f9b57';
+  const stem = wither ? c('#8a6a3a') : c('#1f9b57');
   const gradId = wither ? 'lfw' : 'lfh';
 
   return (
     <Svg width={size} height={size} viewBox="40 40 120 130">
       <Defs>
         <LinearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor={wither ? '#d59a4a' : '#4fc27e'} />
-          <Stop offset="1" stopColor={wither ? '#b5651d' : '#1f9b57'} />
+          <Stop offset="0" stopColor={wither ? c('#d59a4a') : c('#4fc27e')} />
+          <Stop offset="1" stopColor={wither ? c('#b5651d') : c('#1f9b57')} />
         </LinearGradient>
       </Defs>
-      <Circle cx={100} cy={100} r={60} fill={wither ? '#f3e7d2' : '#eaf6ff'} />
+      <Circle cx={100} cy={100} r={60} fill={wither ? c('#f3e7d2') : c('#eaf6ff')} />
       <AnimatedG animatedProps={animatedProps}>
         {st >= 1 && (
           <Path
@@ -123,10 +132,10 @@ export function PlantArt({
             <Path d={leaf(100, 88, 1, 0.95)} fill={`url(#${gradId})`} />
           </>
         )}
-        {st === 3 && <Circle cx={100} cy={top} r={5} fill={wither ? '#c9a46a' : '#6fcf97'} />}
+        {st === 3 && <Circle cx={100} cy={top} r={5} fill={wither ? c('#c9a46a') : c('#6fcf97')} />}
         {st >= 4 && <Flower cx={100} cy={top} s={0.72} wither={wither} />}
       </AnimatedG>
-      <Path d="M86 150 L114 150 L110 168 Q100 172 90 168 Z" fill="#d08b5b" />
+      <Path d="M86 150 L114 150 L110 168 Q100 172 90 168 Z" fill={c('#d08b5b')} />
     </Svg>
   );
 }
