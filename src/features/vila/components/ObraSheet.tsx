@@ -41,7 +41,10 @@ export default function ObraSheet({
 
   return (
     <View style={styles.root}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Fechar painel" />
+      {/* O fundo clareia junto com o arraste. */}
+      <Animated.View style={[styles.backdrop, swipe.backdropStyle]}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={swipe.dismiss} accessibilityLabel="Fechar painel" />
+      </Animated.View>
       <GestureDetector gesture={swipe.gesture}>
       <Animated.View
         onLayout={swipe.onLayout}
@@ -94,10 +97,10 @@ export default function ObraSheet({
               hint={canPay ? undefined : `Você tem ${coins} de ${plot.cost} moedas.`}
               onPress={() => onBuild(plot.id, style)}
             />
-            <Button label="Agora não" onPress={onClose} />
+            <Button label="Agora não" onPress={swipe.dismiss} />
           </>
         ) : (
-          <Button label={done ? 'Fechar' : 'Entendi'} onPress={onClose} />
+          <Button label={done ? 'Fechar' : 'Entendi'} onPress={swipe.dismiss} />
         )}
       </Animated.View>
       </GestureDetector>
