@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import { formatBRL } from '@/lib/format';
 import { useSurveyStore } from './useSurveyStore';
 import { useOnboarding } from './useOnboarding';
@@ -10,6 +12,7 @@ import { OnboardingButton } from './components/OnboardingButton';
 
 // "Seu ponto de partida": estimativas + mensagem acolhedora. Visual de #obProfile.
 export function StartingPointScreen() {
+  const styles = useThemedStyles(makeStyles);
   const answers = useSurveyStore((s) => s.answers);
   const { finishOnboarding } = useOnboarding();
   const sp = useMemo(() => computeStartingPoint(answers), [answers]);
@@ -74,12 +77,13 @@ export function StartingPointScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  c: { flex: 1, backgroundColor: colors.sky },
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
+  c: { flex: 1, backgroundColor: colors.bg },
   body: { padding: spacing.lg, gap: 16 },
-  h1: { fontSize: 25, fontWeight: '800', color: colors.ink, letterSpacing: -0.5 },
-  lead: { fontSize: 14, color: colors.muted, marginTop: 6, lineHeight: 21 },
-  profile: { backgroundColor: colors.blue, borderRadius: radius.lg, padding: spacing.md },
+  h1: { fontSize: fs(25), fontWeight: '800', color: colors.ink, letterSpacing: -0.5 },
+  lead: { fontSize: fs(14), color: colors.muted, marginTop: 6, lineHeight: fs(21) },
+  profile: { backgroundColor: colors.brand, borderRadius: radius.lg, padding: spacing.md },
   chip: {
     alignSelf: 'flex-start',
     backgroundColor: 'rgba(255,255,255,0.18)',
@@ -87,13 +91,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 11,
   },
-  chipTxt: { color: '#fff', fontSize: 12, fontWeight: '600' },
-  est: { color: '#fff', fontSize: 36, fontWeight: '800', marginTop: 8, marginBottom: 2, letterSpacing: -1 },
-  estSub: { color: '#c6d7f6', fontSize: 12 },
+  chipTxt: { color: '#fff', fontSize: fs(12), fontWeight: '600' },
+  est: { color: '#fff', fontSize: fs(36), fontWeight: '800', marginTop: 8, marginBottom: 2, letterSpacing: -1 },
+  estSub: { color: '#c6d7f6', fontSize: fs(12) },
   statRow: { flexDirection: 'row', gap: 12, marginTop: 14 },
   stat: { flex: 1, backgroundColor: colors.surface, borderRadius: radius.md, padding: 13 },
-  statV: { fontSize: 19, fontWeight: '700', color: colors.ink },
-  statL: { fontSize: 11.5, color: colors.muted, marginTop: 2 },
+  statV: { fontSize: fs(19), fontWeight: '700', color: colors.ink },
+  statL: { fontSize: fs(11.5), color: colors.muted, marginTop: 2 },
   card: {
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -101,7 +105,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.md,
   },
-  reflect: { fontSize: 14.5, lineHeight: 23, color: colors.ink },
-  bold: { fontWeight: '700', color: colors.blue700 },
-  disclaimer: { fontSize: 12, color: colors.faint, lineHeight: 18 },
+  reflect: { fontSize: fs(14.5), lineHeight: fs(23), color: colors.ink },
+  bold: { fontWeight: '700', color: colors.brand700 },
+  disclaimer: { fontSize: fs(12), color: colors.faint, lineHeight: fs(18) },
 });
