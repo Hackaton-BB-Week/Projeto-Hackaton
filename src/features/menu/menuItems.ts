@@ -25,7 +25,12 @@ export const MENU_SECTIONS: MenuSection[] = [
       { id: 'chat', label: 'Conversar com a Rô', icon: 'message-circle', href: '/chat' },
       { id: 'financeiro', label: 'Painel financeiro', icon: 'credit-card', href: '/financeiro' },
       { id: 'missoes', label: 'Missões do dia', icon: 'target', href: '/missoes' },
-      { id: 'escolha', label: 'Aposta ou Escolha?', icon: 'check-square', href: null },
+      {
+        id: 'escolha',
+        label: 'Aposta ou Escolha?',
+        icon: 'check-square',
+        href: '/aposta-ou-escolha',
+      },
       { id: 'diagnostico', label: 'Refazer diagnóstico', icon: 'compass', href: null },
       { id: 'ajuda', label: 'Ajuda e recursos', icon: 'life-buoy', href: '/ajuda' },
     ],
