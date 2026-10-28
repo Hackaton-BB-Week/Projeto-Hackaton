@@ -55,8 +55,27 @@ export class Painter {
     );
   }
 
-  ellipse(cx: number, cy: number, rx: number, ry: number, fill: string) {
-    this.els.push(<Ellipse key={this.key()} cx={cx} cy={cy} rx={rx} ry={ry} fill={fill} />);
+  ellipse(
+    cx: number,
+    cy: number,
+    rx: number,
+    ry: number,
+    fill: string,
+    stroke?: string,
+    strokeWidth?: number,
+  ) {
+    this.els.push(
+      <Ellipse
+        key={this.key()}
+        cx={cx}
+        cy={cy}
+        rx={rx}
+        ry={ry}
+        fill={fill}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+      />,
+    );
   }
 
   circle(cx: number, cy: number, r: number, fill: string, stroke?: string, strokeWidth?: number) {
@@ -97,12 +116,15 @@ export class Painter {
     top: string,
     left: string,
     right: string,
+    z = 0,
   ) {
-    const p1 = this.iso(gx, gy);
-    const p2 = this.iso(gx + w, gy);
-    const p3 = this.iso(gx + w, gy + d);
-    const p4 = this.iso(gx, gy + d);
-    const up = (p: Pt): Pt => [p[0], p[1] - h];
+    // z: altura da base do bloco (0 = no chão). Permite empilhar copas, andares e detalhes.
+    const lift = (p: Pt, dz: number): Pt => [p[0], p[1] - dz];
+    const p1 = lift(this.iso(gx, gy), z);
+    const p2 = lift(this.iso(gx + w, gy), z);
+    const p3 = lift(this.iso(gx + w, gy + d), z);
+    const p4 = lift(this.iso(gx, gy + d), z);
+    const up = (p: Pt): Pt => lift(p, h);
     const [t1, t2, t3, t4] = [up(p1), up(p2), up(p3), up(p4)];
     this.poly([p4, p3, t3, t4], left);
     this.poly([p2, p3, t3, t2], right);
@@ -140,16 +162,31 @@ export class Painter {
     this.poly([t3, t4, ap], dark);
   }
 
+  /** Retângulo colado na parede da frente-esquerda (plano gy fixo), entre as alturas z1 e z2. */
+  faceLeft(gy: number, gx1: number, gx2: number, z1: number, z2: number, fill: string) {
+    const at = (gx: number, z: number): Pt => {
+      const p = this.iso(gx, gy);
+      return [p[0], p[1] - z];
+    };
+    this.poly([at(gx1, z1), at(gx2, z1), at(gx2, z2), at(gx1, z2)], fill);
+  }
+
+  /** Retângulo colado na parede da frente-direita (plano gx fixo), entre as alturas z1 e z2. */
+  faceRight(gx: number, gy1: number, gy2: number, z1: number, z2: number, fill: string) {
+    const at = (gy: number, z: number): Pt => {
+      const p = this.iso(gx, gy);
+      return [p[0], p[1] - z];
+    };
+    this.poly([at(gy1, z1), at(gy2, z1), at(gy2, z2), at(gy1, z2)], fill);
+  }
+
+  /** Sombra no chão, projetada a partir da parede da direita (sol vindo da esquerda): é a
+   *  base deslocada só no eixo gx, então forma uma faixa alinhada às duas quinas dessa parede. */
   shadow(gx: number, gy: number, w: number, d: number) {
-    const o = 3;
-    const down = (p: Pt): Pt => [p[0], p[1] + o];
+    const sx = gx + 0.18;
+    const sy = gy;
     this.poly(
-      [
-        down(this.iso(gx, gy)),
-        down(this.iso(gx + w, gy)),
-        down(this.iso(gx + w, gy + d)),
-        down(this.iso(gx, gy + d)),
-      ],
+      [this.iso(sx, sy), this.iso(sx + w, sy), this.iso(sx + w, sy + d), this.iso(sx, sy + d)],
       'rgba(20,34,24,.15)',
     );
   }
