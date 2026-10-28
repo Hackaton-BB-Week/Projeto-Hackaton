@@ -8,7 +8,7 @@ import { usePlantStore } from '@/store/usePlantStore';
 import { useTheme } from '@/theme/useTheme';
 import { RECOVERY_BONUS } from '../plant';
 import { usePlant, usePlantUi, type PlantSheetKind } from '../usePlant';
-import { PlantArt } from './PlantArt';
+import { TouchablePlant } from './TouchablePlant';
 
 /** Verifica se a planta murchou por ausência ao abrir o app e ao voltar para ele. */
 function useAbsenceCheck() {
@@ -40,6 +40,7 @@ export function PlantSheets() {
   const p = usePlant();
   const registerRelapse = usePlantStore((s) => s.registerRelapse);
   const completeRecovery = usePlantStore((s) => s.completeRecovery);
+  const play = usePlantUi((s) => s.play);
 
   const sub = [styles.sub, { color: colors.muted, fontSize: fs(14) }];
 
@@ -57,7 +58,7 @@ export function PlantSheets() {
         <>
           <Text style={sub}>{plantText}</Text>
           <Card style={styles.row}>
-            <PlantArt stage={p.stage} wither={p.wither} size={84} animate={false} />
+            <TouchablePlant stage={p.stage} wither={p.wither} size={84} />
             <View style={styles.flex}>
               <Text style={[styles.stage, { color: colors.ink, fontSize: fs(16) }]}>
                 {p.wither ? 'Precisando de cuidado' : p.stageName}
@@ -93,6 +94,7 @@ export function PlantSheets() {
             label="Concluí, me sinto melhor"
             onPress={() => {
               completeRecovery();
+              play('heal');
               close();
               showToast(`Que bom te ver de volta · +${RECOVERY_BONUS} moedas de autocuidado`);
             }}
@@ -112,6 +114,7 @@ export function PlantSheets() {
             variant="navy"
             onPress={() => {
               registerRelapse();
+              play('relapse');
               open('relapseThanks');
             }}
           />

@@ -12,14 +12,22 @@ export type PlantSheetKind =
   | 'already'
   | 'relapseToday';
 
+/** Micro-animações da bolinha, disparadas pelas ações da pessoa (nunca por sorte). */
+export type PlantFx = 'water' | 'grow' | 'heal' | 'relapse';
+
 export const usePlantUi = create<{
   sheet: PlantSheetKind | null;
+  /** `key` muda a cada disparo, para o mesmo efeito poder rodar de novo. */
+  fx: { kind: PlantFx; key: number } | null;
   open: (s: PlantSheetKind) => void;
   close: () => void;
+  play: (kind: PlantFx) => void;
 }>((set) => ({
   sheet: null,
+  fx: null,
   open: (sheet) => set({ sheet }),
   close: () => set({ sheet: null }),
+  play: (kind) => set((s) => ({ fx: { kind, key: (s.fx?.key ?? 0) + 1 } })),
 }));
 
 /** Dados de exibição da planta, derivados dos stores. */

@@ -3,6 +3,8 @@ import { Button } from '@/components/Button';
 import { showToast } from '@/components/Toast';
 import { formatCoins } from '@/lib/format';
 import { usePlantStore } from '@/store/usePlantStore';
+import { useGameStore } from '@/store/useGameStore';
+import { plantStage } from '../plant';
 import { useTheme } from '@/theme/useTheme';
 import { usePlantUi } from '../usePlant';
 
@@ -12,9 +14,13 @@ export function DailyActions() {
   const open = usePlantUi((s) => s.open);
   const registerDay = usePlantStore((s) => s.registerDay);
 
+  const play = usePlantUi((s) => s.play);
+
   const onDay = () => {
+    const before = plantStage(useGameStore.getState().total);
     const r = registerDay();
     if (r.ok) {
+      play(plantStage(useGameStore.getState().total) > before ? 'grow' : 'water');
       showToast(`Dia registrado! +${formatCoins(r.coins)} moedas · Sequência: ${r.streak}`);
     } else {
       open(r.reason === 'already' ? 'already' : 'relapseToday');
