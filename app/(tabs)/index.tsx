@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 // ScrollView do gesture-handler: deixa o arraste/pinça da vila ganhar da rolagem da página.
 import { ScrollView } from 'react-native-gesture-handler';
 import { VilaSection } from '@/features/vila';
+import { DailyActions, PlantBadge, PlantSheets, RecoveryBanner } from '@/features/planta';
 import { useProfile } from '@/hooks/useProfile';
 import { formatBRL, formatCoins } from '@/lib/format';
 import { colors } from '@/theme/tokens';
@@ -19,7 +20,16 @@ export default function Hub() {
         <Text style={styles.m}>Multiplicador: x{multiplier}</Text>
         <FinanceShortcut />
       </View>
-      <VilaSection />
+      <VilaSection
+        mapOverlay={<PlantBadge />}
+        belowMap={
+          <>
+            <RecoveryBanner />
+            <DailyActions />
+          </>
+        }
+      />
+      <PlantSheets />
     </ScrollView>
   );
 }
