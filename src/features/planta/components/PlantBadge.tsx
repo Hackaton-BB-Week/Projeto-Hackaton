@@ -1,4 +1,6 @@
-import { Pressable, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+// Pressable do gesture-handler: o toque não é engolido pelo gesto do mapa.
+import { Pressable } from 'react-native-gesture-handler';
 import { useTheme } from '@/theme/useTheme';
 import { usePlant, usePlantUi } from '../usePlant';
 import { PlantArt } from './PlantArt';
@@ -18,13 +20,13 @@ export function PlantBadge() {
       accessibilityLabel={`Sua planta: ${p.wither ? 'precisando de cuidado' : `${p.stageName}, saudável`}`}
       accessibilityHint="Abre as informações da planta"
       hitSlop={6}
-      style={[styles.badge, { backgroundColor: colors.surface, borderColor: colors.surface, shadowColor: colors.shadow }]}
+      style={[styles.badge, { backgroundColor: '#fff', borderColor: '#fff', shadowColor: colors.shadow }]}
     >
       <PlantArt stage={p.stage} wither={p.wither} size={50} animate={!reduceMotion} />
       <View
         style={[
           styles.dot,
-          { backgroundColor: p.wither ? AMBER : colors.green600, borderColor: colors.surface },
+          { backgroundColor: p.wither ? AMBER : colors.green600, borderColor: '#fff' },
         ]}
       />
     </Pressable>
