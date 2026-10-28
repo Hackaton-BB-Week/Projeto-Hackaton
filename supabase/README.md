@@ -2,6 +2,8 @@
 
 ## Schema
 Rode `schema.sql` no SQL Editor do seu projeto Supabase (cria tabelas + RLS).
+Depois rode `help.sql` (aba Ajuda: catálogo `help_channels` e `breathing_sessions`).
+Pode rodar `help.sql` de novo sem estragar nada.
 
 ## Edge Function do chat (Rô)
 
