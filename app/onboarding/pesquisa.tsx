@@ -1,10 +1,4 @@
-import { View, Text } from 'react-native';
+import { SurveyScreen } from '@/features/onboarding/SurveyScreen';
 
-// Provisório: a pesquisa entra na sub-branch sub/login-pesquisa.
-export default function Pesquisa() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Pesquisa (em construção)</Text>
-    </View>
-  );
-}
+// Pesquisa inicial: a tela mora em src/features/onboarding.
+export default SurveyScreen;

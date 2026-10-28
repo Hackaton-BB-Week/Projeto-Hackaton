@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useGameStore } from '@/store/useGameStore';
 import { useUserStore } from '@/store/useUserStore';
+import { useSurveyStore } from './useSurveyStore';
 
 // Ações do fluxo de entrada. As telas só chamam estas funções.
 export function useOnboarding() {
@@ -10,6 +11,7 @@ export function useOnboarding() {
   /** Salva nome + e-mail e segue para a pesquisa. */
   const submitIdentity = (name: string, email: string) => {
     setIdentity(name.trim(), email.trim());
+    useSurveyStore.getState().reset();
     router.push('/onboarding/pesquisa');
   };
 
