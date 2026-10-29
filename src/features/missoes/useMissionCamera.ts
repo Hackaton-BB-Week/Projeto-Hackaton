@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Linking } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { shrinkPhoto } from './shrinkPhoto';
 
 export type CameraResult =
   | { status: 'photo'; uri: string }
@@ -26,7 +27,8 @@ export function useMissionCamera() {
         allowsEditing: false,
       });
       if (res.canceled || !res.assets?.[0]?.uri) return { status: 'cancelled' };
-      return { status: 'photo', uri: res.assets[0].uri };
+      // Na web a foto é reduzida (ver shrinkPhoto.web.ts); no celular fica igual.
+      return { status: 'photo', uri: await shrinkPhoto(res.assets[0].uri) };
     } catch {
       return { status: 'error' };
     } finally {

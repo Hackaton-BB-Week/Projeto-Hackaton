@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useRootNavigationState } from 'expo-router';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { Eyebrow } from '@/components/Eyebrow';
@@ -16,13 +16,16 @@ export function HelpScreen() {
   const [breathing, setBreathing] = useState(false);
 
   // `/ajuda?respirar=1` (ex.: vindo do modo pré-jogo) já abre o exercício.
+  // Só mexe na rota depois que a navegação montou: abrindo (ou recarregando, na web)
+  // direto nessa URL, setParams cedo demais derruba o app.
   const { respirar } = useLocalSearchParams<{ respirar?: string }>();
+  const navReady = !!useRootNavigationState()?.key;
   useEffect(() => {
-    if (respirar) {
+    if (respirar && navReady) {
       setBreathing(true);
       router.setParams({ respirar: undefined });
     }
-  }, [respirar]);
+  }, [respirar, navReady]);
 
   return (
     <SafeAreaView style={[styles.c, { backgroundColor: colors.bg }]} edges={['top']}>

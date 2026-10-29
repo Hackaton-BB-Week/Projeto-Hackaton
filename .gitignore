@@ -16,3 +16,9 @@ coverage/
 expo-env.d.ts
 # @end expo-cli
 supabase/.temp/
+
+# Vercel (CLI)
+.vercel
+# .env.local é criado pela CLI da Vercel; o modelo .env.example continua versionado.
+.env*
+!.env.example
