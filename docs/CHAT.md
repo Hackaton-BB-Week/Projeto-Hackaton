@@ -78,18 +78,26 @@ poderia barrar quem está em crise).
 
 O plano grátis do Gemini tem limite por **projeto** do Google (perguntas por
 minuto e por dia) e às vezes fica **sobrecarregado** (erro 503 ou trava).
-A função tenta em ordem e pula para a próxima se uma falhar, travar (15s) ou
-bater no limite:
+A função tenta em ordem. Se uma tentativa falhar ou bater no limite, passa na
+hora para a próxima. Se demorar mais de 5s, começa a próxima **em paralelo** (até
+3 ao mesmo tempo) e usa a primeira resposta que chegar. Cada tentativa desiste em
+20s e a pergunta inteira em 40s (o app espera 45s).
 
-1. modelo principal (`gemini-flash-latest`) na chave 1
-2. modelo `gemini-flash-lite-latest` nas chaves 1, 2 e 3
-3. modelo principal nas chaves 2 e 3
+1. todos os modelos da lista na chave 1
+2. todos os modelos da lista nas chaves 2 e 3
+
+Lista padrão: `gemini-3-flash-preview`, `gemini-flash-latest`,
+`gemini-3.5-flash-lite`, `gemini-flash-lite-latest`. Os apelidos `-latest`
+vivem sobrecarregados e os modelos 2.0/2.5 não existem mais para contas novas;
+se o Google tirar algum do ar, troque a lista pelo secret `LLM_MODELS`, sem
+mexer no código.
 
 | Secret | O que é |
 |---|---|
 | `LLM_API_KEY` | chave do Gemini (obrigatória) — https://aistudio.google.com |
 | `LLM_API_KEY_2`, `LLM_API_KEY_3` | chaves reserva (opcionais). **Precisam ser de projetos diferentes**: chaves do mesmo projeto dividem a mesma cota |
-| `LLM_MODEL` | troca o modelo principal (opcional) |
+| `LLM_MODELS` | lista de modelos separados por vírgula, em ordem (opcional) |
+| `LLM_MODEL` | um modelo para tentar antes de todos (opcional) |
 | `GROQ_API_KEY` | outro provedor como último recurso (opcional, hoje não usamos) |
 
 Estimativa para ~45 pessoas ao mesmo tempo: com 1 chave grátis é arriscado; com
