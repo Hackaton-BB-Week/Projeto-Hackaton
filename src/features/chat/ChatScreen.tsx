@@ -99,6 +99,14 @@ export function ChatScreen() {
             maxLength={1500}
             onSubmitEditing={submit}
             blurOnSubmit={false}
+            // No computador (web), Enter envia e Shift+Enter quebra a linha.
+            onKeyPress={(e) => {
+              const ev = e.nativeEvent as { key: string; shiftKey?: boolean };
+              if (Platform.OS === 'web' && ev.key === 'Enter' && !ev.shiftKey) {
+                e.preventDefault();
+                submit();
+              }
+            }}
             accessibilityLabel="Mensagem para o Rô"
           />
           <Pressable
