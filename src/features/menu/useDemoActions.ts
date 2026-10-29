@@ -66,7 +66,7 @@ export function useDemoActions() {
       usePlantStore.getState().reset();
       useMissionsStore.setState({ day: null, done: [] });
       logout();
-      router.replace('/');
+      router.replace('/onboarding');
       showToast('Demonstração reiniciada');
     },
   };
