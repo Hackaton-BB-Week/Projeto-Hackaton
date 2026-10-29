@@ -18,6 +18,7 @@ import { showToast } from '@/components/Toast';
 import { MENU_SECTIONS, type MenuItem } from './menuItems';
 import { useMenuStore } from './useMenuStore';
 import { useDemoActions } from './useDemoActions';
+import { useUserStore } from '@/store/useUserStore';
 
 const DURATION = 260;
 
@@ -30,6 +31,7 @@ export function SideMenu() {
   const { width } = useWindowDimensions();
   const { open, closeMenu } = useMenuStore();
   const demo = useDemoActions();
+  const email = useUserStore((s) => s.email);
 
   const panelWidth = Math.min(width * 0.84, 322);
   const progress = useRef(new Animated.Value(0)).current;
@@ -179,6 +181,51 @@ export function SideMenu() {
             </View>
           ))}
 
+          {/* Só para quem entrou com e-mail: a demonstração não tem conta para sair. */}
+          {!!email && (
+            <View style={styles.section}>
+              <Text
+                style={[styles.label, { color: colors.muted, fontSize: fs(12) }]}
+                accessibilityRole="header"
+              >
+                Conta
+              </Text>
+              <Pressable
+                onPress={() => {
+                  closeMenu();
+                  demo.signOut();
+                }}
+                style={({ pressed }) => [
+                  styles.item,
+                  pressed && { backgroundColor: colors.surface },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={`Sair da conta ${email}`}
+                accessibilityHint="Seu progresso fica salvo. Entre de novo para continuar."
+              >
+                <View
+                  style={[
+                    styles.itemIcon,
+                    { backgroundColor: colors.surface, shadowColor: colors.shadow },
+                  ]}
+                >
+                  <Feather name="log-out" size={19} color={colors.danger} />
+                </View>
+                <View style={styles.itemTxtWrap}>
+                  <Text style={[styles.itemTxt, { color: colors.danger, fontSize: fs(14.5) }]}>
+                    Sair da conta
+                  </Text>
+                  <Text
+                    style={[styles.itemSub, { color: colors.muted, fontSize: fs(12) }]}
+                    numberOfLines={1}
+                  >
+                    {email}
+                  </Text>
+                </View>
+              </Pressable>
+            </View>
+          )}
+
           <View style={styles.section}>
             <Text
               style={[styles.label, { color: colors.muted, fontSize: fs(12) }]}
@@ -282,6 +329,8 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   itemTxt: { flex: 1, fontWeight: '600' },
+  itemTxtWrap: { flex: 1 },
+  itemSub: { marginTop: 1 },
   soon: { borderRadius: 999, paddingVertical: 3, paddingHorizontal: 8 },
   soonTxt: { fontWeight: '700' },
   demo: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, paddingHorizontal: 10, paddingTop: 4 },

@@ -17,6 +17,18 @@ export function useDemoActions() {
   const earnCoins = useGameStore((s) => s.earnCoins);
   const logout = useUserStore((s) => s.logout);
 
+  /** Sai da conta, apaga o progresso do aparelho e volta para as boas-vindas.
+   *  O progresso da conta continua na nuvem (entrar de novo traz tudo de volta). */
+  const leave = async () => {
+    await signOutCloud();
+    useGameStore.setState(useGameStore.getInitialState());
+    useVilaStore.setState(useVilaStore.getInitialState());
+    usePlantStore.getState().reset();
+    useMissionsStore.setState({ day: null, done: [] });
+    logout();
+    router.replace('/onboarding');
+  };
+
   return {
     /**
      * Simula dias passando. `register: false` (Simular +1 dia) só avança o dia: a pessoa
@@ -57,17 +69,15 @@ export function useDemoActions() {
       earnCoins(n);
       showToast(`+${n} moedas (demonstração)`);
     },
-    /** Sai da conta, apaga o progresso do aparelho e volta para as boas-vindas.
-     *  O progresso da conta continua na nuvem (entrar de novo traz tudo de volta). */
+    /** Reiniciar da demonstração: sai da conta e zera o aparelho. */
     resetAll: async () => {
-      await signOutCloud();
-      useGameStore.setState(useGameStore.getInitialState());
-      useVilaStore.setState(useVilaStore.getInitialState());
-      usePlantStore.getState().reset();
-      useMissionsStore.setState({ day: null, done: [] });
-      logout();
-      router.replace('/onboarding');
+      await leave();
       showToast('Demonstração reiniciada');
+    },
+    /** Botão "Sair da conta": o progresso fica na nuvem, entrar de novo traz tudo de volta. */
+    signOut: async () => {
+      await leave();
+      showToast('Você saiu da conta');
     },
   };
 }
