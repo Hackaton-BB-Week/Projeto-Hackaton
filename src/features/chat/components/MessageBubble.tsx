@@ -81,7 +81,8 @@ const makeStyles = ({ colors, fs }: Theme) =>
   theirs: { alignSelf: 'flex-start', backgroundColor: colors.bg, borderBottomLeftRadius: 4 },
   text: { fontSize: fs(16), lineHeight: fs(23), color: colors.ink },
   textMine: { color: '#fff' },
-  failed: { backgroundColor: '#fff4f1', borderWidth: 1, borderColor: colors.danger },
+  // Fundo do erro segue o tema (no escuro, escuro como as outras mensagens).
+  failed: { backgroundColor: colors.dangerSoft, borderWidth: 1, borderColor: colors.danger },
   offline: {
     fontSize: fs(13),
     fontWeight: '600',

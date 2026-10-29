@@ -83,7 +83,8 @@ const makeStyles = ({ colors, fs }: Theme) =>
   body: { padding: spacing.lg, gap: 16 },
   h1: { fontSize: fs(25), fontWeight: '800', color: colors.ink, letterSpacing: -0.5 },
   lead: { fontSize: fs(14), color: colors.muted, marginTop: 6, lineHeight: fs(21) },
-  profile: { backgroundColor: colors.brand, borderRadius: radius.lg, padding: spacing.md },
+  // Azul que segura o texto branco nos dois modos (o brand do escuro é claro demais).
+  profile: { backgroundColor: colors.feature, borderRadius: radius.lg, padding: spacing.md },
   chip: {
     alignSelf: 'flex-start',
     backgroundColor: 'rgba(255,255,255,0.18)',
