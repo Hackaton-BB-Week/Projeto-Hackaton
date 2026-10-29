@@ -4,6 +4,7 @@ import { useGameStore } from '@/store/useGameStore';
 import { showToast } from '@/components/Toast';
 import { dayKey, dayNumber, missionsForDay } from './missions';
 import { useMissionsStore } from './useMissionsStore';
+import { useMissionPhotosStore } from './useMissionPhotosStore';
 
 /** Data de hoje que se atualiza à meia-noite e quando o app volta do segundo plano. */
 function useToday() {
@@ -31,6 +32,7 @@ export function useDailyMissions() {
   const day = dayNumber(now);
   const { day: storedDay, done, markDone } = useMissionsStore();
   const earnCoins = useGameStore((s) => s.earnCoins);
+  const addPhoto = useMissionPhotosStore((s) => s.add);
 
   const missions = useMemo(() => {
     const doneToday = storedDay === today ? done : [];
@@ -39,14 +41,19 @@ export function useDailyMissions() {
 
   // `photoUri`: foto opcional da missão (o álbum guarda; nada é verificado).
   const complete = useCallback(
-    (id: string, _photoUri?: string) => {
+    (id: string, photoUri?: string) => {
       const mission = missions.find((m) => m.id === id);
       if (!mission || mission.done) return;
       if (!markDone(id, today)) return;
       earnCoins(mission.reward);
-      showToast(`Missão concluída · +${mission.reward} moedas`);
+      if (photoUri) addPhoto(mission, photoUri);
+      showToast(
+        photoUri
+          ? `Missão concluída · +${mission.reward} moedas · foto no álbum`
+          : `Missão concluída · +${mission.reward} moedas`,
+      );
     },
-    [missions, markDone, today, earnCoins],
+    [missions, markDone, today, earnCoins, addPhoto],
   );
 
   const doneCount = missions.filter((m) => m.done).length;

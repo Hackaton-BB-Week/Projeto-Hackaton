@@ -10,6 +10,8 @@ import { formatCoins } from '@/lib/format';
 import { useDailyMissions } from './useDailyMissions';
 import { MissionItem } from './components/MissionItem';
 import { MissionPhotoPanel } from './components/MissionPhotoPanel';
+import { MissionAlbum, MissionPhotoViewer } from './components/MissionAlbum';
+import type { MissionPhoto } from './useMissionPhotosStore';
 import type { Mission } from './missions';
 
 // Missões do dia: 3 missões que mudam a cada dia; cada uma vale moedas uma vez.
@@ -20,6 +22,7 @@ export function MissionsScreen() {
   const allDone = doneCount === total;
   // Missão que a pessoa tocou para concluir (abre o painel da foto).
   const [pending, setPending] = useState<Mission | null>(null);
+  const [viewing, setViewing] = useState<MissionPhoto | null>(null);
 
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
 
@@ -79,9 +82,11 @@ export function MissionsScreen() {
             </Text>
           </Card>
         )}
+        <MissionAlbum onOpen={setViewing} />
       </ScrollView>
 
-      {/* Fora do ScrollView: o painel cobre a tela inteira. */}
+      {/* Fora do ScrollView: os painéis cobrem a tela inteira. */}
+      <MissionPhotoViewer photo={viewing} onClose={() => setViewing(null)} />
       <MissionPhotoPanel
         mission={pending}
         onClose={() => setPending(null)}
