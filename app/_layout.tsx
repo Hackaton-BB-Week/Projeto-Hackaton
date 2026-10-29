@@ -1,4 +1,6 @@
+import '@/lib/a11yIcons';
 import { useEffect, useMemo } from 'react';
+import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { ThemeProvider, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import * as SystemUI from 'expo-system-ui';
@@ -10,6 +12,12 @@ import { useCloudSync } from '@/hooks/useCloudSync';
 import { useTheme } from '@/theme/useTheme';
 
 const queryClient = new QueryClient();
+
+// Web: o HTML gerado pelo Expo sai com lang="en" e o leitor de tela lia o texto com
+// pronúncia em inglês (WCAG 3.1.1). Com output "single", o +html.tsx não é usado.
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  document.documentElement.lang = 'pt-BR';
+}
 
 export default function RootLayout() {
   const { colors, isDark } = useTheme();

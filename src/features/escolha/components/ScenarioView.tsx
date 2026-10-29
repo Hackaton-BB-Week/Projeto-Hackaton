@@ -71,7 +71,7 @@ export function ScenarioView({ index, total, scenario, picked, lastGain, onChoos
                 dim && styles.dim,
               ]}
             >
-              <View style={[styles.radio, { borderColor: chosen ? colors.brand : colors.line }]}>
+              <View style={[styles.radio, { borderColor: chosen ? colors.brand : colors.inputBorder }]}>
                 {chosen && <View style={[styles.dot, { backgroundColor: colors.brand }]} />}
               </View>
               <Text style={[styles.optTxt, { color: colors.ink, fontSize: fs(14.5) }]}>{o.text}</Text>

@@ -99,7 +99,8 @@ const makeStyles = ({ colors, fs }: Theme) =>
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: colors.green,
+    // success: texto branco com 4,5:1 nos dois temas (o green claro não chega lá).
+    backgroundColor: colors.success,
   },
   noticeTxt: { color: '#fff', fontWeight: '700', fontSize: fs(13) },
   doneCard: {

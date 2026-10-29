@@ -5,6 +5,7 @@ import Animated from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
 import { useSwipeToClose } from '@/hooks/useSwipeToClose';
 import { useTheme } from '@/theme/useTheme';
+import { useA11yFocus } from '@/hooks/useA11yFocus';
 
 type Props = {
   visible: boolean;
@@ -27,6 +28,8 @@ function Panel({ title, onClose, children }: Props) {
   const { gesture, panelStyle, backdropStyle, onLayout, dismiss } = useSwipeToClose(onClose, {
     animateIn: true,
   });
+  // Leitor de tela: ao abrir, o foco vai para o título do painel.
+  const titleRef = useA11yFocus();
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -57,6 +60,7 @@ function Panel({ title, onClose, children }: Props) {
             <View style={[styles.grab, { backgroundColor: colors.line }]} />
             <View style={styles.header}>
               <Text
+                ref={titleRef}
                 style={[styles.title, { color: colors.ink, fontSize: fs(18) }]}
                 accessibilityRole="header"
               >

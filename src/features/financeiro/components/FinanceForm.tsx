@@ -110,7 +110,7 @@ const makeStyles = ({ colors, fs }: Theme) =>
     minHeight: 48,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: colors.line,
+    borderColor: colors.inputBorder,
     backgroundColor: colors.surface,
     color: colors.ink,
   },

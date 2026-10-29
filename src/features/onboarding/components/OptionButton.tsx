@@ -51,7 +51,7 @@ const makeStyles = ({ colors, fs }: Theme) =>
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: colors.line,
+    borderColor: colors.inputBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },

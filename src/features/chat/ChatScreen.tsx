@@ -139,7 +139,7 @@ const makeStyles = ({ colors, fs }: Theme) =>
   h: { fontSize: fs(20), fontWeight: '700', color: colors.ink },
   disclaimer: { fontSize: fs(13), lineHeight: fs(18), color: colors.muted },
   list: { padding: spacing.md, gap: spacing.sm },
-  offlineBar: { backgroundColor: colors.danger, paddingVertical: 6, paddingHorizontal: spacing.lg },
+  offlineBar: { backgroundColor: colors.dangerStrong, paddingVertical: 6, paddingHorizontal: spacing.lg },
   offlineTxt: { color: '#fff', fontSize: fs(13), fontWeight: '600' },
   typing: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingVertical: 4 },
   typingTxt: { color: colors.muted, fontSize: fs(14) },
@@ -161,6 +161,8 @@ const makeStyles = ({ colors, fs }: Theme) =>
     color: colors.ink,
     backgroundColor: colors.bg,
     borderRadius: radius.md,
+    borderWidth: 1.5,
+    borderColor: colors.inputBorder,
   },
   send: {
     minHeight: 48,

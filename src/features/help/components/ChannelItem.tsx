@@ -17,7 +17,12 @@ export function ChannelItem({ channel, last }: Props) {
 
   return (
     <View style={[styles.item, !last && { borderBottomWidth: 1, borderBottomColor: colors.line }]}>
-      <View style={[styles.icon, { backgroundColor: colors.brandSoft }]}>
+      {/* Ícone decorativo: no Android o <Text> do ícone não se esconde sozinho do TalkBack. */}
+      <View
+        style={[styles.icon, { backgroundColor: colors.brandSoft }]}
+        importantForAccessibility="no-hide-descendants"
+        accessibilityElementsHidden
+      >
         <Feather name={FEATHER_ICON[channel.icon]} size={22} color={tone} />
       </View>
       <View style={styles.body}>
