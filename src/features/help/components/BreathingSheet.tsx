@@ -16,6 +16,7 @@ import { Eyebrow } from '@/components/Eyebrow';
 import { useTheme } from '@/theme/useTheme';
 import { DURATIONS, formatClock, spokenDuration } from '../breathing';
 import { useBreathingTimer } from '../useBreathingTimer';
+import { useBreathingSound } from '../useBreathingSound';
 import { useLogBreathing } from '../useHelpChannels';
 
 const SCALE_IDLE = 0.62;
@@ -29,6 +30,7 @@ export function BreathingSheet({ visible, onClose }: Props) {
   const logBreathing = useLogBreathing();
   const timer = useBreathingTimer(logBreathing);
   const { status, remaining, total, current } = timer;
+  useBreathingSound(status, timer.elapsed, visible);
 
   const scale = useRef(new Animated.Value(SCALE_IDLE)).current;
   const secondsLeftRef = useRef(current.secondsLeft);
