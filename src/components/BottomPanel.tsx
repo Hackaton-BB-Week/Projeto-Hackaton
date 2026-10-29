@@ -14,6 +14,7 @@ type Props = {
 };
 
 // Painel que sobe de baixo, desenhado dentro da própria tela (como o .sheet do protótipo).
+// Compartilhado: planta, missões e o que mais precisar de um painel inferior.
 // Não usa <Modal>: no Android, o Modal abria encolhido e invisível e travava os toques.
 // Fecha deslizando para baixo, pelo X, tocando fora ou no "voltar" do Android.
 export function BottomPanel(props: Props) {
