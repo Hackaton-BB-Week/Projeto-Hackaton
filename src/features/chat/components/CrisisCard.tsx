@@ -46,13 +46,13 @@ const makeStyles = ({ colors, fs }: Theme) =>
   title: { fontSize: fs(18), fontWeight: '700', color: colors.ink },
   body: { fontSize: fs(15), lineHeight: fs(21), color: colors.ink },
   btn: {
-    backgroundColor: colors.danger,
+    backgroundColor: colors.dangerStrong,
     borderRadius: radius.md,
     paddingVertical: 12,
     paddingHorizontal: spacing.md,
     minHeight: 48,
   },
   btnTxt: { color: '#fff', fontSize: fs(16), fontWeight: '700' },
-  btnDetail: { color: '#ffe3dc', fontSize: fs(13) },
+  btnDetail: { color: '#ffffff', fontSize: fs(13) },
   close: { textAlign: 'center', color: colors.muted, fontSize: fs(14), paddingTop: 4 },
 });

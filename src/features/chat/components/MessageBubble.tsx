@@ -100,7 +100,7 @@ const makeStyles = ({ colors, fs }: Theme) =>
     justifyContent: 'center',
     paddingHorizontal: spacing.md,
     borderRadius: radius.md,
-    backgroundColor: colors.danger,
+    backgroundColor: colors.dangerStrong,
   },
   retryTxt: { color: '#fff', fontWeight: '700', fontSize: fs(15) },
   help: {
