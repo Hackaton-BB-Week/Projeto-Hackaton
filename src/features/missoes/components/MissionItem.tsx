@@ -21,7 +21,12 @@ export function MissionItem({ mission, onComplete }: Props) {
         },
       ]}
     >
-      <View style={[styles.icon, { backgroundColor: colors.brandSoft }]}>
+      {/* Ícone decorativo: no Android o <Text> do ícone não se esconde sozinho do TalkBack. */}
+      <View
+        style={[styles.icon, { backgroundColor: colors.brandSoft }]}
+        importantForAccessibility="no-hide-descendants"
+        accessibilityElementsHidden
+      >
         <Feather name={mission.icon} size={20} color={accent} />
       </View>
       <View style={styles.body}>
