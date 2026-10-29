@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -8,6 +9,10 @@ import { useGameStore } from '@/store/useGameStore';
 import { formatCoins } from '@/lib/format';
 import { useDailyMissions } from './useDailyMissions';
 import { MissionItem } from './components/MissionItem';
+import { MissionPhotoPanel } from './components/MissionPhotoPanel';
+import { MissionAlbum, MissionPhotoViewer } from './components/MissionAlbum';
+import type { MissionPhoto } from './useMissionPhotosStore';
+import type { Mission } from './missions';
 
 // Missões do dia: 3 missões que mudam a cada dia; cada uma vale moedas uma vez.
 export function MissionsScreen() {
@@ -15,6 +20,9 @@ export function MissionsScreen() {
   const { missions, complete, doneCount, total } = useDailyMissions();
   const coins = useGameStore((s) => s.coins);
   const allDone = doneCount === total;
+  // Missão que a pessoa tocou para concluir (abre o painel da foto).
+  const [pending, setPending] = useState<Mission | null>(null);
+  const [viewing, setViewing] = useState<MissionPhoto | null>(null);
 
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
 
@@ -29,7 +37,10 @@ export function MissionsScreen() {
         >
           <Feather name="chevron-left" size={22} color={colors.ink} />
         </Pressable>
-        <Text style={[styles.h, { color: colors.ink, fontSize: fs(17) }]} accessibilityRole="header">
+        <Text
+          style={[styles.h, { color: colors.ink, fontSize: fs(17) }]}
+          accessibilityRole="header"
+        >
           Missões do dia
         </Text>
         <View
@@ -57,7 +68,7 @@ export function MissionsScreen() {
         </View>
 
         {missions.map((m) => (
-          <MissionItem key={m.id} mission={m} onComplete={() => complete(m.id)} />
+          <MissionItem key={m.id} mission={m} onComplete={() => setPending(m)} />
         ))}
 
         {allDone && (
@@ -71,7 +82,19 @@ export function MissionsScreen() {
             </Text>
           </Card>
         )}
+        <MissionAlbum onOpen={setViewing} />
       </ScrollView>
+
+      {/* Fora do ScrollView: os painéis cobrem a tela inteira. */}
+      <MissionPhotoViewer photo={viewing} onClose={() => setViewing(null)} />
+      <MissionPhotoPanel
+        mission={pending}
+        onClose={() => setPending(null)}
+        onConfirm={(photoUri) => {
+          if (pending) complete(pending.id, photoUri);
+          setPending(null);
+        }}
+      />
     </SafeAreaView>
   );
 }

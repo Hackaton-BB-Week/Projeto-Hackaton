@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { AppState, View, Text, StyleSheet } from 'react-native';
-import { BottomPanel } from './BottomPanel';
+import { BottomPanel } from '@/components/BottomPanel';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { showToast } from '@/components/Toast';
@@ -35,7 +35,7 @@ export function PlantSheets() {
     relapseToday: 'Hoje foi um dia difícil',
   };
   useAbsenceCheck();
-  const { colors, fs } = useTheme();
+  const { colors, fs, isDark } = useTheme();
   const { sheet, open, close } = usePlantUi();
   const p = usePlant();
   const registerRelapse = usePlantStore((s) => s.registerRelapse);
@@ -112,6 +112,8 @@ export function PlantSheets() {
           <Button
             label="Registrar e seguir em frente"
             variant="navy"
+            // No escuro, letras vermelhas do tema (laranja no modo daltonismo).
+            labelColor={isDark ? colors.danger : undefined}
             onPress={() => {
               registerRelapse();
               play('relapse');

@@ -188,7 +188,7 @@ export function SideMenu() {
             </Text>
             <View style={styles.demo}>
               {[
-                { label: 'Simular +1 dia', onPress: () => demo.addDays(1) },
+                { label: 'Simular +1 dia', onPress: () => demo.addDays(1, false) },
                 { label: 'Simular +7 dias', onPress: () => demo.addDays(7) },
                 { label: '+300 moedas', onPress: () => demo.addCoins(300) },
                 {

@@ -13,7 +13,8 @@ export type PlantSheetKind =
   | 'relapseToday';
 
 /** Micro-animações da bolinha, disparadas pelas ações da pessoa (nunca por sorte). */
-export type PlantFx = 'water' | 'grow' | 'heal' | 'relapse';
+/** `tick`: versão curta do crescer, para "Simular +7 dias" (vários dias em sequência). */
+export type PlantFx = 'water' | 'grow' | 'tick' | 'heal' | 'relapse';
 
 export const usePlantUi = create<{
   sheet: PlantSheetKind | null;
