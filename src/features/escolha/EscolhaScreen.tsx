@@ -25,7 +25,7 @@ export function EscolhaScreen() {
           <>
             {e.index === 0 && e.picked === null && (
               <Text style={[styles.lead, { color: colors.muted, fontSize: fs(14) }]}>
-                Escolha como você reagiria. Depois, veja os riscos ou benefícios — é só
+                Escolha como você reagiria. Depois, veja os riscos ou benefícios. É só
                 educativo, sem apostas de verdade.
               </Text>
             )}

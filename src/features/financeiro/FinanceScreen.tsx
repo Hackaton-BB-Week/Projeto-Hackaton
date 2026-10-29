@@ -43,7 +43,7 @@ export function FinanceScreen() {
         <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
           <Text style={styles.lead}>
             Acompanhe o que as apostas custavam e para onde esse dinheiro pode ir. Tudo é
-            estimativa, com base no que você informa — sem promessa de ganho.
+            estimativa, com base no que você informa. Sem promessa de ganho.
           </Text>
 
           <View style={styles.statRow}>

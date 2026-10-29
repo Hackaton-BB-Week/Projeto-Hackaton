@@ -35,7 +35,7 @@ export function computeStartingPoint(
 
   let message: string;
   if (impact >= 2 || freq >= 3) {
-    message = `Pelo que você contou, as apostas vêm ocupando um espaço grande na sua rotina e no seu bolso. Isso não te define — é só um ponto de partida. A cada dia aqui, você vê esse valor virar progresso pra **${goalText}**.`;
+    message = `Pelo que você contou, as apostas vêm ocupando um espaço grande na sua rotina e no seu bolso. Isso não te define. É só um ponto de partida. A cada dia aqui, você vê esse valor virar progresso pra **${goalText}**.`;
   } else if (freq >= 1 || tries >= 1) {
     message = `Você já percebe que quer ajustar essa relação, e isso é o passo mais importante. Vamos transformar o que ia pras apostas em algo real: um caminho pra **${goalText}**, um dia de cada vez.`;
   } else {

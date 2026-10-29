@@ -82,7 +82,7 @@ export function PlantSheets() {
       {sheet === 'recovery' && (
         <>
           <Text style={sub}>
-            Um gesto pequeno de cuidado, no seu tempo. Isto não conta como um novo dia — é só pra
+            Um gesto pequeno de cuidado, no seu tempo. Isto não conta como um novo dia. É só pra
             ajudar você e sua planta a recuperarem o fôlego.
           </Text>
           <Card>
@@ -134,7 +134,7 @@ export function PlantSheets() {
       {sheet === 'already' && (
         <>
           <Text style={sub}>
-            Você já registrou seu progresso de hoje. Amanhã poderá registrar um novo dia — o
+            Você já registrou seu progresso de hoje. Amanhã poderá registrar um novo dia. O
             contador acompanha datas reais, não cliques.
           </Text>
           <Button label="Entendi" variant="navy" onPress={close} />
@@ -143,7 +143,7 @@ export function PlantSheets() {
       {sheet === 'relapseToday' && (
         <>
           <Text style={sub}>
-            Você registrou uma recaída hoje. Amanhã você poderá registrar um novo dia firme — um
+            Você registrou uma recaída hoje. Amanhã você poderá registrar um novo dia firme. Um
             passo de cada vez.
           </Text>
           <Button label="Entendi" variant="navy" onPress={close} />

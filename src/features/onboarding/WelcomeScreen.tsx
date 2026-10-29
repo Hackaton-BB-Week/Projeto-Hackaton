@@ -72,7 +72,7 @@ export function WelcomeScreen() {
                 Cada dia sem apostar reconstrói um pedaço da sua cidade.
               </Animated.Text>
               <Animated.Text entering={enter(FadeInDown, 1050)} style={styles.lead}>
-                Transforme o dinheiro e o tempo das apostas em progresso de verdade — no seu
+                Transforme o dinheiro e o tempo das apostas em progresso de verdade. No seu
                 ritmo, sem cobrança.
               </Animated.Text>
             </View>
