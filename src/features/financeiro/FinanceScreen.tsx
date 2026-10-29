@@ -5,6 +5,7 @@ import { radius, spacing } from '@/theme/tokens';
 import { useTheme, type Theme } from '@/theme/useTheme';
 import { useThemedStyles } from '@/theme/useThemedStyles';
 import { formatBRL } from '@/lib/format';
+import { Button } from '@/components/Button';
 import { useFinance } from './useFinance';
 import { FinanceStat } from './components/FinanceStat';
 import { ComparisonBars } from './components/ComparisonBars';
@@ -58,6 +59,14 @@ export function FinanceScreen() {
               color={colors.brand}
             />
           </View>
+
+          <Button
+            label="Investimentos"
+            icon="trending-up"
+            variant="navy"
+            onPress={() => router.push('/investimentos')}
+            accessibilityHint="Simula o dinheiro das apostas no CDB e no Tesouro Selic"
+          />
 
           <View style={styles.card}>
             <Text style={styles.eyebrow} accessibilityRole="header">
