@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { syncedStorage } from '@/services/sync';
 import { dailyCoinGain, useGameStore } from './useGameStore';
 import {
   RECOVERY_BONUS,
@@ -115,7 +115,7 @@ export const usePlantStore = create<PlantState>()(
     }),
     {
       name: 'rqr-plant',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => syncedStorage),
       partialize: ({ lastDayNum, lastCareDay, relapseDays, mood, witherReason, dayOffset }) => ({
         lastDayNum,
         lastCareDay,
