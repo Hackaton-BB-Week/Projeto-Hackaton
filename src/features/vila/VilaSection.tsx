@@ -116,7 +116,8 @@ const makeStyles = ({ colors, fs }: Theme) =>
     minHeight: 44,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.md,
-    backgroundColor: colors.brand,
+    // Mesmo azul fechado dos destaques (o brand do escuro é claro demais).
+    backgroundColor: colors.feature,
     justifyContent: 'center',
   },
   doneBtnTxt: { color: '#fff', fontWeight: '700', fontSize: fs(15) },
