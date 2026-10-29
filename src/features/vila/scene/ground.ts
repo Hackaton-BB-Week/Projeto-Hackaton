@@ -16,11 +16,14 @@ function dash(d: Painter, gx1: number, gy1: number, gx2: number, gy2: number) {
   d.line(d.iso(gx1, gy1), d.iso(gx2, gy2), 'rgba(255,255,255,.5)', 1.4, '5 6');
 }
 
+// Faixa de pedestre: cada listra é comprida no sentido da rua, e as listras ficam
+// lado a lado atravessando-a (como uma faixa de verdade).
+// `horiz` = rua no sentido de gx (horizontal na grade).
 function crosswalk(d: Painter, gx: number, gy: number, horiz: boolean) {
   for (let i = 0; i < 4; i++) {
     const o = i * 0.22 + 0.08;
-    if (horiz) d.tileR(gx + o, gy + 0.2, 0.12, 0.6, 'rgba(255,255,255,.55)');
-    else d.tileR(gx + 0.2, gy + o, 0.6, 0.12, 'rgba(255,255,255,.55)');
+    if (horiz) d.tileR(gx + 0.2, gy + o, 0.6, 0.12, 'rgba(255,255,255,.55)');
+    else d.tileR(gx + o, gy + 0.2, 0.12, 0.6, 'rgba(255,255,255,.55)');
   }
 }
 
