@@ -18,6 +18,7 @@ import { showToast } from '@/components/Toast';
 import { MENU_SECTIONS, type MenuItem } from './menuItems';
 import { useMenuStore } from './useMenuStore';
 import { useDemoActions } from './useDemoActions';
+import { useA11yFocus } from '@/hooks/useA11yFocus';
 import { useUserStore } from '@/store/useUserStore';
 
 const DURATION = 260;
@@ -31,6 +32,8 @@ export function SideMenu() {
   const { width } = useWindowDimensions();
   const { open, closeMenu } = useMenuStore();
   const demo = useDemoActions();
+  // Leitor de tela: ao abrir, o foco vai para o título "Menu".
+  const titleRef = useA11yFocus(open);
   const email = useUserStore((s) => s.email);
 
   const panelWidth = Math.min(width * 0.84, 322);
@@ -114,6 +117,7 @@ export function SideMenu() {
             <Feather name="feather" size={20} color={colors.goldInk} />
           </View>
           <Text
+            ref={titleRef}
             style={[styles.title, { color: colors.ink, fontSize: fs(17) }]}
             accessibilityRole="header"
           >

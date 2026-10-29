@@ -1,3 +1,4 @@
+import '@/lib/a11yIcons';
 import { useEffect, useMemo } from 'react';
 import { Stack } from 'expo-router';
 import { ThemeProvider, DarkTheme, DefaultTheme } from '@react-navigation/native';

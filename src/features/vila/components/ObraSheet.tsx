@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { useSwipeToClose } from '@/hooks/useSwipeToClose';
+import { useA11yFocus } from '@/hooks/useA11yFocus';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { tintFor } from '@/theme/colorblind';
 import { styleOptionsFor, type Plot } from '../data/cities';
@@ -38,6 +39,8 @@ export default function ObraSheet({
   const tint = tintFor(useSettingsStore((s) => s.colorblind));
   // Fecha deslizando para baixo, o mesmo caminho por onde entrou.
   const swipe = useSwipeToClose(onClose, { animateIn: true });
+  // Leitor de tela: ao abrir, o foco vai para o nome da obra.
+  const titleRef = useA11yFocus(plot.id !== undefined);
   useEffect(() => setStyle(0), [plot.id]);
 
   const done = built[plot.id];
@@ -50,7 +53,12 @@ export default function ObraSheet({
     <View style={styles.root}>
       {/* O fundo clareia junto com o arraste. */}
       <Animated.View style={[styles.backdrop, swipe.backdropStyle]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={swipe.dismiss} accessibilityLabel="Fechar painel" />
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={swipe.dismiss}
+          accessibilityRole="button"
+          accessibilityLabel="Fechar painel"
+        />
       </Animated.View>
       <GestureDetector gesture={swipe.gesture}>
       <Animated.View
@@ -59,7 +67,7 @@ export default function ObraSheet({
         accessibilityViewIsModal
       >
         <View style={styles.grab} />
-        <Text style={styles.title} accessibilityRole="header">
+        <Text ref={titleRef} style={styles.title} accessibilityRole="header">
           {plot.name}
         </Text>
         <Text style={styles.zone}>{plot.zone}</Text>
