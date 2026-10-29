@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { AppState } from 'react-native';
-import { applySnapshot, flushPending, pullAll } from '@/services/sync';
+import { applySnapshot, flushPending, pullAll, pushIfNewer } from '@/services/sync';
 import { useGameStore } from '@/store/useGameStore';
 import { usePlantStore } from '@/store/usePlantStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -22,16 +22,22 @@ const SYNCED = [
   usePreJogoStore,
 ];
 
-/** Ao abrir o app, traz da nuvem o que estiver mais novo; ao ir para o fundo, envia o que falta. */
+/**
+ * Ao abrir o app, traz da nuvem o que estiver mais novo e envia o que o aparelho tiver de
+ * mais novo (ex.: mudou sem internet). Ao ir para o fundo, envia o que estiver esperando.
+ */
 export function useCloudSync() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const snapshots = await pullAll();
-      for (const s of snapshots) {
-        const store = SYNCED.find((st) => st.persist.getOptions().name === s.store);
-        if (!store || cancelled) continue;
-        if (await applySnapshot(s)) await store.persist.rehydrate();
+      if (!snapshots) return; // sem Supabase ou sem internet: segue só com o aparelho
+      for (const store of SYNCED) {
+        if (cancelled) return;
+        const name = store.persist.getOptions().name!;
+        const remote = snapshots.find((s) => s.store === name);
+        if (remote && (await applySnapshot(remote))) await store.persist.rehydrate();
+        else await pushIfNewer(name, remote?.updated_at);
       }
     })().catch(() => {});
 

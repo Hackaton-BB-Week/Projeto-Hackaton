@@ -75,11 +75,11 @@ export function flushPending() {
 
 export type Snapshot = { store: string; data: unknown; updated_at: string };
 
-/** Estados salvos na nuvem para este usuário ([] sem Supabase, sem internet ou com erro). */
-export async function pullAll(): Promise<Snapshot[]> {
+/** Estados salvos na nuvem para este usuário (null sem Supabase, sem internet ou com erro). */
+export async function pullAll(): Promise<Snapshot[] | null> {
   try {
     const userId = await ensureUser();
-    if (!userId) return [];
+    if (!userId) return null;
     const { data, error } = await getClient()
       .from('app_state')
       .select('store, data, updated_at')
@@ -87,7 +87,7 @@ export async function pullAll(): Promise<Snapshot[]> {
     if (error) throw error;
     return data ?? [];
   } catch {
-    return [];
+    return null;
   }
 }
 
@@ -105,10 +105,24 @@ export async function applySnapshot(s: Snapshot): Promise<boolean> {
   return true;
 }
 
+/**
+ * Envia o estado local se ele for mais novo que o da nuvem (ou se a nuvem não tiver nada):
+ * cobre o que mudou sem internet. `remoteAt` é o updated_at baixado em pullAll.
+ */
+export async function pushIfNewer(store: string, remoteAt?: string) {
+  const [[, json], [, localAt]] = await AsyncStorage.multiGet([store, tsKey(store)]);
+  if (!json || !localAt) return;
+  if (remoteAt && new Date(localAt) <= new Date(remoteAt)) return;
+  pushState(store, json, localAt);
+}
+
 /** Storage do `persist` do Zustand: AsyncStorage + cópia na nuvem em segundo plano. */
 export const syncedStorage: StateStorage = {
   getItem: (name) => AsyncStorage.getItem(name),
   setItem: async (name, value) => {
+    // Ao abrir, a hidratação regrava o mesmo estado: isso não pode contar como mudança,
+    // senão o aparelho sempre pareceria mais novo e apagaria o que veio da nuvem.
+    if ((await AsyncStorage.getItem(name)) === value) return;
     const at = new Date().toISOString();
     await AsyncStorage.multiSet([
       [name, value],
