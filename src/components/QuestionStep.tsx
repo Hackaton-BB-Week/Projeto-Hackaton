@@ -50,7 +50,7 @@ export function QuestionStep({ step, total, question, options, selected, onChoos
                 },
               ]}
             >
-              <View style={[styles.radio, { borderColor: sel ? colors.brand : colors.line }]}>
+              <View style={[styles.radio, { borderColor: sel ? colors.brand : colors.inputBorder }]}>
                 {sel && <View style={[styles.dot, { backgroundColor: colors.brand }]} />}
               </View>
               <Text style={[styles.optTxt, { color: colors.ink, fontSize: fs(14.5) }]}>

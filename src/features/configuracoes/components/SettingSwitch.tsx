@@ -30,7 +30,7 @@ export function SettingSwitch({
       accessibilityLabel={label}
       accessibilityState={{ checked: value }}
       hitSlop={8}
-      style={[styles.track, { backgroundColor: value ? colors.green600 : colors.line }]}
+      style={[styles.track, { backgroundColor: value ? colors.green600 : colors.inputBorder }]}
     >
       <Animated.View style={[styles.knob, knob]} />
     </Pressable>
