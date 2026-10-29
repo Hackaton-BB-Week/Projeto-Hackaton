@@ -94,7 +94,8 @@ export function BuildingPreview({
     <Svg
       width={size}
       height={tight ? (size * 70) / 56 : (size * 150) / 208}
-      viewBox={tight ? '142 118 56 70' : '66 46 208 150'}
+      // Sem `tight`, o quadro desce um pouco: a base e a sombra do prédio não ficam cortadas.
+      viewBox={tight ? '142 118 56 70' : '66 62 208 150'}
     >
       {els}
     </Svg>

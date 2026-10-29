@@ -15,19 +15,28 @@ export function useDemoActions() {
   const logout = useUserStore((s) => s.logout);
 
   return {
-    /** Avança `n` dias e registra cada um como dia sem apostar. */
-    addDays: (n: number) => {
+    /**
+     * Simula dias passando. `register: false` (Simular +1 dia) só avança o dia: a pessoa
+     * registra pelo botão "Registrar novo dia sem apostar", e as missões do dia trocam.
+     * `register: true` (Simular +7 dias) já registra cada dia como sem apostar.
+     */
+    addDays: (n: number, register = true) => {
       const plant = usePlantStore.getState();
       let coins = 0;
       for (let i = 0; i < n; i++) {
         plant.devAdvanceDay();
+        if (!register) continue;
         const r = usePlantStore.getState().registerDay();
         if (r.ok) coins += r.coins;
       }
+      usePlantStore.getState().checkAbsence();
+      const label = n === 1 ? '1 dia simulado' : `${n} dias simulados`;
+      if (!register) {
+        showToast(`${label} · registre o dia pelo botão "Registrar novo dia"`);
+        return;
+      }
       const { streak } = useGameStore.getState();
-      showToast(
-        `${n === 1 ? '1 dia simulado' : `${n} dias simulados`} · +${formatCoins(coins)} moedas · Sequência: ${streak}`,
-      );
+      showToast(`${label} e registrados · +${formatCoins(coins)} moedas · Sequência: ${streak}`);
     },
     addCoins: (n: number) => {
       earnCoins(n);
