@@ -18,3 +18,6 @@ expo-env.d.ts
 
 # Vercel (CLI)
 .vercel
+# .env.local é criado pela CLI da Vercel; o modelo .env.example continua versionado.
+.env*
+!.env.example
