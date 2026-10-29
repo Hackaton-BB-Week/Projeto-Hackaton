@@ -20,12 +20,14 @@ const AMBER = '#bb6a1e';
 const SIZE = 54;
 const FX_LABEL: Record<PlantFx, string | null> = {
   water: '+1 dia',
+  tick: '+1 dia',
   grow: 'Cresceu!',
   heal: 'Recuperada!',
   relapse: null,
 };
 const RING_COLOR: Record<PlantFx, string> = {
   water: '#5aa9e6',
+  tick: '#ffc62b',
   grow: '#ffc62b',
   heal: '#1f9b57',
   relapse: AMBER,
@@ -82,7 +84,18 @@ export function PlantBadge() {
       drop.value = withTiming(1, { duration: 420, easing: Easing.in(Easing.quad) });
     };
 
-    if (fx.kind === 'water') {
+    if (fx.kind === 'tick') {
+      // Um dia "checado" rapidinho: gota curta, pulo de crescimento, anel e brilhos.
+      drop.value = 0;
+      drop.value = withTiming(1, { duration: 180, easing: Easing.in(Easing.quad) });
+      pop.value = withDelay(
+        150,
+        withSequence(withTiming(1.22, { duration: 90 }), withSpring(1, { damping: 9 })),
+      );
+      run(ring, 380, 150);
+      run(sparkle, 420, 150);
+      run(label, 520, 160);
+    } else if (fx.kind === 'water') {
       fallDrop();
       pop.value = burst(1.14, 380);
       run(ring, 650, 380);
