@@ -7,3 +7,7 @@ export function validateName(name: string): string | null {
 export function validateEmail(email: string): string | null {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ? null : 'Digite um e-mail válido.';
 }
+
+export function validatePassword(password: string): string | null {
+  return password.length < 6 ? 'A senha precisa ter pelo menos 6 caracteres.' : null;
+}

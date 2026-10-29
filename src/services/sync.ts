@@ -66,11 +66,79 @@ export function pushState(store: string, json: string, at = new Date().toISOStri
 
 /** Envia na hora o que estiver esperando (ex.: o app foi para o fundo). */
 export function flushPending() {
+  const uploads: Promise<void>[] = [];
   for (const [store, t] of pending) {
     clearTimeout(t);
     pending.delete(store);
-    upload(store).catch(() => {});
+    uploads.push(upload(store).catch(() => {}));
   }
+  return Promise.all(uploads);
+}
+
+/** Descarta o que ia subir: ao trocar de conta, nada do usuário anterior vai para a nova. */
+function dropPending() {
+  for (const t of pending.values()) clearTimeout(t);
+  pending.clear();
+  queued.clear();
+}
+
+// ----- Conta com e-mail e senha -----
+
+export type AuthResult = { ok: true } | { ok: false; error: string };
+
+function authError(message: string): string {
+  const m = message.toLowerCase();
+  if (m.includes('already registered') || m.includes('already been registered'))
+    return 'Esse e-mail já tem conta. Toque em "Já tenho conta" para entrar.';
+  if (m.includes('invalid login credentials')) return 'E-mail ou senha incorretos.';
+  if (m.includes('password')) return 'A senha precisa ter pelo menos 6 caracteres.';
+  if (m.includes('email not confirmed')) return 'Confirme o e-mail antes de entrar.';
+  if (m.includes('fetch') || m.includes('network')) return 'Sem conexão. Tente de novo.';
+  return 'Não deu certo agora. Tente de novo.';
+}
+
+/** Cria a conta. Sem Supabase configurado, segue só no aparelho (ok). */
+export async function signUpWithEmail(email: string, password: string): Promise<AuthResult> {
+  if (!isConfigured()) return { ok: true };
+  try {
+    const { data, error } = await getClient().auth.signUp({ email, password });
+    if (error) return { ok: false, error: authError(error.message) };
+    if (!data.session) return { ok: false, error: 'Confirme o e-mail antes de entrar.' };
+    dropPending();
+    session = Promise.resolve(data.session.user.id);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: authError(String(e)) };
+  }
+}
+
+/** Entra numa conta existente e devolve o progresso salvo nela. */
+export async function signInWithEmail(
+  email: string,
+  password: string,
+): Promise<{ ok: true; snapshots: Snapshot[] } | { ok: false; error: string }> {
+  if (!isConfigured())
+    return { ok: false, error: 'Login indisponível sem conexão com o servidor.' };
+  try {
+    const { data, error } = await getClient().auth.signInWithPassword({ email, password });
+    if (error) return { ok: false, error: authError(error.message) };
+    dropPending();
+    session = Promise.resolve(data.user.id);
+    return { ok: true, snapshots: (await pullAll()) ?? [] };
+  } catch (e) {
+    return { ok: false, error: authError(String(e)) };
+  }
+}
+
+/** Sai da conta: envia o que faltava e volta ao login anônimo na próxima gravação. */
+export async function signOutCloud() {
+  if (!isConfigured()) return;
+  await flushPending();
+  dropPending();
+  session = null;
+  await getClient()
+    .auth.signOut()
+    .catch(() => {});
 }
 
 export type Snapshot = { store: string; data: unknown; updated_at: string };
@@ -92,12 +160,13 @@ export async function pullAll(): Promise<Snapshot[] | null> {
 }
 
 /**
- * Grava no aparelho o estado vindo da nuvem, se ele for mais novo que o local.
+ * Grava no aparelho o estado vindo da nuvem, se ele for mais novo que o local
+ * (`force`: sempre, ex.: ao entrar numa conta).
  * Retorna true quando gravou (o store precisa reidratar).
  */
-export async function applySnapshot(s: Snapshot): Promise<boolean> {
+export async function applySnapshot(s: Snapshot, force = false): Promise<boolean> {
   const localAt = await AsyncStorage.getItem(tsKey(s.store));
-  if (localAt && new Date(localAt) >= new Date(s.updated_at)) return false;
+  if (!force && localAt && new Date(localAt) >= new Date(s.updated_at)) return false;
   await AsyncStorage.multiSet([
     [s.store, JSON.stringify(s.data)],
     [tsKey(s.store), s.updated_at],
