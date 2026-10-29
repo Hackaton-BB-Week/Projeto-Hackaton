@@ -1,0 +1,60 @@
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { syncedStorage } from '@/services/sync';
+import { useGameStore } from './useGameStore';
+
+// Login local (sem auth real, ver docs/MVP.md). Fica salvo no aparelho.
+// 'partida' (empolgação de uma partida) vem do "Refazer diagnóstico".
+export type Trigger = 'tedio' | 'recuperar' | 'ansiedade' | 'promo' | 'partida';
+
+interface UserState {
+  name: string;
+  email: string;
+  weeklySpend: number;
+  trigger: Trigger | null;
+  /** Objetivo escolhido na pesquisa (0–3). */
+  goal: number;
+  onboarded: boolean;
+  /** true quando os dados salvos já foram lidos do aparelho. */
+  hydrated: boolean;
+
+  setIdentity: (name: string, email: string) => void;
+  completeOnboarding: (v: { weeklySpend: number; trigger: Trigger; goal: number }) => void;
+  /** Resultado do "Refazer diagnóstico": atualiza gasto semanal e gatilho. */
+  updateDiagnosis: (v: { weeklySpend: number; trigger: Trigger }) => void;
+  logout: () => void;
+}
+
+export const useUserStore = create<UserState>()(
+  persist(
+    (set) => ({
+      name: '',
+      email: '',
+      weeklySpend: 0,
+      trigger: null,
+      goal: 0,
+      onboarded: false,
+      hydrated: false,
+
+      setIdentity: (name, email) => set({ name, email }),
+      completeOnboarding: (v) => set({ ...v, onboarded: true }),
+      updateDiagnosis: (v) => {
+        set(v);
+        // O gasto semanal também alimenta a economia de moedas.
+        useGameStore.getState().setWeeklySpend(v.weeklySpend);
+      },
+      logout: () =>
+        set({ name: '', email: '', weeklySpend: 0, trigger: null, goal: 0, onboarded: false }),
+    }),
+    {
+      name: 'rqr-user',
+      storage: createJSONStorage(() => syncedStorage),
+      partialize: ({ hydrated: _h, ...rest }) => rest,
+      onRehydrateStorage: () => (state) => {
+        // O gasto semanal também alimenta a economia de moedas.
+        if (state?.onboarded) useGameStore.setState({ weeklySpend: state.weeklySpend });
+        useUserStore.setState({ hydrated: true });
+      },
+    },
+  ),
+);

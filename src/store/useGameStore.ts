@@ -1,4 +1,6 @@
-import { create } from 'zustand';
+import { create, type StateCreator } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { syncedStorage } from '@/services/sync';
 
 // ----- Regras da economia (puras, testáveis) -----
 export const MULTIPLIER_TIERS = [
@@ -18,17 +20,12 @@ export function dailyCoinGain(weeklySpend: number, streak: number): number {
   return Math.round((weeklySpend / 7) * multiplierForStreak(streak));
 }
 
-export type VillageTask = 'roof' | 'walls' | 'frontGarden' | 'tree' | 'bench';
-
-type Village = Partial<Record<VillageTask, { style: number }>>;
-
 interface GameState {
   weeklySpend: number;
   streak: number;
   total: number;
   relapses: number;
   coins: number;
-  village: Village;
   villageGrey: boolean;
   missionDone: boolean;
 
@@ -36,16 +33,18 @@ interface GameState {
   advanceDays: (n: number) => void;
   registerRelapse: () => void;
   completeMission: (bonus?: number) => void;
-  restore: (task: VillageTask, style: number, cost: number) => void;
+  /** Credita moedas ganhas (ex.: missões diárias). Ignora valores inválidos. */
+  earnCoins: (amount: number) => void;
+  /** Gasta moedas se houver saldo. Retorna false (sem gastar nada) se não houver. */
+  spendCoins: (cost: number) => boolean;
 }
 
-export const useGameStore = create<GameState>((set, get) => ({
+const gameStore: StateCreator<GameState> = (set, get) => ({
   weeklySpend: 0,
   streak: 1,
   total: 1,
   relapses: 0,
   coins: 0,
-  village: {},
   villageGrey: false,
   missionDone: false,
 
@@ -74,9 +73,19 @@ export const useGameStore = create<GameState>((set, get) => ({
   completeMission: (bonus = 15) =>
     set((s) => (s.missionDone ? s : { missionDone: true, coins: s.coins + bonus })),
 
-  restore: (task, style, cost) => {
-    const s = get();
-    if (s.coins < cost) return;
-    set({ coins: s.coins - cost, village: { ...s.village, [task]: { style } } });
+  earnCoins: (amount) => {
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    set((s) => ({ coins: s.coins + Math.round(amount) }));
   },
-}));
+
+  spendCoins: (cost) => {
+    if (get().coins < cost) return false;
+    set((s) => ({ coins: s.coins - cost }));
+    return true;
+  },
+});
+
+// Salvo no aparelho: sequência, dias e moedas não podem sumir ao fechar o app.
+export const useGameStore = create<GameState>()(
+  persist(gameStore, { name: 'rqr-game', storage: createJSONStorage(() => syncedStorage) }),
+);

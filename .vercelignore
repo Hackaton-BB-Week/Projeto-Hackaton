@@ -1,0 +1,9 @@
+# Nunca enviar segredos nem builds locais para a Vercel (a CLI sobe a pasta).
+.env
+.env.*
+!.env.example
+supabase/functions/.env
+node_modules
+dist
+.expo
+deno.lock

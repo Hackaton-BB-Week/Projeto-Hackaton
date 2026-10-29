@@ -1,0 +1,127 @@
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { router } from 'expo-router';
+import { AccessibilityInfo, Pressable, StyleSheet, Text, View } from 'react-native';
+import CityHeader from './components/CityHeader';
+import ObrasList from './components/ObrasList';
+import { CITIES } from './data/cities';
+import CityView from './scene/CityView';
+import { builtCount, isCityComplete, useVilaStore } from '@/store/useVilaStore';
+import { radius, spacing } from '@/theme/tokens';
+import type { Theme } from '@/theme/useTheme';
+import { useThemedStyles } from '@/theme/useThemedStyles';
+
+// Bloco da vila para a tela Início: cidade com câmera e lista de obras. O painel da
+// obra abre como rota (app/obra.tsx).
+// É autossuficiente (lê e grava nos stores), então a Home só precisa de <VilaSection />.
+// `mapOverlay` fica sobre o canto superior direito do mapa; `belowMap` logo abaixo dele.
+export default function VilaSection({
+  mapOverlay,
+  belowMap,
+}: { mapOverlay?: ReactNode; belowMap?: ReactNode } = {}) {
+  const styles = useThemedStyles(makeStyles);
+  const { cityIndex, built: builtByCity, nextCity } = useVilaStore();
+  const city = CITIES[cityIndex];
+  const built = builtByCity[cityIndex];
+  const [notice, setNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!notice) return;
+    AccessibilityInfo.announceForAccessibility(notice);
+    const t = setTimeout(() => setNotice(null), 2500);
+    return () => clearTimeout(t);
+  }, [notice]);
+
+  // Avisa quando uma obra nova é concluída (a construção acontece no painel).
+  const done = builtCount(built);
+  const lastDone = useRef({ cityIndex, done });
+  useEffect(() => {
+    const last = lastDone.current;
+    if (last.cityIndex === cityIndex && done > last.done) setNotice('Obra concluída!');
+    lastDone.current = { cityIndex, done };
+  }, [cityIndex, done]);
+
+  const openObra = useCallback(
+    (id: string) => router.push({ pathname: '/obra', params: { id } }),
+    [],
+  );
+  const complete = isCityComplete(cityIndex, built);
+  const next = CITIES[cityIndex + 1];
+
+  return (
+    <View style={styles.c}>
+      <CityHeader name={city.name} done={done} total={city.plots.length} />
+      <View>
+        <CityView cityIndex={cityIndex} built={built} onPlotPress={openObra} />
+        {mapOverlay && <View style={styles.overlay}>{mapOverlay}</View>}
+      </View>
+      {belowMap}
+      {notice && (
+        <View style={styles.notice} accessibilityLiveRegion="polite">
+          <Text style={styles.noticeTxt}>{notice}</Text>
+        </View>
+      )}
+
+      {complete && next && (
+        <View style={styles.doneCard}>
+          <Text style={styles.doneTitle}>{city.name} restaurada!</Text>
+          <Text style={styles.doneTxt}>Uma nova cidade está pronta: a {next.name}.</Text>
+          <Pressable
+            onPress={() => {
+              nextCity();
+              setNotice(`Boas-vindas à ${next.name}`);
+            }}
+            accessibilityRole="button"
+            style={styles.doneBtn}
+          >
+            <Text style={styles.doneBtnTxt}>Explorar nova cidade</Text>
+          </Pressable>
+        </View>
+      )}
+
+      <View style={styles.listHead}>
+        <Text style={styles.h2} accessibilityRole="header">
+          Construir a vila
+        </Text>
+      </View>
+      <ObrasList city={city} built={built} onOpen={openObra} />
+
+    </View>
+  );
+}
+
+const makeStyles = ({ colors, fs }: Theme) =>
+  StyleSheet.create({
+  c: { gap: spacing.md },
+  overlay: { position: 'absolute', top: 10, right: 10 },
+  notice: {
+    alignSelf: 'center',
+    marginTop: -spacing.sm,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 999,
+    // success: texto branco com 4,5:1 nos dois temas (o green claro não chega lá).
+    backgroundColor: colors.success,
+  },
+  noticeTxt: { color: '#fff', fontWeight: '700', fontSize: fs(13) },
+  doneCard: {
+    padding: spacing.md,
+    gap: 6,
+    borderRadius: radius.lg,
+    backgroundColor: colors.greenSoft,
+    alignItems: 'center',
+  },
+  doneTitle: { fontSize: fs(16), fontWeight: '700', color: colors.green600 },
+  doneTxt: { fontSize: fs(13), color: colors.muted, textAlign: 'center' },
+  doneBtn: {
+    marginTop: 6,
+    minHeight: 44,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.md,
+    // Mesmo azul fechado dos destaques (o brand do escuro é claro demais).
+    backgroundColor: colors.feature,
+    justifyContent: 'center',
+  },
+  doneBtnTxt: { color: '#fff', fontWeight: '700', fontSize: fs(15) },
+  listHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  h2: { fontSize: fs(18), fontWeight: '700', color: colors.ink },
+});
