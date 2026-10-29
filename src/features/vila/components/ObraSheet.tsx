@@ -153,7 +153,9 @@ function Button({
         pressed && { opacity: 0.8 },
       ]}
     >
-      <Text style={[styles.btnTxt, primary && styles.btnPrimaryTxt]}>{label}</Text>
+      <Text style={[styles.btnTxt, primary && styles.btnPrimaryTxt, disabled && styles.btnDisabledTxt]}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -224,7 +226,9 @@ const makeStyles = ({ colors, fs }: Theme) =>
     justifyContent: 'center',
   },
   btnPrimary: { backgroundColor: colors.gold, marginTop: spacing.sm },
-  btnDisabled: { backgroundColor: colors.line },
+  // "Moedas insuficientes": vermelho e legível nos dois modos (antes, texto dourado sobre cinza).
+  btnDisabled: { backgroundColor: colors.dangerSoft, borderWidth: 1, borderColor: colors.danger },
+  btnDisabledTxt: { color: colors.danger },
   btnTxt: { fontSize: fs(15), fontWeight: '700', color: colors.muted },
   btnPrimaryTxt: { color: colors.goldInk },
 });
