@@ -39,7 +39,7 @@ const makeStyles = ({ colors, fs }: Theme) =>
     padding: spacing.md,
     gap: spacing.sm,
     borderRadius: radius.lg,
-    backgroundColor: '#fff4f1',
+    backgroundColor: colors.dangerSoft,
     borderWidth: 2,
     borderColor: colors.danger,
   },

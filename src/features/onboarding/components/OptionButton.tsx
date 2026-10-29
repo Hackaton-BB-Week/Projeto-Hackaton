@@ -44,7 +44,8 @@ const makeStyles = ({ colors, fs }: Theme) =>
     borderColor: colors.line,
     backgroundColor: colors.surface,
   },
-  optSel: { borderColor: colors.brand, backgroundColor: '#eef3fd' },
+  // Selecionada: fundo do tema (no escuro, o claro fixo deixava o texto ilegível).
+  optSel: { borderColor: colors.brand, backgroundColor: colors.brandSoft },
   radio: {
     width: 20,
     height: 20,

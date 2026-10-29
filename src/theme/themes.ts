@@ -13,7 +13,12 @@ export type Palette = {
   brand700: string;
   brandSoft: string;
   gold: string;
+  /** Topo do degradê dos botões amarelos. */
+  gold2: string;
   goldInk: string;
+  /** Degradê do botão de conclusão (registrar dia): topo → base. Texto branco (AA). */
+  success: string;
+  success2: string;
   green600: string;
   /** Verde de destaque (barras, avisos de sucesso). */
   green: string;
@@ -39,7 +44,10 @@ const light: Palette = {
   brand700: '#17409e',
   brandSoft: '#e4ebfb',
   gold: '#ffc62b',
+  gold2: '#ffd861',
   goldInk: '#5a3f00',
+  success: '#146c3c',
+  success2: '#23874e',
   green600: '#157a43',
   green: '#2e9e5b',
   greenSoft: '#e3f3e9',
@@ -63,7 +71,10 @@ const dark: Palette = {
   brand700: '#9ab6ff',
   brandSoft: '#1f2b4a',
   gold: '#ffc62b',
+  gold2: '#ffd861',
   goldInk: '#5a3f00',
+  success: '#146c3c',
+  success2: '#23874e',
   green600: '#4fc08a',
   green: '#4fc08a',
   greenSoft: '#1d3a2b',
@@ -77,6 +88,8 @@ const dark: Palette = {
 
 // Daltonismo: troca o par verde/vermelho por azul/laranja (paleta Okabe-Ito).
 const colorblindLight: Partial<Palette> = {
+  success: '#005a8f',
+  success2: '#1c75b8',
   green600: '#0072b2',
   green: '#0072b2',
   greenSoft: '#d7e9f5',
@@ -84,6 +97,8 @@ const colorblindLight: Partial<Palette> = {
   dangerSoft: '#fbe6d6',
 };
 const colorblindDark: Partial<Palette> = {
+  success: '#005a8f',
+  success2: '#1c75b8',
   green600: '#4ea3e0',
   green: '#4ea3e0',
   greenSoft: '#17344a',

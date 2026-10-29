@@ -66,7 +66,7 @@ export const SCENARIOS: Scenario[] = [
         text: 'Faço a missão "A rodada começou"',
         protective: true,
         feedback:
-          'Exato — planejar o horário da partida é das estratégias mais eficazes.',
+          'Exato. Planejar o horário da partida é das estratégias mais eficazes.',
       },
     ],
     learn: {

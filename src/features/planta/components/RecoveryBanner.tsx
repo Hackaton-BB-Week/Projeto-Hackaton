@@ -15,7 +15,7 @@ export function RecoveryBanner() {
 
   const text =
     p.witherReason === 'relapse'
-      ? 'Uma recaída aconteceu — faça a missão de retomada para ajudá-la a se recuperar.'
+      ? 'Uma recaída aconteceu. Faça a missão de retomada para ajudá-la a se recuperar.'
       : 'Ela sentiu sua falta. Uma missão rapidinha ajuda ela a se recuperar.';
 
   return (
