@@ -65,7 +65,7 @@ export function FinanceScreen() {
             icon="trending-up"
             variant="navy"
             onPress={() => router.push('/investimentos')}
-            accessibilityHint="Simula o dinheiro das apostas no CDB e no Tesouro Selic"
+            accessibilityHint="Simula o dinheiro das apostas a 100% do CDI e no Tesouro Selic"
           />
 
           <View style={styles.card}>
