@@ -42,14 +42,13 @@ export function useDemoActions() {
         showToast(`${label} · registre o dia pelo botão "Registrar novo dia"`);
         return;
       }
-      // Uma gota por dia registrado, em sequência; no fim, "Cresceu!" se mudou de estágio.
+      // No fim, "Cresceu!" completo se a planta mudou de estágio.
       // (A bolinha ignora os efeitos com "reduzir animações".)
       const grew = plantStage(useGameStore.getState().total) > stageBefore;
       const { play } = usePlantUi.getState();
-      for (let i = 0; i < registered; i++) {
-        const last = i === registered - 1;
-        setTimeout(() => play(last && grew ? 'grow' : 'water'), 450 + i * 520);
-      }
+      // Crescimento rapidinho, um por dia, como se os dias passassem sendo checados.
+      for (let i = 0; i < registered; i++) setTimeout(() => play('tick'), 400 + i * 300);
+      if (grew) setTimeout(() => play('grow'), 400 + registered * 300 + 250);
       const { streak } = useGameStore.getState();
       showToast(`${label} e registrados · +${formatCoins(coins)} moedas · Sequência: ${streak}`);
     },
