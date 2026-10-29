@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { AppState } from 'react-native';
-import { applySnapshot, flushPending, pullAll, pushIfNewer } from '@/services/sync';
+import { applySnapshot, flushPending, pullAll, pushIfNewer, type Snapshot } from '@/services/sync';
 import { useGameStore } from '@/store/useGameStore';
 import { usePlantStore } from '@/store/usePlantStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -21,6 +21,14 @@ const SYNCED = [
   useEscolhaStore,
   usePreJogoStore,
 ];
+
+/** Troca o progresso do aparelho pelo da conta que acabou de entrar. */
+export async function restoreSnapshots(snapshots: Snapshot[]) {
+  for (const store of SYNCED) {
+    const remote = snapshots.find((s) => s.store === store.persist.getOptions().name);
+    if (remote && (await applySnapshot(remote, true))) await store.persist.rehydrate();
+  }
+}
 
 /**
  * Ao abrir o app, traz da nuvem o que estiver mais novo e envia o que o aparelho tiver de

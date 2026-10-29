@@ -8,6 +8,7 @@ import { showToast } from '@/components/Toast';
 import { formatCoins } from '@/lib/format';
 import { usePlantUi } from '@/features/planta/usePlant';
 import { plantStage } from '@/features/planta/plant';
+import { signOutCloud } from '@/services/sync';
 
 // Atalhos de demonstração (apresentação do hackathon). Passam pelo mesmo registro de
 // dias do botão "Registrar novo dia sem apostar", então planta, sequência e moedas
@@ -56,8 +57,10 @@ export function useDemoActions() {
       earnCoins(n);
       showToast(`+${n} moedas (demonstração)`);
     },
-    /** Apaga o login e todo o progresso e volta para as boas-vindas. */
-    resetAll: () => {
+    /** Sai da conta, apaga o progresso do aparelho e volta para as boas-vindas.
+     *  O progresso da conta continua na nuvem (entrar de novo traz tudo de volta). */
+    resetAll: async () => {
+      await signOutCloud();
       useGameStore.setState(useGameStore.getInitialState());
       useVilaStore.setState(useVilaStore.getInitialState());
       usePlantStore.getState().reset();
