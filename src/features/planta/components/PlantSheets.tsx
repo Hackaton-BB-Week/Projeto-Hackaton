@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { AppState, View, Text, StyleSheet } from 'react-native';
-import { BottomPanel } from './BottomPanel';
+import { BottomPanel } from '@/components/BottomPanel';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { showToast } from '@/components/Toast';

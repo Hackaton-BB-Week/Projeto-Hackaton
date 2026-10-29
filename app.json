@@ -20,7 +20,14 @@
     "plugins": [
       "expo-router",
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "O Rolê que Rende usa a câmera só quando você quer registrar uma missão concluída com uma foto. A foto fica apenas no seu aparelho.",
+          "photosPermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

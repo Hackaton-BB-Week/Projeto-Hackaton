@@ -37,8 +37,9 @@ export function useDailyMissions() {
     return missionsForDay(day).map((m) => ({ ...m, done: doneToday.includes(m.id) }));
   }, [day, today, storedDay, done]);
 
+  // `photoUri`: foto opcional da missão (o álbum guarda; nada é verificado).
   const complete = useCallback(
-    (id: string) => {
+    (id: string, _photoUri?: string) => {
       const mission = missions.find((m) => m.id === id);
       if (!mission || mission.done) return;
       if (!markDone(id, today)) return;
