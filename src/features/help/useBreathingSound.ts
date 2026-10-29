@@ -5,9 +5,15 @@ import { CYCLE_SECONDS, type TimerStatus } from './breathing';
 // O arquivo tem ~3 min, mas é só o mesmo trecho de ~12 s repetido.
 const SOUND = require('../../../assets/audios/somdarespiracaoo.mp4');
 
+const VOLUME = 0.8;
+const FADE_MS = 600;
+const FADE_STEPS = 12;
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 /**
  * Som ambiente do exercício de respiração. Toca enquanto o cronômetro roda,
- * pausa junto e para ao concluir/fechar. A cada novo ciclo (Inspire) o áudio
+ * pausa junto e, ao concluir, reiniciar ou fechar, baixa o volume aos poucos
+ * antes de parar (sem corte súbito). A cada novo ciclo (Inspire) o áudio
  * volta ao início, então fica sempre em sincronia com o orbe, qualquer que
  * seja a duração escolhida (1, 2 ou 5 min).
  */
@@ -15,6 +21,29 @@ export function useBreathingSound(status: TimerStatus, elapsed: number, enabled 
   const soundRef = useRef<Audio.Sound | null>(null);
   const playingRef = useRef(false);
   playingRef.current = status === 'running' && enabled;
+  // Cada fade ganha um número; se o usuário der play no meio, o fade antigo desiste.
+  const fadeIdRef = useRef(0);
+
+  /** Baixa o volume até zero, para e volta ao início, pronto para a próxima vez. */
+  const fadeOutAndStop = async (sound: Audio.Sound) => {
+    const id = ++fadeIdRef.current;
+    try {
+      const st = await sound.getStatusAsync();
+      if (st.isLoaded && st.isPlaying) {
+        const from = st.volume;
+        for (let i = 1; i <= FADE_STEPS; i++) {
+          if (fadeIdRef.current !== id) return;
+          await sound.setVolumeAsync(from * (1 - i / FADE_STEPS));
+          await wait(FADE_MS / FADE_STEPS);
+        }
+      }
+      if (fadeIdRef.current !== id) return;
+      await sound.stopAsync();
+      await sound.setVolumeAsync(VOLUME);
+    } catch {
+      // som já descarregado: nada a fazer
+    }
+  };
 
   // Carrega uma vez e descarrega ao desmontar.
   useEffect(() => {
@@ -22,7 +51,7 @@ export function useBreathingSound(status: TimerStatus, elapsed: number, enabled 
     (async () => {
       try {
         await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
-        const { sound } = await Audio.Sound.createAsync(SOUND, { isLooping: true, volume: 0.8 });
+        const { sound } = await Audio.Sound.createAsync(SOUND, { isLooping: true, volume: VOLUME });
         if (cancelled) await sound.unloadAsync();
         else {
           soundRef.current = sound;
@@ -34,21 +63,32 @@ export function useBreathingSound(status: TimerStatus, elapsed: number, enabled 
     })();
     return () => {
       cancelled = true;
-      soundRef.current?.unloadAsync().catch(() => {});
+      const sound = soundRef.current;
       soundRef.current = null;
+      // Saiu da tela de Ajuda: some suave e só então libera o áudio.
+      if (sound) fadeOutAndStop(sound).finally(() => sound.unloadAsync().catch(() => {}));
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Play / pause / stop conforme o cronômetro.
+  const prevStatusRef = useRef(status);
   useEffect(() => {
     const sound = soundRef.current;
+    const resuming = prevStatusRef.current === 'paused';
+    prevStatusRef.current = status;
     if (!sound) return;
     if (status === 'running' && enabled) {
-      sound.playAsync().catch(() => {});
+      fadeIdRef.current++; // cancela um fade em andamento
+      // Retomar continua de onde parou; começar de novo volta ao início do trecho.
+      (resuming ? Promise.resolve() : sound.setPositionAsync(0))
+        .then(() => sound.setVolumeAsync(VOLUME))
+        .then(() => sound.playAsync())
+        .catch(() => {});
     } else if (status === 'paused') {
       sound.pauseAsync().catch(() => {});
     } else {
-      sound.stopAsync().catch(() => {}); // idle/done: volta ao início
+      fadeOutAndStop(sound); // idle/done/fechou: some suave e volta ao início
     }
   }, [status, enabled]);
 
