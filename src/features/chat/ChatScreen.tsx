@@ -159,8 +159,8 @@ const makeStyles = ({ colors, fs }: Theme) =>
     paddingHorizontal: spacing.md,
     justifyContent: 'center',
     borderRadius: radius.md,
-    backgroundColor: colors.gold,
+    backgroundColor: colors.success,
   },
   sendOff: { opacity: 0.5 },
-  sendTxt: { color: colors.goldInk, fontWeight: '700', fontSize: fs(15) },
+  sendTxt: { color: '#fff', fontWeight: '700', fontSize: fs(15) },
 });

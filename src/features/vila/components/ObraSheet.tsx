@@ -225,10 +225,10 @@ const makeStyles = ({ colors, fs }: Theme) =>
     alignItems: 'center',
     justifyContent: 'center',
   },
-  btnPrimary: { backgroundColor: colors.gold, marginTop: spacing.sm },
+  btnPrimary: { backgroundColor: colors.success, marginTop: spacing.sm },
   // "Moedas insuficientes": vermelho e legível nos dois modos (antes, texto dourado sobre cinza).
   btnDisabled: { backgroundColor: colors.dangerSoft, borderWidth: 1, borderColor: colors.danger },
   btnDisabledTxt: { color: colors.danger },
   btnTxt: { fontSize: fs(15), fontWeight: '700', color: colors.muted },
-  btnPrimaryTxt: { color: colors.goldInk },
+  btnPrimaryTxt: { color: '#fff' },
 });

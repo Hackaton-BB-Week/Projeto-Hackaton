@@ -115,7 +115,7 @@ const makeStyles = ({ colors, fs }: Theme) =>
     color: colors.ink,
   },
   btn: {
-    backgroundColor: colors.gold,
+    backgroundColor: colors.success,
     borderRadius: radius.md,
     paddingVertical: 15,
     minHeight: 48,
@@ -123,6 +123,6 @@ const makeStyles = ({ colors, fs }: Theme) =>
     justifyContent: 'center',
   },
   btnPressed: { opacity: 0.85 },
-  btnTxt: { color: colors.goldInk, fontWeight: '700', fontSize: fs(15) },
+  btnTxt: { color: '#fff', fontWeight: '700', fontSize: fs(15) },
   ok: { textAlign: 'center', color: colors.green600, fontWeight: '600', marginTop: spacing.sm },
 });
