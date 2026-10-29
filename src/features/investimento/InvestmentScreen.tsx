@@ -62,7 +62,7 @@ export function InvestmentScreen() {
             {inv.loading && <ActivityIndicator color={colors.brand} />}
 
             <ProductCard
-              title={`CDB Banco do Brasil · ${CDB_PERCENT_CDI}% do CDI`}
+              title={`${CDB_PERCENT_CDI}% do CDI`}
               index="CDI"
               sim={inv.cdb}
               color={colors.green}

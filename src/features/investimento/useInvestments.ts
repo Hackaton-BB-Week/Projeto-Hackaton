@@ -4,7 +4,7 @@ import { FALLBACK_SELIC, fetchMonthlyRates } from '@/services/rates';
 import { estimatedNotBet } from '@/features/financeiro/finance';
 import { applyPercent, monthlyContribution, simulate, type MonthlyRate } from './investment';
 
-/** CDB do Banco do Brasil considerado a 100% do CDI (referência, não oferta). */
+/** Rendimento de referência: 100% do CDI. */
 export const CDB_PERCENT_CDI = 100;
 
 export type RatesSource = 'bcb' | 'fallback';
@@ -22,7 +22,7 @@ function useRates(series: 'selic' | 'cdi') {
 
 /**
  * Aplica hoje o que já deixou de ir para apostas e soma o gasto com apostas como
- * aporte mensal, no CDB a 100% do CDI e no Tesouro Selic, por 12 meses. Taxas reais
+ * aporte mensal, a 100% do CDI e no Tesouro Selic, por 12 meses. Taxas reais
  * do Banco Central; offline, usa a tabela embutida. Se só o CDI falhar, usa a Selic.
  */
 export function useInvestments() {

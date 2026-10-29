@@ -1,7 +1,7 @@
 # Feature: investimento
 
 Simula o dinheiro que deixou de ir para apostas aplicado hoje, mais aportes mensais, em renda
-fixa: CDB do Banco do Brasil (100% do CDI, referência) e Tesouro Selic.
+fixa: 100% do CDI e Tesouro Selic.
 
 - Rota: `app/investimentos.tsx`, aberta pelo botão "Investimentos" no Painel financeiro.
 - Tela: `InvestmentScreen.tsx`. Gráfico SVG: `components/GrowthChart.tsx`.
