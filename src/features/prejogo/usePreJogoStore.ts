@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { syncedStorage } from '@/services/sync';
 
 // Dia (dayKey) em que a recompensa do pré-jogo já foi dada. Salvo no aparelho.
 interface PreJogoState {
@@ -19,6 +19,6 @@ export const usePreJogoStore = create<PreJogoState>()(
         return true;
       },
     }),
-    { name: 'rqr-prejogo', storage: createJSONStorage(() => AsyncStorage) },
+    { name: 'rqr-prejogo', storage: createJSONStorage(() => syncedStorage) },
   ),
 );

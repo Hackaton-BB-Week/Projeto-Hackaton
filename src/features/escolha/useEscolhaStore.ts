@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { syncedStorage } from '@/services/sync';
 
 // Cenários em que a pessoa já ganhou as moedas (uma vez por cenário). Salvo no aparelho.
 interface EscolhaState {
@@ -19,6 +19,6 @@ export const useEscolhaStore = create<EscolhaState>()(
         return true;
       },
     }),
-    { name: 'rqr-escolha', storage: createJSONStorage(() => AsyncStorage) },
+    { name: 'rqr-escolha', storage: createJSONStorage(() => syncedStorage) },
   ),
 );

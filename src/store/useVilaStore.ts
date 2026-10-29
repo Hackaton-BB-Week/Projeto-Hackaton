@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { syncedStorage } from '@/services/sync';
 import { CITIES, type Plot } from '@/features/vila/data/cities';
 import { useGameStore } from '@/store/useGameStore';
 
@@ -24,26 +26,35 @@ interface VilaState {
   nextCity: () => void;
 }
 
-export const useVilaStore = create<VilaState>((set, get) => ({
-  cityIndex: 0,
-  built: CITIES.map(() => ({})),
+export const useVilaStore = create<VilaState>()(
+  persist(
+    (set, get) => ({
+      cityIndex: 0,
+      built: CITIES.map(() => ({})),
 
-  build: (plotId, style) => {
-    const { cityIndex, built } = get();
-    const current = built[cityIndex];
-    const plot = CITIES[cityIndex].plots.find((p) => p.id === plotId);
-    if (!plot || current[plotId] || !isAvailable(plot, current)) return false;
-    if (!useGameStore.getState().spendCoins(plot.cost)) return false;
-    const next = [...built];
-    next[cityIndex] = { ...current, [plotId]: { style: plot.hasStyle ? style : 0 } };
-    set({ built: next });
-    return true;
-  },
+      build: (plotId, style) => {
+        const { cityIndex, built } = get();
+        const current = built[cityIndex];
+        const plot = CITIES[cityIndex].plots.find((p) => p.id === plotId);
+        if (!plot || current[plotId] || !isAvailable(plot, current)) return false;
+        if (!useGameStore.getState().spendCoins(plot.cost)) return false;
+        const next = [...built];
+        next[cityIndex] = { ...current, [plotId]: { style: plot.hasStyle ? style : 0 } };
+        set({ built: next });
+        return true;
+      },
 
-  nextCity: () => {
-    const { cityIndex, built } = get();
-    if (cityIndex + 1 < CITIES.length && isCityComplete(cityIndex, built[cityIndex])) {
-      set({ cityIndex: cityIndex + 1 });
-    }
-  },
-}));
+      nextCity: () => {
+        const { cityIndex, built } = get();
+        if (cityIndex + 1 < CITIES.length && isCityComplete(cityIndex, built[cityIndex])) {
+          set({ cityIndex: cityIndex + 1 });
+        }
+      },
+    }),
+    {
+      name: 'rqr-vila',
+      storage: createJSONStorage(() => syncedStorage),
+      partialize: ({ cityIndex, built }) => ({ cityIndex, built }),
+    },
+  ),
+);

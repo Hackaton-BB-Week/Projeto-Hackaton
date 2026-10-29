@@ -3,6 +3,8 @@ import { useGameStore } from '@/store/useGameStore';
 import { useUserStore } from '@/store/useUserStore';
 import { usePlantStore } from '@/store/usePlantStore';
 import { dayNumber } from '@/features/planta/plant';
+import { restoreSnapshots } from '@/hooks/useCloudSync';
+import { signInWithEmail, signUpWithEmail } from '@/services/sync';
 import { useSurveyStore } from './useSurveyStore';
 import type { StartingPoint } from './profile';
 
@@ -11,11 +13,30 @@ export function useOnboarding() {
   const setIdentity = useUserStore((s) => s.setIdentity);
   const completeOnboarding = useUserStore((s) => s.completeOnboarding);
 
-  /** Salva nome + e-mail e segue para a pesquisa. */
-  const submitIdentity = (name: string, email: string) => {
+  /** Cria a conta (e-mail e senha), salva nome + e-mail e segue para a pesquisa. Retorna o erro, se houver. */
+  const submitIdentity = async (name: string, email: string, password: string) => {
+    const r = await signUpWithEmail(email.trim(), password);
+    if (!r.ok) return r.error;
     setIdentity(name.trim(), email.trim());
     useSurveyStore.getState().reset();
     router.push('/onboarding/pesquisa');
+    return null;
+  };
+
+  /** Entra numa conta existente e traz o progresso dela. Retorna o erro, se houver. */
+  const login = async (email: string, password: string) => {
+    const r = await signInWithEmail(email.trim(), password);
+    if (!r.ok) return r.error;
+    await restoreSnapshots(r.snapshots);
+    if (useUserStore.getState().onboarded) {
+      router.replace('/(tabs)');
+    } else {
+      // Conta sem pesquisa concluída: continua de onde parou.
+      setIdentity(useUserStore.getState().name, email.trim());
+      useSurveyStore.getState().reset();
+      router.push('/onboarding/pesquisa');
+    }
+    return null;
   };
 
   /** Conclui a pesquisa: salva o resultado e começa a vila do zero (80 moedas, como no protótipo). */
@@ -37,5 +58,5 @@ export function useOnboarding() {
     router.replace('/(tabs)');
   };
 
-  return { submitIdentity, finishOnboarding, startDemo };
+  return { submitIdentity, login, finishOnboarding, startDemo };
 }
