@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { syncedStorage } from '@/services/sync';
 import type { FontSize } from '@/theme/themes';
 
 // Preferências de aparência e acessibilidade (salvas no aparelho).
@@ -42,7 +42,7 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: 'rqr-settings',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => syncedStorage),
       // v2: volta a seguir o celular por padrão (a v1 forçava o claro).
       version: 2,
       migrate: (saved, version) => {

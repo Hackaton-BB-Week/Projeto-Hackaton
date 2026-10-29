@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { syncedStorage } from '@/services/sync';
 import { useGameStore } from './useGameStore';
 
 // Login local (sem auth real, ver docs/MVP.md). Fica salvo no aparelho.
@@ -48,7 +48,7 @@ export const useUserStore = create<UserState>()(
     }),
     {
       name: 'rqr-user',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => syncedStorage),
       partialize: ({ hydrated: _h, ...rest }) => rest,
       onRehydrateStorage: () => (state) => {
         // O gasto semanal também alimenta a economia de moedas.

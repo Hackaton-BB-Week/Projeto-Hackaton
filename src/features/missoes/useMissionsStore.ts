@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { syncedStorage } from '@/services/sync';
 
 // Quais missões já foram concluídas hoje. Salvo no aparelho para que fechar e
 // abrir o app não libere a mesma missão (e as mesmas moedas) duas vezes.
@@ -26,6 +26,6 @@ export const useMissionsStore = create<MissionsState>()(
         return true;
       },
     }),
-    { name: 'rqr-missions', storage: createJSONStorage(() => AsyncStorage) },
+    { name: 'rqr-missions', storage: createJSONStorage(() => syncedStorage) },
   ),
 );
