@@ -25,6 +25,8 @@ type Props = {
   accessibilityLabel?: string;
   accessibilityHint?: string;
   style?: StyleProp<ViewStyle>;
+  /** Troca só a cor do texto e do ícone (ex.: vermelho na recaída). */
+  labelColor?: string;
 };
 
 const RADIUS = 14;
@@ -40,6 +42,7 @@ export function Button({
   accessibilityLabel,
   accessibilityHint,
   style,
+  labelColor,
 }: Props) {
   const { colors, fs } = useTheme();
 
@@ -110,8 +113,8 @@ export function Button({
         </Svg>
       )}
       <View style={styles.row}>
-        {icon && <Feather name={icon} size={small ? 16 : 18} color={look.fg} />}
-        <Text style={[styles.label, { color: look.fg, fontSize: fs(small ? 13 : 15) }]}>
+        {icon && <Feather name={icon} size={small ? 16 : 18} color={labelColor ?? look.fg} />}
+        <Text style={[styles.label, { color: labelColor ?? look.fg, fontSize: fs(small ? 13 : 15) }]}>
           {label}
         </Text>
       </View>

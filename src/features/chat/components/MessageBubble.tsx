@@ -77,7 +77,8 @@ const makeStyles = ({ colors, fs }: Theme) =>
     paddingHorizontal: spacing.md,
     borderRadius: radius.lg,
   },
-  mine: { alignSelf: 'flex-end', backgroundColor: colors.brand, borderBottomRightRadius: 4 },
+  // Azul mais fechado (o dos cartões de destaque): combina com o design e segura o texto branco.
+  mine: { alignSelf: 'flex-end', backgroundColor: colors.feature, borderBottomRightRadius: 4 },
   theirs: { alignSelf: 'flex-start', backgroundColor: colors.bg, borderBottomLeftRadius: 4 },
   text: { fontSize: fs(16), lineHeight: fs(23), color: colors.ink },
   textMine: { color: '#fff' },

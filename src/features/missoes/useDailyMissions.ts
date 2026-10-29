@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppState } from 'react-native';
 import { useGameStore } from '@/store/useGameStore';
+import { usePlantStore } from '@/store/usePlantStore';
 import { showToast } from '@/components/Toast';
 import { dayKey, dayNumber, missionsForDay } from './missions';
 import { useMissionsStore } from './useMissionsStore';
@@ -27,7 +28,13 @@ function useToday() {
 
 /** Missões de hoje, quais já foram feitas e a ação de concluir (credita as moedas). */
 export function useDailyMissions() {
-  const now = useToday();
+  const realNow = useToday();
+  // Dias simulados da demonstração ("Simular +1 dia") também trocam as missões.
+  const dayOffset = usePlantStore((s) => s.dayOffset);
+  const now = useMemo(
+    () => new Date(realNow.getTime() + dayOffset * 86_400_000),
+    [realNow, dayOffset],
+  );
   const today = dayKey(now);
   const day = dayNumber(now);
   const { day: storedDay, done, markDone } = useMissionsStore();
