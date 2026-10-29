@@ -10,8 +10,8 @@ const H = 150;
 const PAD = { top: 10, bottom: 8, left: 4, right: 4 };
 
 /**
- * Linha do saldo: 12 meses passados (contínua) + 12 de projeção (tracejada).
- * A linha fina mostra só o que foi aportado, para ver o rendimento entre as duas.
+ * Saldo estimado de hoje até 12 meses à frente. A linha fina mostra só o que foi
+ * aportado, para ver o rendimento entre as duas.
  */
 export function GrowthChart({ points, color }: { points: SimPoint[]; color: string }) {
   const styles = useThemedStyles(makeStyles);
@@ -23,13 +23,11 @@ export function GrowthChart({ points, color }: { points: SimPoint[]; color: stri
   const n = points.length;
   const x = (i: number) => PAD.left + (i / Math.max(1, n - 1)) * (w - PAD.left - PAD.right);
   const y = (v: number) => PAD.top + (1 - v / max) * (H - PAD.top - PAD.bottom);
-  const path = (list: SimPoint[], key: 'balance' | 'invested', offset = 0) =>
-    list.map((p, i) => `${i ? 'L' : 'M'}${x(i + offset).toFixed(1)},${y(p[key]).toFixed(1)}`).join(' ');
+  const path = (key: 'balance' | 'invested') =>
+    points.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p[key]).toFixed(1)}`).join(' ');
 
-  const todayIdx = points.findIndex((p) => p.projected) - 1;
-  const past = points.slice(0, todayIdx + 1);
-  const future = points.slice(todayIdx); // começa no "hoje" para a linha emendar
-  const today = points[todayIdx];
+  const first = points[0];
+  const last = points[n - 1];
 
   return (
     <View>
@@ -37,38 +35,23 @@ export function GrowthChart({ points, color }: { points: SimPoint[]; color: stri
         <Text style={styles.axis}>{formatBRL(max)}</Text>
       </View>
       <View onLayout={onLayout} style={{ height: H }}>
-        {w > 0 && today && (
+        {w > 0 && first && last && (
           <Svg width={w} height={H}>
             <Line x1={0} x2={w} y1={y(0)} y2={y(0)} stroke={colors.line} strokeWidth={1} />
-            <Line
-              x1={x(todayIdx)}
-              x2={x(todayIdx)}
-              y1={PAD.top}
-              y2={y(0)}
-              stroke={colors.line}
-              strokeDasharray="3 3"
-            />
-            <Path d={path(points, 'invested')} stroke={colors.faint} strokeWidth={1.5} fill="none" />
-            <Path d={path(past, 'balance')} stroke={color} strokeWidth={3} fill="none" />
-            <Path
-              d={path(future, 'balance', todayIdx)}
-              stroke={color}
-              strokeWidth={3}
-              strokeDasharray="6 5"
-              fill="none"
-            />
-            <Circle cx={x(todayIdx)} cy={y(today.balance)} r={5} fill={color} />
+            <Path d={path('invested')} stroke={colors.faint} strokeWidth={1.5} fill="none" />
+            <Path d={path('balance')} stroke={color} strokeWidth={3} fill="none" />
+            <Circle cx={x(0)} cy={y(first.balance)} r={4} fill={color} />
+            <Circle cx={x(n - 1)} cy={y(last.balance)} r={5} fill={color} />
           </Svg>
         )}
       </View>
       <View style={styles.xRow}>
-        <Text style={styles.axis}>{points[0]?.label}</Text>
-        <Text style={[styles.axis, styles.today]}>hoje</Text>
-        <Text style={styles.axis}>{points[n - 1]?.label}</Text>
+        <Text style={[styles.axis, styles.today]}>{first?.label}</Text>
+        <Text style={styles.axis}>{points[Math.floor(n / 2)]?.label}</Text>
+        <Text style={styles.axis}>{last?.label}</Text>
       </View>
       <View style={styles.legend}>
-        <Legend color={color} label="saldo" />
-        <Legend color={color} label="projeção" dashed />
+        <Legend color={color} label="saldo estimado" />
         <Legend color={colors.faint} label="só o aportado" />
       </View>
     </View>

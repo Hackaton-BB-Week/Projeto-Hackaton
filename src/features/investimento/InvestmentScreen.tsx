@@ -38,8 +38,8 @@ export function InvestmentScreen() {
 
       <ScrollView contentContainerStyle={styles.body}>
         <Text style={styles.lead}>
-          E se o que ia para as apostas virasse um aporte todo mês? Veja quanto você teria hoje
-          aplicando nos últimos 12 meses, e uma estimativa para os próximos 12.
+          E se você aplicasse hoje o que já deixou de apostar e, todo mês, colocasse lá o que iria
+          para as apostas? Veja uma estimativa para os próximos 12 meses.
         </Text>
 
         {inv.weeklySpend <= 0 ? (
@@ -53,7 +53,8 @@ export function InvestmentScreen() {
           <>
             <View style={styles.pill}>
               <Text style={styles.pillTxt}>
-                Aporte mensal: <Text style={styles.strong}>{formatBRL(inv.monthly)}</Text>
+                Aplica hoje: <Text style={styles.strong}>{formatBRL(inv.initial)}</Text>
+                {'\n'}Aporte mensal: <Text style={styles.strong}>{formatBRL(inv.monthly)}</Text>
                 {'  '}({formatBRL(inv.weeklySpend)}/semana)
               </Text>
             </View>
@@ -74,7 +75,7 @@ export function InvestmentScreen() {
           {inv.source === 'bcb'
             ? 'Taxas: Banco Central do Brasil (Selic e CDI mensais dos últimos 12 meses). '
             : 'Sem conexão com o Banco Central: usando taxas de referência embutidas. '}
-          A projeção repete a taxa do último mês. Valores brutos, sem imposto de renda nem taxas.
+          A estimativa usa a taxa do último mês para os próximos 12. Valores brutos, sem imposto de renda nem taxas.
           É uma simulação educativa, não uma recomendação nem promessa de rendimento.
         </Text>
       </ScrollView>
@@ -100,31 +101,35 @@ function ProductCard({
         {title}
       </Text>
       <Text style={styles.note}>
-        {index} acumulado em 12 meses: {pct(sim.rate12m)} · projeção a {pct(sim.projectionRate)} ao mês
+        {index} acumulado em 12 meses: {pct(sim.rate12m)} · estimativa a {pct(sim.projectionRate)} ao mês
       </Text>
 
       <View
         accessible
-        accessibilityLabel={`${title}. Hoje você teria ${formatBRL(sim.today)}, tendo aportado ${formatBRL(sim.investedToday)}. Em 12 meses, cerca de ${formatBRL(sim.in12)}.`}
+        accessibilityLabel={`${title}. Aplicando ${formatBRL(sim.initial)} hoje e aportando todo mês, em 12 meses você teria cerca de ${formatBRL(sim.in12)}, tendo aportado ${formatBRL(sim.investedIn12)}.`}
       >
         <GrowthChart points={sim.points} color={color} />
       </View>
 
       <View style={styles.stats}>
-        <Stat label="teria hoje" value={sim.today} sub={`rendeu ${formatBRL(sim.today - sim.investedToday)}`} />
-        <Stat label="em 12 meses (estim.)" value={sim.in12} sub={`rendeu ${formatBRL(sim.in12 - sim.investedIn12)}`} />
+        <Stat label="você aporta em 12 meses" value={sim.investedIn12} />
+        <Stat
+          label="teria em 12 meses (estim.)"
+          value={sim.in12}
+          sub={`rendeu ${formatBRL(sim.in12 - sim.investedIn12)}`}
+        />
       </View>
     </View>
   );
 }
 
-function Stat({ label, value, sub }: { label: string; value: number; sub: string }) {
+function Stat({ label, value, sub }: { label: string; value: number; sub?: string }) {
   const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.stat}>
       <Text style={styles.statVal}>{formatBRL(value)}</Text>
       <Text style={styles.note}>{label}</Text>
-      <Text style={styles.gain}>{sub}</Text>
+      {sub && <Text style={styles.gain}>{sub}</Text>}
     </View>
   );
 }

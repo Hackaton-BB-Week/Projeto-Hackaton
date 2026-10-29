@@ -9,21 +9,20 @@ export interface MonthlyRate {
 }
 
 export interface SimPoint {
-  /** 1..12 = meses passados, 13..24 = projeção. */
+  /** 0 = hoje, 1..12 = meses à frente. */
   index: number;
   label: string;
   balance: number;
   invested: number;
-  projected: boolean;
 }
 
 export interface Simulation {
   points: SimPoint[];
-  /** Saldo hoje, se tivesse aplicado nos últimos 12 meses. */
-  today: number;
-  investedToday: number;
-  /** Saldo estimado daqui a 12 meses (continuando os aportes). */
+  /** Valor aplicado hoje (o que já deixou de ir para apostas). */
+  initial: number;
+  /** Saldo estimado daqui a 12 meses. */
   in12: number;
+  /** Total aportado em 12 meses (inicial + mensais). */
   investedIn12: number;
   /** Rentabilidade acumulada nos últimos 12 meses, em %. */
   rate12m: number;
@@ -57,48 +56,31 @@ export const applyPercent = (rates: MonthlyRate[], percentOfIndex: number) =>
   rates.map((r) => ({ ...r, rate: (r.rate * percentOfIndex) / 100 }));
 
 /**
- * Simula aportes mensais iguais: 12 meses passados com as taxas reais e 12 meses
- * de projeção repetindo a taxa do último mês. Aporte no início de cada mês.
+ * Aplica hoje o valor inicial e soma `monthly` no início de cada um dos próximos
+ * 12 meses, rendendo a taxa do último mês conhecido. As taxas passadas servem só
+ * para a referência de rentabilidade em 12 meses.
  */
-export function simulate(rates: MonthlyRate[], monthly: number): Simulation {
+export function simulate(
+  rates: MonthlyRate[],
+  initial: number,
+  monthly: number,
+  from: Date = new Date(),
+): Simulation {
   const past = [...rates].sort((a, b) => a.month.localeCompare(b.month)).slice(-12);
   const projectionRate = past.length ? past[past.length - 1].rate : 0;
-  const points: SimPoint[] = [];
-  let balance = 0;
-  let invested = 0;
-  let growth = 1;
+  const rate12m = (past.reduce((g, r) => g * (1 + r.rate / 100), 1) - 1) * 100;
+  const start = `${from.getFullYear()}-${String(from.getMonth() + 1).padStart(2, '0')}`;
 
-  past.forEach((r, i) => {
-    invested += monthly;
-    balance = (balance + monthly) * (1 + r.rate / 100);
-    growth *= 1 + r.rate / 100;
-    points.push({ index: i + 1, label: monthLabel(r.month), balance, invested, projected: false });
-  });
-  const today = balance;
-  const investedToday = invested;
-
-  const last = past.length ? past[past.length - 1].month : '2000-01';
+  let balance = initial;
+  let invested = initial;
+  const points: SimPoint[] = [{ index: 0, label: 'hoje', balance, invested }];
   for (let i = 1; i <= 12; i++) {
+    balance = balance * (1 + projectionRate / 100) + monthly;
     invested += monthly;
-    balance = (balance + monthly) * (1 + projectionRate / 100);
-    points.push({
-      index: past.length + i,
-      label: monthLabel(addMonths(last, i)),
-      balance,
-      invested,
-      projected: true,
-    });
+    points.push({ index: i, label: monthLabel(addMonths(start, i)), balance, invested });
   }
 
-  return {
-    points,
-    today,
-    investedToday,
-    in12: balance,
-    investedIn12: invested,
-    rate12m: (growth - 1) * 100,
-    projectionRate,
-  };
+  return { points, initial, in12: balance, investedIn12: invested, rate12m, projectionRate };
 }
 
 /** "01/10/2026" (formato do Banco Central) → "2026-10" */
