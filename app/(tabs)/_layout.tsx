@@ -20,12 +20,27 @@ export default function TabsLayout() {
         tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.line },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Início', tabBarIcon: icon('home') }} />
+      {/* Nome explícito: no Android a aba junta o texto dos filhos e incluía o símbolo do ícone. */}
+      <Tabs.Screen
+        name="index"
+        options={{ title: 'Início', tabBarAccessibilityLabel: 'Início', tabBarIcon: icon('home') }}
+      />
       <Tabs.Screen
         name="chat"
-        options={{ title: 'Conversar', tabBarIcon: icon('message-circle') }}
+        options={{
+          title: 'Conversar',
+          tabBarAccessibilityLabel: 'Conversar',
+          tabBarIcon: icon('message-circle'),
+        }}
       />
-      <Tabs.Screen name="ajuda" options={{ title: 'Ajuda', tabBarIcon: icon('life-buoy') }} />
+      <Tabs.Screen
+        name="ajuda"
+        options={{
+          title: 'Ajuda',
+          tabBarAccessibilityLabel: 'Ajuda',
+          tabBarIcon: icon('life-buoy'),
+        }}
+      />
     </Tabs>
   );
 }
