@@ -99,6 +99,14 @@ export function ChatScreen() {
             maxLength={1500}
             onSubmitEditing={submit}
             blurOnSubmit={false}
+            // No computador (web), Enter envia e Shift+Enter quebra a linha.
+            onKeyPress={(e) => {
+              const ev = e.nativeEvent as { key: string; shiftKey?: boolean };
+              if (Platform.OS === 'web' && ev.key === 'Enter' && !ev.shiftKey) {
+                e.preventDefault();
+                submit();
+              }
+            }}
             accessibilityLabel="Mensagem para o Rô"
           />
           <Pressable
@@ -159,8 +167,8 @@ const makeStyles = ({ colors, fs }: Theme) =>
     paddingHorizontal: spacing.md,
     justifyContent: 'center',
     borderRadius: radius.md,
-    backgroundColor: colors.gold,
+    backgroundColor: colors.success,
   },
   sendOff: { opacity: 0.5 },
-  sendTxt: { color: colors.goldInk, fontWeight: '700', fontSize: fs(15) },
+  sendTxt: { color: '#fff', fontWeight: '700', fontSize: fs(15) },
 });

@@ -47,7 +47,8 @@ export function Button({
   const { colors, fs } = useTheme();
 
   const look = {
-    primary: { bg: colors.gold, fg: colors.goldInk, border: 'transparent' },
+    // Ação principal: verde (antes era o amarelo do protótipo).
+    primary: { bg: colors.success, fg: '#ffffff', border: 'transparent' },
     // Conclusão e acerto (ex.: registrar dia): verde, texto branco.
     success: { bg: colors.success, fg: '#ffffff', border: 'transparent' },
     outline: { bg: colors.surface, fg: colors.ink, border: colors.line },
@@ -59,11 +60,7 @@ export function Button({
   }[variant];
   // Variantes com degradê: [topo, base].
   const gradient =
-    variant === 'primary'
-      ? [colors.gold2, colors.gold]
-      : variant === 'success'
-        ? [colors.success2, colors.success]
-        : null;
+    variant === 'primary' || variant === 'success' ? [colors.success2, colors.success] : null;
   const primary = gradient !== null;
   // Tamanho real do botão (com a borda), para o degradê cobrir tudo, sem sobras.
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
@@ -95,7 +92,7 @@ export function Button({
       ]}
     >
       {primary && size && (
-        // Degradê (amarelo do protótipo ou verde de conclusão). Recua a largura da
+        // Degradê verde das ações principais. Recua a largura da
         // borda para cobrir o botão inteiro, com o mesmo arredondamento.
         <Svg
           width={size.w}

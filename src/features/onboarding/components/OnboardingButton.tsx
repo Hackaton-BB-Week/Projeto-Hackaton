@@ -5,7 +5,7 @@ import { useThemedStyles } from '@/theme/useThemedStyles';
 
 type Variant = 'primary' | 'navy' | 'ghost';
 
-// Botões do onboarding (primary = amarelo, navy = azul escuro, ghost = só texto).
+// Botões do onboarding (primary = verde, navy = azul escuro, ghost = só texto).
 export function OnboardingButton({
   label,
   onPress,
@@ -47,13 +47,13 @@ const makeStyles = ({ colors, fs }: Theme) =>
     alignItems: 'center',
     justifyContent: 'center',
   },
-  primary: { backgroundColor: colors.gold },
+  primary: { backgroundColor: colors.success },
   navy: { backgroundColor: colors.navy },
   ghost: { backgroundColor: 'transparent', paddingVertical: 12 },
   pressed: { opacity: 0.85 },
   disabled: { opacity: 0.5 },
   txt: { fontSize: fs(15), fontWeight: '700' },
-  primaryTxt: { color: colors.goldInk },
+  primaryTxt: { color: '#fff' },
   navyTxt: { color: '#fff' },
   ghostTxt: { color: colors.brand, fontWeight: '600' },
 });

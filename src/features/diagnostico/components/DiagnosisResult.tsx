@@ -72,7 +72,7 @@ export function DiagnosisResult({ result }: Props) {
         variant="outline"
         onPress={() => router.replace(result.action.href)}
       />
-      <Button label="Voltar à vila" onPress={() => router.replace('/(tabs)')} />
+      <Button label="Voltar à vila" variant="success" onPress={() => router.replace('/(tabs)')} />
     </View>
   );
 }

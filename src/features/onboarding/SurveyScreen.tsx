@@ -72,7 +72,6 @@ export function SurveyScreen() {
 
       <View style={styles.foot}>
         <OnboardingButton
-          variant="navy"
           label={isLast ? 'Ver meu ponto de partida' : 'Continuar'}
           onPress={next}
           disabled={selected === undefined}
